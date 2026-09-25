@@ -22,11 +22,11 @@ const GPT = {
   },
   tail: { root: '#1F3B42', mid: '#2C6064', belly: '#467E7E', tuft: '#5DB6A4', tuftLight: '#A9E6D5', line: '#0E2427', ridge: '#15292E' },
 };
-const COAT = {   // worn off the shoulders: the collar rides at the elbows, the body flares to mid-thigh
-  y0: .69, y1: .405, a: [.118, .19], bf: [.07, .12], bb: [.08, .15], open: [1.05, 1.3], lapel: .3, pow: .8, lapelTo: 1,
-  cols: { out: '#2A2A31', outSh: '#1C1C22', lining: '#2D6D6A', inside: '#1F4847', line: '#0E0E12' },
+const COAT = {   // worn dropped off the shoulders: it hangs from the upper arms and flares to mid-thigh
+  y0: .715, y1: .405, a: [.112, .178], bf: [.07, .115], bb: [.08, .14], open: [.95, 1.12], lapel: .34, pow: .9, lapelTo: 1,
+  cols: { out: '#2A2A31', outSh: '#1C1C22', lining: '#2D6D6A', inside: '#26262D', insideDeep: '#1B3B3B', line: '#0E0E12' },
 };
-const GPT_SLEEVE = { w: [.064, .092, .15], start: .62, over: .045, puff: 1.12, col: '#2A2A31', colSh: '#1B1B21', lining: '#2D6D6A', line: '#0E0E12' };
+const GPT_SLEEVE = { w: [.058, .078, .112], start: .55, over: .028, puff: 1.06, col: '#2A2A31', colSh: '#1B1B21', lining: '#2D6D6A', line: '#0E0E12' };
 const GPT_SHIRT_SLEEVE = { w: [.046, .04, .036], start: 0, over: -.01, puff: 1, col: '#F8F4EF', colSh: '#D7D2D6', lining: '#E9E4E6', line: '#7F7984' };
 
 function garter(F, leg, y, col, metal) {
@@ -78,17 +78,20 @@ function drawTail(F, S, pts, phi) {
   outline(spline(body, true, 1), lw(F), T.line, { shade: .5, seed: 91 });
   // fin-tuft: four flame locks from the last third, each lagging a little more (curl from the chain's own bend)
   const tip = C[n - 1], bend = angDiff(Math.atan2(C[n - 1][0] - C[n - 4][0], C[n - 1][1] - C[n - 4][1]), Math.atan2(C[n - 6][0] - C[n - 10][0], C[n - 6][1] - C[n - 10][1]));
-  const tufts = [[.7, 1.05, .9], [.78, 1.25, -.7], [.86, 1.35, .5], [.93, 1.2, -.4]];
+  const tufts = [[.66, 1.0, .9], [.74, 1.25, -.75], [.82, 1.4, .45], [.9, 1.3, -.35], [.97, 1.05, .1]], shapes = [];
   for (const [k0, len, sd] of tufts) {
     const i0 = Math.round(k0 * (n - 1)), p = C[i0], dd = norm2(sub2(C[Math.min(n - 1, i0 + 3)], C[Math.max(0, i0 - 3)])), nn = N[i0];
-    const base = add2(p, mul2(nn, sd * width(k0) * .3)), L2 = h * .07 * len;
-    const a = add2(base, add2(mul2(dd, L2 * .45), mul2(nn, sd * L2 * .28 + bend * L2 * .2)));
-    const b = add2(base, add2(mul2(dd, L2), mul2(nn, sd * L2 * .15 + bend * L2 * .45)));
-    const lock = lockPts([base, a, b], width(k0) * 1.3, 0, .45);
-    const gg = X.createLinearGradient(base[0], base[1], b[0], b[1]); gg.addColorStop(0, T.tuft); gg.addColorStop(1, T.tuftLight);
-    X.fillStyle = gg; pathOf(spline(lock, true, 2)); X.fill();
-    outline(spline(lock, true, 2), lw(F, .7), T.line, { shade: .3 });
+    const base = add2(p, mul2(nn, sd * width(k0) * .2)), L2 = h * .075 * len;
+    const a = add2(base, add2(mul2(dd, L2 * .45), mul2(nn, sd * L2 * .22 + bend * L2 * .2)));
+    const b = add2(base, add2(mul2(dd, L2), mul2(nn, sd * L2 * .12 + bend * L2 * .45)));
+    shapes.push({ S: spline(lockPts([add2(base, mul2(dd, -L2 * .25)), base, a, b], width(k0) * 1.5, 0, .5, 0, .15), true, 2), base, b });
   }
+  for (const t of shapes) outline(t.S, lw(F, .75) * 2, T.line, { shade: .3 });          // outline pass (outer contour survives)
+  for (const t of shapes) {                                                              // fill pass covers the inner lines
+    const gg = X.createLinearGradient(t.base[0], t.base[1], t.b[0], t.b[1]); gg.addColorStop(0, T.tuft); gg.addColorStop(1, T.tuftLight);
+    X.fillStyle = gg; pathOf(t.S); X.fill();
+  }
+  for (const t of shapes.slice(1, -1)) line([lerp2(t.base, t.b, .25), lerp2(t.base, t.b, .8)], lw(F, .45), hexA(T.line, .5), { taper: [.4, .6], shade: 0 });
 }
 
 // ---------- horns ----------
@@ -219,4 +222,26 @@ function gptTie(F, S, P) {
 function poseDefaults(P = {}) {
   return { yawH: 0, yawC: 0, yawP: 0, lean: 0, tilt: 0, bob: 0, gazeX: 0, gazeY: 0, ...P,
     yawC: P.yawC ?? P.yawP ?? P.yawH ?? 0, yawP: P.yawP ?? P.yawC ?? P.yawH ?? 0, yawH: P.yawH ?? P.yawC ?? 0 };
+}
+
+// ---------- the approved head, as two passes for the layered art ----------
+// headBack: hair clumps behind the head and shoulders. headFront: horns, dome, face, fringe, clip, brows.
+function gptHeadBack(F, P, D = {}) {
+  const phiH = P.yawH * TU, hc = GPT.hair;
+  const hp = { base: hc.base, shade: hc.shade, sheen: hc.sheen, line: hc.line, inner: hc.inner, innerSh: hc.innerLine, innerLine: hc.innerLine, innerSheen: '#5FA7A0' };
+  if (Math.cos(phiH) >= 0) drawClumps(F, phiH, GPT_HAIR, hp, 'back', null, D.hairSway);
+}
+function gptHeadFront(F, P, D = {}) {
+  const S = GPT, phiH = P.yawH * TU, hc = S.hair, h = F.h;
+  const hp = { base: hc.base, shade: hc.shade, sheen: hc.sheen, line: hc.line, inner: hc.inner, innerSh: hc.innerLine, innerLine: hc.innerLine, innerSheen: '#5FA7A0' };
+  const farHorn = Math.sin(phiH) >= 0 ? 1 : -1, dome = domePts(F, phiH, .62, .07, .1);
+  if (Math.abs(Math.sin(phiH)) > .15) drawHorn(F, S, phiH, farHorn);
+  hairMass(F, dome, hc, { seed: 5 });
+  drawFace(F, S, P);
+  if (Math.abs(Math.sin(phiH)) <= .15) drawHorn(F, S, phiH, farHorn);
+  drawHorn(F, S, phiH, -farHorn);
+  drawClumps(F, phiH, GPT_HAIR, hp, 'front', dome, D.hairSway);
+  const q = projH(F, phiH, scalp(.72, .3, .09)), fc = Math.cos(.72 + phiH);
+  if (fc > .15) { const r = PROP.head * h * .085 * Math.max(.5, fc); for (const a of [.75, -.75]) line([add2(q, rot2([-r, 0], a + F.lean + F.tilt)), add2(q, rot2([r, 0], a + F.lean + F.tilt))], PROP.head * h * .032, '#3E9C93', { taper: [.05, .05], min: .8, shade: 0 }); }
+  drawBrows(F, S, P, phiH);
 }

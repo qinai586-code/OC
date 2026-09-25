@@ -22,6 +22,10 @@ function drawGarmentBack(F, P, G) {
   const hem = []; for (let i = 0; i <= 12; i++) { const th = -Math.PI / 2 - phi + Math.PI + Math.PI * i / 12; hem.push(garmentAt(F, P, G, 1, th, phi)); }
   const C = spline(L.concat(hem.reverse().slice(1, -1)).concat(R.reverse()), true, 3);
   fillPts(C, G.cols.inside);
+  if (G.cols.insideDeep) clipTo(C, () => {   // the far inside of the back panel, seen through the opening, is darker
+    const m = F.raw(0, lerp(G.y0, G.y1, .6)), w = (R[4][0] - L[4][0]) * .28;
+    fillPts(ellipsePts(m[0], m[1] + F.h * .06, w, F.h * .2, 20), G.cols.insideDeep, .8);
+  });
   outline(C, lw(F), G.cols.line, { shade: .4, seed: 51 });
 }
 function drawGarmentFront(F, P, G) {
