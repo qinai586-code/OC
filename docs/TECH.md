@@ -113,3 +113,20 @@ drawClaude (x, groundY, h, pose, dyn)
 | Plates | about 37 shots × about 4 layers × up to 3 boil variants. Many layers are reused, since there is one rooftop set and one town. Roughly 1–3 h, one-time and cached. |
 | Frames | 7,488 at 60 fps × about 0.1–0.3 s (composite + encode) ≈ 15–40 min with 4 workers |
 | Output | 1920×1080, 60 fps, H.264 CRF 17, muxed with the song once it exists (the film is locked to the beat map in SONG.md, so picture can be built before the audio arrives) |
+
+## 7. Production ordering (revised)
+
+1. **The song audio is locked first.** The 150 BPM / 78-bar beat map in SONG.md is the working target only.
+2. **Picture timing is reconciled against the produced WAV**, not only the theoretical grid:
+   - beat and onset tracking plus a manual cue sheet produce a tempo map
+   - `bar(b, beat)` reads that map
+   - every storyboard hit is re-checked against it
+3. Full animation timing is frozen only after that reconciliation. Until then, pilots use a temporary 150 BPM click track.
+
+## 8. Character art pipeline (revised after the art gates)
+
+- **Visual authority:** the supplied model sheets in `reference/` (sheet_chatgpt.webp, sheet_claude_b.webp).
+- **Hard rule: no puppet animation.** Bone rotation of cutouts is not an acceptable way to make large or expressive actions.
+- **Required method:** authored key pose → deformed in-between → secondary motion. The engine morphs between layered key drawings with matching landmarks, then adds chain-driven secondary motion (`solveChain`) to the hair, tail and sleeves.
+- **What is still needed:** the key-pose drawings themselves. These must come from ChatGPT or an artist; they cannot be derived from the standing model views.
+- **`tools/cut_assets.py`** demonstrates the layer split and hidden-area back-fill on the approved side views. It is kept for layer conventions, not as a pose source.

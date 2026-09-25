@@ -159,6 +159,8 @@ level   1    3  |  5     3   |  6→7  |   8   |   7   |  6     4    |  7→8  |
 
 ## Beat map: the synchronisation contract between the song and the film
 
+**Revised ordering:** this grid is the working target. Final picture timing is reconciled against the actual produced WAV (a tempo map from beat tracking plus a cue sheet) before animation timing is frozen. See TECH.md §7.
+
 Frames are at 60 fps (1 beat = 24 frames, 1 bar = 96 frames). A time written **b.x** means bar b, beat x.
 
 | Time | Bar.beat | Frame | Musical event | On screen |
