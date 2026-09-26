@@ -4,3 +4,5 @@ audio/
 *.mp3
 *.wav
 cache/
+__pycache__/
+*.pyc

@@ -29,8 +29,9 @@ def rgba(c, a=255):
 class Canvas:
     """An RGBA drawing surface. `im` is a PIL image, `a` lazily a numpy view."""
 
-    def __init__(self, w, h, fill=None):
+    def __init__(self, w, h, fill=None, ox=0, oy=0):
         self.w, self.h = w, h
+        self.ox, self.oy = ox, oy      # drawing origin: all primitives are offset by (ox, oy)
         self.im = Image.new('RGBA', (w, h), rgba(fill) if fill is not None else (0, 0, 0, 0))
         self.d = ImageDraw.Draw(self.im)
 
@@ -50,37 +51,50 @@ class Canvas:
 
     # primitives (PIL draws without anti-aliasing)
     def px(self, x, y, c):
+        x, y = int(round(x + self.ox)), int(round(y + self.oy))
         if 0 <= x < self.w and 0 <= y < self.h:
-            self.im.putpixel((int(x), int(y)), rgba(c))
+            self.im.putpixel((x, y), rgba(c))
+
+    def fill(self, c):
+        self.d.rectangle([0, 0, self.w, self.h], fill=rgba(c))
 
     def rect(self, x, y, w, h, c):
+        x, y, w, h = int(round(x)), int(round(y)), int(round(w)), int(round(h))
         if w <= 0 or h <= 0:
             return
-        self.d.rectangle([int(x), int(y), int(x + w - 1), int(y + h - 1)], fill=rgba(c))
+        x += self.ox
+        y += self.oy
+        self.d.rectangle([x, y, x + w - 1, y + h - 1], fill=rgba(c))
+
+    def frame(self, x, y, w, h, c):
+        self.rect(x, y, w, 1, c); self.rect(x, y + h - 1, w, 1, c)
+        self.rect(x, y, 1, h, c); self.rect(x + w - 1, y, 1, h, c)
 
     def poly(self, pts, c):
-        self.d.polygon([(round(x), round(y)) for x, y in pts], fill=rgba(c))
+        self.d.polygon([(round(x + self.ox), round(y + self.oy)) for x, y in pts], fill=rgba(c))
 
     def line(self, x0, y0, x1, y1, c, width=1):
-        self.d.line([(round(x0), round(y0)), (round(x1), round(y1))], fill=rgba(c), width=width)
+        self.d.line([(round(x0 + self.ox), round(y0 + self.oy)), (round(x1 + self.ox), round(y1 + self.oy))], fill=rgba(c), width=width)
 
     def lines(self, pts, c, width=1):
-        self.d.line([(round(x), round(y)) for x, y in pts], fill=rgba(c), width=width)
+        self.d.line([(round(x + self.ox), round(y + self.oy)) for x, y in pts], fill=rgba(c), width=width)
 
     def ellipse(self, x0, y0, x1, y1, c):
-        self.d.ellipse([round(x0), round(y0), round(x1), round(y1)], fill=rgba(c))
+        self.d.ellipse([round(x0 + self.ox), round(y0 + self.oy), round(x1 + self.ox), round(y1 + self.oy)], fill=rgba(c))
 
     def circle(self, cx, cy, r, c):
         if r < 0.5:
-            self.px(round(cx), round(cy), c)
+            self.px(cx, cy, c)
             return
+        cx, cy = cx + self.ox, cy + self.oy
         self.d.ellipse([round(cx - r), round(cy - r), round(cx + r), round(cy + r)], fill=rgba(c))
 
     def ring(self, cx, cy, r, c, width=1):
+        cx, cy = cx + self.ox, cy + self.oy
         self.d.ellipse([round(cx - r), round(cy - r), round(cx + r), round(cy + r)], outline=rgba(c), width=width)
 
     def blit(self, spr, x, y, flip=False):
-        """Paste a Sprite (or RGBA array) with its anchor at (x, y)."""
+        """Paste a Sprite (anchor at (x, y)) or an RGBA array (top-left at (x, y))."""
         if isinstance(spr, Sprite):
             a = spr.arr[:, ::-1] if flip else spr.arr
             ax = (spr.arr.shape[1] - 1 - spr.ax) if flip else spr.ax
@@ -88,11 +102,22 @@ class Canvas:
         else:
             a = spr[:, ::-1] if flip else spr
             x, y = int(round(x)), int(round(y))
-        paste(self, a, x, y)
+        paste(self, a, x + self.ox, y + self.oy)
 
     def text(self, s, x, y, c, font='5', shadow=None, align='left'):
         from .font import draw_text
         draw_text(self, s, x, y, c, font=font, shadow=shadow, align=align)
+
+    def mask_fill(self, m, c, x=0, y=0):
+        """Colour the True pixels of boolean mask m, top-left at (x, y)."""
+        a = np.array(self.im)
+        x, y = int(round(x + self.ox)), int(round(y + self.oy))
+        h, w = m.shape
+        x0, y0, x1, y1 = max(0, x), max(0, y), min(self.w, x + w), min(self.h, y + h)
+        if x1 > x0 and y1 > y0:
+            sub = m[y0 - y:y1 - y, x0 - x:x1 - x]
+            a[y0:y1, x0:x1][sub] = rgba(c)
+            self.set_arr(a)
 
 
 def paste(canvas, a, x, y):

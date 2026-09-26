@@ -176,6 +176,6 @@ def word_time(line_text_prefix, word):
     for s, e, txt, words in LYRICS:
         if txt.startswith(line_text_prefix):
             for w, wt in words:
-                if w.strip(',.?!"\'').lower() == word.lower():
+                if w.strip(',.?!"\'').lower() == word.strip(',.?!"\'').lower():
                     return wt
     raise KeyError((line_text_prefix, word))

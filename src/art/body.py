@@ -308,7 +308,15 @@ def draw_claude(p):
     # --- skirt
     sw = p['skirt']
     wy = -38 + b
-    if v in ('F', 'B'):
+    hem = -27
+    if p.get('sit') and v in ('Q', 'P'):
+        kx = max(p['leg_n'][1][0], p['leg_f'][1][0])
+        sk = [(-5 + lean, wy), (4 + lean, wy), (kx - 2, -37), (kx - 1, -32), (-6, -31)]
+        hem = -31
+    elif p.get('sit'):
+        sk = [(-6 + lean, wy), (6 + lean, wy), (8 + sw, -30), (-8 + sw, -30)]
+        hem = -30
+    elif v in ('F', 'B'):
         sk = [(-6 + lean, wy), (6 + lean, wy), (9 + sw, -27), (-9 + sw, -27)]
     elif v == 'Q':
         sk = [(-5 + lean, wy), (6 + lean, wy), (9 + sw, -27), (-8 + sw, -27)]
@@ -317,6 +325,8 @@ def draw_claude(p):
     ms = poly_mask(sk)
     P.part(ms, C['p'], line=C['q'], light=C['P'])
     for k in range(-2, 3):
+        if p.get('sit'):
+            break
         x0 = lerp(sk[0][0], sk[1][0], (k + 2.5) / 5)
         x1 = lerp(sk[3][0], sk[2][0], (k + 2.5) / 5)
         for yy in range(round(wy) + 3, -27):
@@ -469,7 +479,12 @@ def draw_gpt(p):
     # --- skirt
     sw = p['skirt']
     wy = -38 + b
-    if v in ('F', 'B'):
+    if p.get('sit') and v in ('Q', 'P'):
+        kx = max(p['leg_n'][1][0], p['leg_f'][1][0])
+        sk = [(-5 + lean, wy), (4 + lean, wy), (kx - 2, -37), (kx - 1, -32), (-6, -31)]
+    elif p.get('sit'):
+        sk = [(-6 + lean, wy), (6 + lean, wy), (8 + sw, -30), (-8 + sw, -30)]
+    elif v in ('F', 'B'):
         sk = [(-6 + lean, wy), (6 + lean, wy), (9 + sw, -28), (-9 + sw, -28)]
     elif v == 'Q':
         sk = [(-5 + lean, wy), (6 + lean, wy), (9 + sw, -28), (-8 + sw, -28)]
@@ -478,6 +493,8 @@ def draw_gpt(p):
     ms = poly_mask(sk)
     P.part(ms, G['p'], line=G['o'], light=G['P'])
     for k in range(-2, 3):
+        if p.get('sit'):
+            break
         x0 = lerp(sk[0][0], sk[1][0], (k + 2.5) / 5)
         x1 = lerp(sk[3][0], sk[2][0], (k + 2.5) / 5)
         for yy in range(round(wy) + 3, -28):
@@ -503,16 +520,17 @@ def draw_gpt(p):
     # --- coat (open, off-shoulder, long)
     cy0 = ty + 2
     cf = p['coat']
+    hem_dy = 8 if p.get('sit') else 0
     if v in ('F', 'B'):
-        panels = [[(-9 + lean, cy0), (-3 + lean, cy0 - 1), (-4 + lean, -34), (-5 + cf, -21), (-12 + cf, -19), (-11 + lean, cy0 + 8)],
-                  [(9 + lean, cy0), (3 + lean, cy0 - 1), (4 + lean, -34), (5 + cf, -21), (12 + cf, -19), (11 + lean, cy0 + 8)]]
+        panels = [[(-9 + lean, cy0), (-3 + lean, cy0 - 1), (-4 + lean, -34), (-5 + cf, -21 - hem_dy), (-12 + cf, -19 - hem_dy), (-11 + lean, cy0 + 8)],
+                  [(9 + lean, cy0), (3 + lean, cy0 - 1), (4 + lean, -34), (5 + cf, -21 - hem_dy), (12 + cf, -19 - hem_dy), (11 + lean, cy0 + 8)]]
         if back:
             panels = [[(-9 + lean, cy0), (9 + lean, cy0), (11 + lean, cy0 + 8), (12 + cf, -18), (-12 + cf, -18), (-11 + lean, cy0 + 8)]]
     elif v == 'Q':
-        panels = [[(-8 + lean, cy0), (-1 + lean, cy0 - 1), (-1 + lean, -34), (-2 + cf, -21), (-11 + cf, -19), (-10 + lean, cy0 + 8)],
-                  [(7 + lean, cy0), (4 + lean, cy0 - 1), (5 + lean, -34), (6 + cf, -22), (9 + cf, -21), (8 + lean, cy0 + 8)]]
+        panels = [[(-8 + lean, cy0), (-1 + lean, cy0 - 1), (-1 + lean, -34), (-2 + cf, -21 - hem_dy), (-11 + cf, -19 - hem_dy), (-10 + lean, cy0 + 8)],
+                  [(7 + lean, cy0), (4 + lean, cy0 - 1), (5 + lean, -34), (6 + cf, -22 - hem_dy), (9 + cf, -21 - hem_dy), (8 + lean, cy0 + 8)]]
     else:
-        panels = [[(-5 + lean, cy0 - 1), (3 + lean, cy0 - 1), (4 + lean, -34), (4 + cf, -22), (-9 + cf, -19), (-7 + lean, cy0 + 8)]]
+        panels = [[(-5 + lean, cy0 - 1), (3 + lean, cy0 - 1), (4 + lean, -34), (4 + cf, -22 - hem_dy), (-9 + cf, -19 - hem_dy), (-7 + lean, cy0 + 8)]]
     for pp in panels:
         mc = poly_mask(pp)
         P.part(mc, G['c'], line=G['o'], light=G['C'])
