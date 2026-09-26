@@ -8,7 +8,7 @@ The audio file is the timing master; nothing was stretched or re-timed. All numb
 * **Beat grid**: kick-drum onsets (low-band spectral flux) fitted to **131.98 BPM, phase 0.238 s** (213 of 224
   kicks within 30 ms). Bar m starts at `0.238 + 1.81846 m`; bar 1 = 2.056 s is the first sung word.
 * **Sections** (RMS / low-band energy): intro pickup 0.24-2.06 · verse 1 · chorus 1 22.8 · break 35.8 ·
-  verse 2 38.6 · chorus 2 59.1 · energy drop 88.0 · half-energy chorus 3 95.3 · rap 110.1 · chorus 4 124.5 ·
+  verse 2 38.6 · chorus 2 59.1 · energy drop 89.34 (bar 49; "Ga-" sung from 89.40) · half-energy chorus 3 95.3 · rap 110.1 · chorus 4 124.5 ·
   **band stop 138.44** (a cappella "all ... for") · **slam 140.26** on "show?" · outro vocalise 141.1-152.3 ·
   decay from bar 84 = 152.99 · **audible hard stop 154.75** · silence to 156.65.
 

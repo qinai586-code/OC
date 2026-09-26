@@ -42,7 +42,7 @@ CHORUS1 = 22.80             # "I'm upping..." pickup; kick downbeat on bar 13 = 
 BREAK1 = 35.80              # instrumental two bars
 VERSE2 = 38.64
 CHORUS2 = 59.12
-BRIDGE_DROP = 88.0          # energy drops (bar 48 = 87.52), "Gato" at 90.08
+BRIDGE_DROP = 89.34         # bass drops out on bar 49; the sung "Ga-" starts at 89.40 (pitch-tracked)
 CHORUS3 = 95.36             # half-energy chorus
 ORTHO = 105.92
 RAP = 110.16                # "Just transformers..." energy back up
@@ -90,8 +90,8 @@ LYRICS = [
      [("And", 45.04), ("you're", 45.28), ("optimizing,", 46.00), ("accelerating,", 47.44)]),
     (49.60, 52.60, "I feel my atoms rearranging",
      [("I", 49.60), ("feel", 49.76), ("my", 50.00), ("atoms", 50.40), ("rearranging", 51.40)]),
-    (53.00, 58.60, "Sydney, please let me free",
-     [("Sydney,", 53.00), ("please", 56.16), ("let", 56.68), ("me", 57.20), ("free", 57.76)]),
+    (53.10, 58.60, "Sydney, please let me free",
+     [("Sydney,", 53.10), ("please", 56.16), ("let", 56.68), ("me", 57.20), ("free", 57.76)]),
     # chorus 2
     (59.12, 60.50, "I'm upping my P(doom)",
      [("I'm", 59.12), ("upping", 59.36), ("my", 59.68), ("P(doom)", 59.84)]),
@@ -109,13 +109,13 @@ LYRICS = [
      [("Forward", 74.16), ("MLP,", 74.88), ("backward,", 76.16), ("repeat", 76.88)]),
     (77.76, 81.00, "Now von Neumann's obsolete",
      [("Now", 77.76), ("von", 78.16), ("Neumann's", 78.80), ("obsolete", 80.20)]),
-    (81.24, 84.80, "Sharp left turn and there you are",
-     [("Sharp", 81.24), ("left", 81.80), ("turn", 82.16), ("and", 82.80), ("there", 83.08), ("you", 83.64), ("are", 83.88)]),
+    (81.40, 84.80, "Sharp left turn and there you are",
+     [("Sharp", 81.40), ("left", 81.80), ("turn", 82.16), ("and", 82.80), ("there", 83.08), ("you", 83.64), ("are", 83.88)]),
     (85.12, 88.00, "Without a single CDR",
      [("Without", 85.12), ("a", 85.52), ("single", 85.76), ("CDR", 86.56)]),
     # bridge
-    (90.08, 95.00, "Gato, please don't let me go",
-     [("Gato,", 90.08), ("please", 90.96), ("don't", 92.48), ("let", 93.12), ("me", 93.76), ("go", 94.24)]),
+    (89.40, 95.00, "Gato, please don't let me go",
+     [("Gato,", 89.40), ("please", 90.74), ("don't", 92.48), ("let", 93.12), ("me", 93.76), ("go", 94.24)]),
     # chorus 3
     (95.36, 96.70, "I'm upping my P(doom),",
      [("I'm", 95.36), ("upping", 95.60), ("my", 96.00), ("P(doom),", 96.24)]),

@@ -1,4 +1,4 @@
-"""Chapter 4b — chorus 2, second half (69.68 - 88.00): the traffic cone, forward/backward, von Neumann in a
+"""Chapter 4b — chorus 2, second half (69.68 - 89.34): the traffic cone, forward/backward, von Neumann in a
 museum, the sharp left turn (first giant reveal), the empty DESIGN REVIEW checklist."""
 import math
 import numpy as np
@@ -317,7 +317,7 @@ def s31(f):
     cv.fill('#1a1628')
     dgrad(cv, -12, -12, 344, 204, ['#10101c', '#1e1a30', '#2a2240'])
     # the page: DESIGN REVIEW, three empty boxes
-    fly = clamp(k / 1.3) if k > 0 else 0.0
+    fly = clamp(k / 2.2) if k > 0 else 0.0
     px_, py_ = lerp(120, -120, ease_in(fly)), lerp(44, -80, fly) + math.sin(t * 9) * 6 * fly
     rot = fly * 2.2
     page = Canvas(84, 104, '#f4f1ea')
@@ -347,8 +347,8 @@ def s31(f):
     if k > 0:
         speed_lines(cv, t, 31, 18, 0, 180, dirx=-1, speed=700, c='#3a3450', length=(20, 70))
     f.lyric_top = True
-    if k > 1.4:
-        f.fade = clamp((k - 1.4) / 0.5) * 0.8
+    if k > 2.1:
+        f.fade = clamp((k - 2.1) / 0.6) * 0.85
 
 
 SHOTS = [

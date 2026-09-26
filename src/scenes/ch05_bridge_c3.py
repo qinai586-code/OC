@@ -1,4 +1,4 @@
-"""Chapter 5 — bridge + chorus 3 (88.00 - 110.14): the cat on the cliff, the fall past knob #3, the kid's room
+"""Chapter 5 — bridge + chorus 3 (89.34 - 110.14): the cat on the cliff, the fall past knob #3, the kid's room
 filling with paperclips, the empty kill-switch office, the flooded town, the FOOM fuse, the orthogonality
 blues, and the push into ChatGPT's eye that carries us into the rap."""
 import math
@@ -295,7 +295,8 @@ def s32(f):
     t_me, t_go = wt('Gato', 'me'), wt('Gato', 'go')
     t_fall = t_go + 0.16                           # the overhead fall shot
     swing = f.step(5) % 4
-    if t < t_gato - 0.02:
+    t_est = t_gato + 0.6                          # wide holds the sung "Ga-"; cut in on "-to"
+    if t < t_est:
         # ---------------------------------------------------------- WIDE: the dangling, the wind
         put_layer(cv, s32_wide_bg())
         wind(cv, t, 3201, 14, 10, 150, speed=220)
@@ -308,7 +309,7 @@ def s32(f):
         hp = hang_pose(swing, eyes='worried', mouth='none', hair=-2)
         gx, gy = 173, 74
         cv.blit(render('claude', hp), gx + HANG_HAND[0] + [0, 1, 0, -1][swing] * 0, gy - HANG_HAND[1], flip=True)
-        k = ease_io(f.lt / (t_gato - f.shot.start))
+        k = ease_io(f.lt / (t_est - f.shot.start))
         f.cam['zoom'] = 1.0 + 0.10 * k
         f.cam['x'], f.cam['y'] = lerp(160, 172, k), lerp(90, 98, k)
         return
@@ -727,7 +728,7 @@ def s39(f):
 
 
 SHOTS = [
-    Shot('32_gato', 88.00, 0, s32),
+    Shot('32_gato', song.BRIDGE_DROP, 0, s32),
     Shot('33_knob3', 95.34, 0, s33),
     Shot('34_paperclips', 96.78, 0, s34),
     Shot('35_killswitch', 98.70, 0, s35),

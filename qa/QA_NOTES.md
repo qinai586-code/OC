@@ -49,3 +49,16 @@ between FOOM and the Chinese room.
 * 51 "We'll never know": the band keeps playing hard, so after the keyhole goes dark on "know" the pull-back moves in
   steps on the beats and stars land on the drums; a light beat punch is back for 132-137.5.
 * 54 the searching spotlight jumps to a new block of seats every two beats; 56 the waves alternate on half-beats.
+
+## Revision 4 (lyric-sync audit)
+
+Every line's first word was re-checked with tight ASR windows (each line cropped from the previous line's end) and
+a pYIN pitch track of the sung melody. Corrections:
+* **"Gato"** was 0.68 s late: the first pass had mistaken the second syllable ("-to", 90.05) for the start. Pitch
+  tracking shows the sung "Ga-" starting at **89.40**; "please" 90.74 confirmed.
+* The bridge drop is **89.34 (bar 49)**, where the bass cuts out, not 88.0. The Gato shot now cuts in on the drop,
+  and its wide shot holds the sung "Ga-". The DESIGN REVIEW page flutters away across the extra loud bars, and the
+  beat punch runs until the drop.
+* "Sharp" moved from 81.24 to 81.40; "Sydney" from 53.00 to 53.10.
+* All other lines are within about ±0.1 s of the voice. The sounds at 104.8-105.7 are wordless "ooh" ad-libs and
+  have no subtitle; "Orthogonality" at 105.92 is confirmed.
