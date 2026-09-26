@@ -116,6 +116,30 @@ Times are clip seconds. The exact values for every channel are in `motion.json`.
 | **12** (21.38) 選んでいく | She lifts her hands overhead and **the colours release into the sky**, washing the upper frame. The camera tilts up 10° with her gaze. On beat 3 she looks back down to the viewer. On beat 4, a closed-eye smile. | Awe: mouth .35, pupils 1.2. |
 | **end** (23.29–27.36) | The final chord strikes. Her eyes open to the camera. At 24.26, a **slow blink**: 12 f to close, a 10 f hold, 14 f to open. At 25.2, a small head tilt to the other side and a last ear flick. Breathing continues, and the picture fades back to paper over the last 0.5 s. | The tail settles into a soft question-mark curl. Petals of colour drift down. |
 
+## 5a. Current render: motion comic, expressions only
+
+The user's direction: no body motion. The character art stays perfectly still. Only her **expressions** animate:
+- gaze
+- blinks and the slow blink
+- ^^ and > < eyes
+- sparkly eyes
+- mouth
+- blush
+
+The energy comes from the edit and comic effects:
+- **One panel per lyric beat** (13 panels), with a paper gutter and an ink frame.
+- **Comic transitions on the beat:** panel slide, ink wipe, halftone dissolve, iris, a white flash into the chorus, a soft dissolve into the tender bar, and a hard punch-cut into the boop.
+- **Manga marks timed to the lyrics:**
+  - a sweat drop (「正解じゃなくていい」)
+  - "…" (「まだいらない」)
+  - "!" and then "!!" with focus lines as the drop hits her nose
+  - speed lines for 「走っていく」
+  - "?" and "!" for the bead that pops on her ear
+  - blush hatching and > < eyes for the pink boop
+  - hearts for eye contact and the final slow blink
+
+The sections below describe the earlier deformation approach, which is still in `render_yohaku.py` behind `STATIC = False`.
+
 ## 5b. The rendered version: acting from one design sheet
 
 There is only one drawing of her, a front view. So the render keeps every beat and emotion above, but plays the big full-body moves in place:

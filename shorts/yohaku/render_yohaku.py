@@ -90,6 +90,7 @@ K = {
              ('5:4',3,'back'),('7:3-4',2,'io'),('7:3+2',26,'o'),('7:3+12',6,'io'),('7:4',3,'io'),('8:3',15,'o'),('8:3+8',4,'io'),('8:4',15,'o'),
              ('8:4+8',3,'io'),('10:2',-2,'io'),('10:3',2,'io'),('11:3',5,'io'),('12:1',22,'o'),('12:3',5,'io'),('13:1',2,'io')],
  'knead':   [('0',1,'io'),('3:2',0,'io')],
+ 'squeeze': [('0',0,'io'),('10:1+14',0,'io'),('10:2',1,'o'),('10:3',1,'io'),('10:3+8',0,'io')],
  'liftL':   [('0',0,'io'),('1:2',14,'o'),('1:2+8',0,'i'),('1:3',10,'o'),('1:3+8',0,'i')],
  'camH':    [('0',.84,'io'),('2:1',.92,'io'),('3:1',1.08,'io'),('4:1',1.28,'io'),('4:4',1.33,'io'),('5:1',.74,'cut'),('6:1',.76,'io'),
              ('7:2',.9,'io'),('8:4',.95,'io'),('9:1',1.08,'io'),('10:1',1.16,'io'),('11:1',1.24,'io'),('11:4',1.27,'io'),('12:1',1.02,'io'),
@@ -332,7 +333,13 @@ def edit_face(src, R, s):
         out = patch.copy()
         out[..., :3] = out[..., :3] * (1 - skin_a[..., None]) + fill * skin_a[..., None]
         # drawn lid line once the eye is nearly shut: calm = soft U, happy = arch
-        lc = smoothstep(.62, .95, c)
+        lc = smoothstep(.62, .95, c) * (float(s['squeeze']) < .5)
+        if float(s['squeeze']) >= .5:                                   # manga > < eyes
+            m8 = np.zeros(X.shape, np.uint8); k = -E['side']
+            pts = [(-.5 * a * k, -.55 * b), (.45 * a * k, 0), (-.5 * a * k, .55 * b)]
+            pp = np.int32([[(cx + uu * cth - vv * sth - x0) * 16, (cy + uu * sth + vv * cth - y0) * 16] for uu, vv in pts])
+            cv2.polylines(m8, [pp], False, 255, 4, cv2.LINE_AA, 4); la = (m8 / 255.)[..., None] * mask[..., None]
+            out[..., :3] = out[..., :3] * (1 - la) + np.array([.27, .23, .33]) * la
         if lc > 0:
             curv = (1 - es) * 3.5 - es * 7
             vline = vl + curv * (1 - (u / a) ** 2) - (1 - c) * 0
@@ -445,10 +452,10 @@ class Scene:
         self.g_tl = np.clip(1 - np.hypot(xx / W, yy / H) / 1.15, 0, 1)[..., None].astype(np.float32) ** 1.6       # light from the top-left
         self.g_br = np.clip(1 - np.hypot((W - xx) / W, (H - yy) / H) / 1.2, 0, 1)[..., None].astype(np.float32) ** 1.4  # cool tint at the bottom-right
         self.g_v = (yy / H)[..., None].astype(np.float32)
-        tb = T('5:1+16')
+        tb = T('5:1')
         self.bloom = [(tb + .08 * i, 510 + dx, 1495 + dy, R, PASTEL[i % 5], i % 4, r.uniform(0, 360)) for i, (dx, dy, R) in enumerate(
             [(0, 0, 1500), (-420, -500, 1300), (430, -620, 1350), (-200, -1250, 1500), (300, -1500, 1450), (0, -800, 1700), (-600, 200, 900), (650, 150, 950)])]
-        self.steps = [(T(f'{6 + int(n * .5 // 4)}:{(n * .5) % 4 + 1:g}'), -40 if n % 2 == 0 else 40, PASTEL[n % 5], r.uniform(0, 360)) for n in range(10)]
+        self.steps = [] and [(T(f'{6 + int(n * .5 // 4)}:{(n * .5) % 4 + 1:g}'), -40 if n % 2 == 0 else 40, PASTEL[n % 5], r.uniform(0, 360)) for n in range(10)]
         self.float_beads = [(x, y, PASTEL[i % 5], d, r.uniform(0, 6.28), blur) for i, (x, y, d, blur) in enumerate(
             [(200, 380, 46, 0), (840, 250, 38, 0), (170, 820, 40, 0), (880, 1020, 44, 0), (120, 130, 110, 3.5), (930, 620, 90, 3), (300, 1180, 34, 0)])]
         self.sparks = [(r.uniform(0, 6.28), r.uniform(.6, 1.4), r.uniform(0, 1), PASTEL[i % 5]) for i in range(16)]
@@ -626,7 +633,7 @@ def render_character(F, R, s, t, scene):
     if x0 >= x1 or y0 >= y1: return
     qx, qy = np.meshgrid(np.arange(x0, x1, dtype=np.float32), np.arange(y0, y1, dtype=np.float32))
     cx = Mi[0, 0] * qx + Mi[0, 1] * qy + Mi[0, 2]; cy = Mi[1, 0] * qx + Mi[1, 1] * qy + Mi[1, 2]
-    Gx, Gy = warp_field(R, s)
+    Gx, Gy = (R['gx'], R['gy']) if STATIC else warp_field(R, s)
     mx, my = (cx / STEP).astype(np.float32), (cy / STEP).astype(np.float32)
     srcx = cv2.remap(Gx, mx, my, cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT, borderValue=-9999)
     srcy = cv2.remap(Gy, mx, my, cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT, borderValue=-9999)
@@ -640,7 +647,7 @@ def render_character(F, R, s, t, scene):
     cxt, cyt = cx[ty0:ty1, tx0:tx1], cy[ty0:ty1, tx0:tx1]
     dxs, dys = cxt - (bx + s['hipShift']), cyt - (by + s['crouch'])
     rr = np.hypot(dxs, dys) / TAIL_L
-    wave = 6 * math.sin(2 * math.pi * .7 * t) * np.clip(rr, 0, 1.3)
+    wave = 0 if STATIC else 6 * math.sin(2 * math.pi * .7 * t) * np.clip(rr, 0, 1.3)
     th = np.radians(min(s['tailBase'] * .42, 30) + .5 * s['tailCurl'] * np.clip(rr, 0, 1.3) ** 2 + 1.6 * wave + np.clip(s['tail'][0] * .35, -30, 30) * np.clip(rr, 0, 1.3) ** 1.5)
     c, sn = np.cos(th), np.sin(th)
     tsx = (bx + c * dxs + sn * dys).astype(np.float32); tsy = (by + -sn * dxs + c * dys).astype(np.float32)
@@ -667,24 +674,152 @@ def render_character(F, R, s, t, scene):
     reg[:] = reg * (1 - a[..., None]) + np.clip(rgb, 0, None)
 
 SIG = RIG = SCENE = None
+STATIC = True                   # expressions only: the art itself never deforms
+STILL = ['bodyY', 'crouch', 'squash', 'bodyRoll', 'bodyX', 'hipShift', 'rise', 'breath', 'headRoll', 'headPitch', 'headYaw',
+         'earRot', 'earSwivel', 'armL', 'armR', 'liftL', 'liftR', 'tailBase', 'tailCurl']
+# one comic panel per lyric beat: (cue, hFrac, camY, camX, transition in)
+SHOTS = [('0', .84, 780, 510, 'none'), ('2:1', 1.5, 300, 505, 'slide'), ('3:1', 1.12, 470, 510, 'wipe'), ('4:1', 1.45, 310, 505, 'halftone'),
+         ('5:1', .8, 760, 510, 'flash'), ('6:1', 1.08, 560, 520, 'wipe'), ('7:1', 1.1, 520, 560, 'slide'), ('8:1', 1.45, 310, 505, 'iris'),
+         ('9:1', 1.28, 420, 505, 'dissolve'), ('10:1', 1.5, 300, 530, 'cut'), ('11:1', 1.12, 530, 510, 'halftone'),
+         ('12:1', .95, 380, 510, 'wipeup'), ('13:1', 1.42, 305, 505, 'iris')]
+INK = np.array([.16, .13, .2], np.float32)
 
 def init():
-    global SIG, RIG, SCENE
-    if SIG is None: SIG, RIG, SCENE = build_signals(), build_rig(), Scene()
+    global SIG, RIG, SCENE, FOCUS, SPEED, HALF, YY, XX
+    if SIG is not None: return
+    SIG, RIG, SCENE = build_signals(), build_rig(), Scene()
+    r = rng(11); YY, XX = np.mgrid[0:H, 0:W].astype(np.float32); FOCUS = []
+    for v in range(3):                                              # 集中線 focus lines, three boiling variants
+        m = np.zeros((H, W), np.uint8)
+        for k in range(120):
+            a = r.uniform(0, 2 * math.pi); r0 = r.uniform(.42, .7) * W / 2 * (1.6 if abs(math.sin(a)) > .7 else 1); w = r.uniform(.004, .012)
+            p = [(W / 2 + math.cos(a) * 2400, H / 2 + math.sin(a) * 2400), (W / 2 + math.cos(a + w) * 2400, H / 2 + math.sin(a + w) * 2400),
+                 (W / 2 + math.cos(a) * r0, H / 2 + math.sin(a) * r0)]
+            cv2.fillPoly(m, [np.int32(np.array(p) * 16)], 255, cv2.LINE_AA, 4)
+        FOCUS.append(m.astype(np.float32) / 255)
+    SPEED = np.zeros((H, W * 2), np.uint8)                          # speed lines, scrolled sideways
+    for k in range(70):
+        y = int(r.uniform(0, H)); x = int(r.uniform(0, 2 * W)); L = int(r.uniform(150, 700))
+        cv2.line(SPEED, (x * 16, y * 16), ((x + L) * 16, y * 16), 255, int(r.uniform(1, 4)), cv2.LINE_AA, 4)
+    SPEED = SPEED.astype(np.float32) / 255
+    d = np.hypot(np.mod(XX, 22) - 11, np.mod(YY, 22) - 11)          # halftone dots, bigger toward the bottom-left corner
+    HALF = (d < 9 * np.clip(1 - np.hypot(XX / W, (H - YY) / H) / 1.0, 0, 1)).astype(np.float32)
 
-def frame(i):
-    init(); t = i / FPS
-    s = {k: v[min(i, len(v) - 1)] for k, v in SIG.items()}
-    F = SCENE.background(t, s)
-    SCENE.fx_back(F, t, s)
-    render_character(F, RIG, s, t, SCENE)
-    SCENE.fx_front(F, t, s)
+def smooth01(a, b, t): return float(smoothstep(T(a), T(b), t)) if isinstance(a, str) else float(smoothstep(a, b, t))
+
+def win(t, a, b, fi=.08, fo=.12):
+    ta, tb = T(a), T(b); return float(np.clip((t - ta) / fi, 0, 1) * np.clip((tb - t) / fo, 0, 1))
+
+def pop(t, a):
+    u = np.clip((t - T(a)) / .12, 0, 1); return float(1 + .35 * math.sin(math.pi * u) * (1 - u) * 2) if u < 1 else 1.
+
+def put(F, col, a, draw):
+    m = np.zeros((H, W), np.uint8); draw(m); m = (m.astype(np.float32) / 255 * a)[..., None]
+    F[:] = F * (1 - m) + np.asarray(col, np.float32) * m
+
+def text(F, t, s, a, sc):
+    if a <= 0: return
+    sz = cv2.getTextSize(s, cv2.FONT_HERSHEY_TRIPLEX, sc, int(sc * 3))[0]
+    for col, th in (((1, 1, 1), int(sc * 9)), (INK, int(sc * 3.2))):
+        put(F, col, a, lambda m: cv2.putText(m, s, (int(t[0] - sz[0] / 2), int(t[1] + sz[1] / 2)), cv2.FONT_HERSHEY_TRIPLEX, sc, 255, max(th, 1), cv2.LINE_AA))
+
+def shape(F, pts, fill, a, outline=INK, th=3):
+    pp = [np.int32(np.array(pts) * 16)]
+    put(F, fill, a, lambda m: cv2.fillPoly(m, pp, 255, cv2.LINE_AA, 4))
+    put(F, outline, a, lambda m: cv2.polylines(m, pp, True, 255, th, cv2.LINE_AA, 4))
+
+def heart(cx, cy, r):
+    u = np.linspace(0, 2 * math.pi, 40)
+    return np.stack([cx + r * 16 * np.sin(u) ** 3 / 16, cy - r * (13 * np.cos(u) - 5 * np.cos(2 * u) - 2 * np.cos(3 * u) - np.cos(4 * u)) / 16], 1)
+
+def drop(cx, cy, r):
+    u = np.linspace(-math.pi / 2, 3 * math.pi / 2, 30)
+    pts = [(cx + r * math.cos(v), cy + r * math.sin(v)) for v in u[4:-4]]
+    return np.array(pts + [(cx, cy - 2.4 * r)])
+
+def comic_back(F, t, s, k):
+    fi = int(t * 60) // 3 % 3
+    for a, b in (('3:3+14', '4:1'), ('5:1', '5:3'), ('7:4+14', '8:1+10'), ('10:1+14', '10:2+10')):
+        al = win(t, a, b, .03, .2)
+        if al: F *= 1 - (FOCUS[fi] * .6 * al)[..., None] * (1 - INK)
+    if k in (4, 5):                                                     # chorus run: speed lines behind her
+        off = int((t * 2600) % W); a = .22 * (1 - smooth01('6:4', '7:1', t))
+        F *= 1 - (SPEED[:, off:off + W] * a)[..., None] * (1 - np.array([.55, .6, .8], np.float32))
+    if k in (2, 4, 9, 11):                                              # halftone accent in the corner
+        tint = [(.65, .8, 1.), (.98, .7, .82)][k % 2]
+        F *= 1 - (HALF * .10)[..., None] * (1 - np.array(tint, np.float32))
+
+def comic_front(F, t, s, k, M, z):
+    a2s = lambda x, y: tuple(M @ np.array([x + P, y + P, 1.]))
+    al = win(t, '1:3', '2:1')                                           # embarrassed sweat drop
+    if al: x, y = a2s(632, 205 + 30 * smooth01('1:3', '2:1', t)); shape(F, drop(x, y, 12 * z), (.78, .9, 1.), al)
+    for j, c in enumerate(('2:2', '2:2.5', '2:3')):                     # "..."
+        al = win(t, c, '3:1')
+        if al: x, y = a2s(360 + 32 * j, 95); put(F, INK, al, lambda m: cv2.circle(m, (int(x * 16), int(y * 16)), int(6 * z * 16), 255, -1, cv2.LINE_AA, 4))
+    for c, e, ch, pos in (('3:1-8', '3:2', '!', (660, 70)), ('3:3+14', '4:1', '!!', (670, 60)), ('7:1+4', '7:4+14', '?', (680, 60)), ('7:4+14', '8:1+10', '!', (680, 60))):
+        al = win(t, c, e)
+        if al: x, y = a2s(*pos); text(F, (x, y), ch, al, 2.7 * z * pop(t, c))
+    for a, b in (('4:2', '5:1'), ('8:1', '9:1'), ('11:1', '12:1'), ('12:4', '15:1')):   # sparkly eyes
+        al = win(t, a, b, .1, .2)
+        if al:
+            for j, (ex, ey) in enumerate(((455, 259), (541, 244))):
+                tw = .7 + .3 * math.sin(t * 9 + j * 2); x, y = a2s(ex, ey)
+                blit(F, SCENE.SP['star'], x, y, 30 * z * tw, 30 * z * tw, (1, 1, 1), 'over')
+    al = win(t, '10:1+14', '11:3', .1, .3)                              # blush hatching
+    if al:
+        for (cx, cy) in CHEEKS:
+            for j in range(3):
+                x, y = a2s(cx - 14 + 12 * j, cy - 2)
+                put(F, (.88, .38, .5), al * .8, lambda m: cv2.line(m, (int((x - 5 * z) * 16), int((y + 6 * z) * 16)), (int((x + 5 * z) * 16), int((y - 6 * z) * 16)), 255, max(1, int(2 * z)), cv2.LINE_AA, 4))
+    for c, e, pos, r in (('10:3', '11:1', (650, 150), 16), ('10:3.5', '11:1', (360, 170), 12), ('11:3', '12:1', (670, 110), 26), ('13:4', '15:1', (660, 130), 20)):
+        al = win(t, c, e)
+        if al:
+            u = t - T(c); x, y = a2s(pos[0] + 8 * math.sin(u * 4), pos[1] - 40 * u)
+            shape(F, heart(x, y, r * z * pop(t, c)), (1., .62, .74), al, (.62, .25, .38))
+
+def mix(A, B, typ, p, t):
+    p = float(ease(np.array(p), 'io'))
+    if typ == 'dissolve': return A * (1 - p) + B * p
+    if typ == 'slide':
+        off = int(W * (1 - p)); out = A.copy()
+        if off < W: out[:, off:] = B[:, :W - off]; out[:, max(off - 8, 0):off] = INK
+        return out
+    if typ == 'iris': m = (np.hypot(XX - W / 2, YY - H / 2) < p * 1150).astype(np.float32)
+    elif typ == 'halftone':
+        d = np.hypot(np.mod(XX, 60) - 30, np.mod(YY, 60) - 30); m = (d < p * 46 * (.7 + .3 * YY / H + .0)).astype(np.float32)
+    elif typ == 'wipeup': m = (YY > H * (1 - p * 1.1)).astype(np.float32)
+    else: m = ((XX + (H - YY) * .45) < p * (W + H * .45 + 40)).astype(np.float32)
+    m = cv2.GaussianBlur(m, (0, 0), 1.2)[..., None]
+    edge = np.clip(1 - np.abs(m - .5) * 4, 0, 1) * (typ not in ('halftone',))
+    return (A * (1 - m) + B * m) * (1 - edge * .9) + INK * edge * .9
+
+def panel(t, k, s0):
+    s = dict(s0); c, h, y, x, _ = SHOTS[k]; t0 = T(c); t1 = T(SHOTS[k + 1][0]) if k + 1 < len(SHOTS) else DUR
+    s.update(camH=h * (1 + .035 * np.clip((t - t0) / (t1 - t0), 0, 1)), camY=y, camX=x)
+    F = SCENE.background(t, s); comic_back(F, t, s, k); SCENE.fx_back(F, t, s)
+    render_character(F, RIG, s, t, SCENE); SCENE.fx_front(F, t, s)
+    w2s, z = SCENE.cam(s); comic_front(F, t, s, k, body_affine(s, z, x, y), z)
     F = F * SCENE.grain
     u = smoothstep(CUT, CUT + 1.2, t); w12 = smoothstep(T('12:1'), T('12:3'), t)
     top = np.array([1., .86, .78]) * (1 - u) + np.array([.99, .80, .92]) * u * (1 - w12) + np.array([1., .92, .80]) * u * w12
     bot = np.array([.80, .87, 1.]) * (1 - u) + np.array([.76, .80, 1.]) * u
-    F = 1 - (1 - F) * (1 - (.20 + .08 * w12) * SCENE.g_tl * top)                      # screen: soft warm light
-    F = F * (1 - .16 * SCENE.g_br * (1 - bot)) * (1 - .05 * SCENE.g_v * (1 - bot))    # multiply: cool depth
+    F = 1 - (1 - F) * (1 - (.20 + .08 * w12) * SCENE.g_tl * top)
+    return F * (1 - .16 * SCENE.g_br * (1 - bot)) * (1 - .05 * SCENE.g_v * (1 - bot))
+
+def frame(i):
+    init(); t = i / FPS
+    s0 = {k: v[min(i, len(v) - 1)] for k, v in SIG.items()}
+    for k in STILL: s0[k] = 0.
+    s0['approach'] = 1.
+    for k in ('hairL', 'hairR', 'ahoge', 'earTipL', 'earTipR', 'cuffL', 'cuffR', 'skirt', 'tail'): s0[k] = np.zeros(2)
+    k = max(j for j, sh in enumerate(SHOTS) if T(sh[0]) <= t)
+    F = panel(t, k, s0)
+    if k + 1 < len(SHOTS):
+        tn, typ = T(SHOTS[k + 1][0]), SHOTS[k + 1][4]; d = .35 if typ == 'dissolve' else .16
+        if typ not in ('cut', 'flash') and t > tn - d: F = mix(F, panel(t, k + 1, s0), typ, (t - tn + d) / d, t)
+    if SHOTS[k][4] == 'flash' and t - T(SHOTS[k][0]) < .3: F = F + (1 - F) * (1 - (t - T(SHOTS[k][0])) / .3) ** 2
+    F[:14], F[-14:], F[:, :14], F[:, -14:] = SCENE.paper[:14], SCENE.paper[-14:], SCENE.paper[:, :14], SCENE.paper[:, -14:]   # panel gutter
+    F[14:20, 14:-14] = INK; F[-20:-14, 14:-14] = INK; F[14:-14, 14:20] = INK; F[14:-14, -20:-14] = INK                      # ink frame
     fin = smoothstep(0, .25, t) * (1 - smoothstep(DUR - .5, DUR - .02, t))
     F = SCENE.paper * (1 - fin) + F * fin
     return (np.clip(F, 0, 1) * 255 + .5).astype(np.uint8)
