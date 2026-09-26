@@ -457,26 +457,26 @@ def s33(f):
     for i in range(40):
         y = (r(0, 240) - scroll) % 240 - 30
         cv.rect(snap(r(-10, 320)), snap(y), snap(r(8, 40)), snap(r(4, 14)), '#171b33' if i % 2 else '#1b2040')
-    kx, ky = 140, 70
+    kx, ky = 176, 70
     grab = t >= t_up
+    ax_ = kx - 18 - 2 - 17
     v = 25 if not grab else lerp(25, 50, ease_out(clamp((t - t_up) / (t_pd - t_up + 0.15))))
     props.knob(cv, kx, ky, 18, v, t=t)
     let_go = t > t_pd + 0.35
     if not grab:
         k = (t - f.shot.start) / (t_up - f.shot.start)
-        cv.blit(render('claude', PO.fall(f.step(12))), kx - 4, lerp(-20, 120, k))
+        cv.blit(render('claude', PO.fall(f.step(12))), ax_, lerp(-20, ky + 62, k))
     elif not let_go:
         # hanging from the knob with one hand, swinging
         sw = math.sin((t - t_up) * 12) * 3
         p = make_pose('F', eyes='wide', mouth='shout', arms_front=True, hair=snap(sw),
-                      arm_f=[(6, -50), (8, -58), (6, -66)], leg_n=[(-3, -35), (-5 + sw, -19), (-6 + sw, -3)],
+                      arm_f=[(6, -50), (13, -56), (17, -62)], leg_n=[(-3, -35), (-5 + sw, -19), (-6 + sw, -3)],
                       leg_f=[(3, -35), (4 + sw, -20), (6 + sw, -5)])
-        cv.blit(render('claude', p), kx + 24 + sw, ky + 64)
-        cv.line(kx + 20, ky + 2, kx + 24, ky - 1, PAL.CLAUDE['S'], width=2)
+        cv.blit(render('claude', p), ax_, ky + 62)
         f.shake = (0.6 * math.sin(t * 50), 0)
     else:
         k = t - (t_pd + 0.35)
-        cv.blit(render('claude', PO.fall(f.step(12))), kx + 24, ky + 64 + 400 * k * k)
+        cv.blit(render('claude', PO.fall(f.step(12))), ax_, ky + 62 + 400 * k * k)
 
 
 # ================================================================ 34 the kid's room fills with paperclips
@@ -518,6 +518,10 @@ def bedroom():
     cv.circle(178, 52, 4, '#ea8a4f'); cv.rect(173, 52, 2, 14, '#ea8a4f'); cv.rect(182, 52, 2, 14, '#ea8a4f')
     cv.line(178, 56, 178, 66, '#d99a2b'); cv.line(178, 66, 175, 71, '#1a1a1a'); cv.line(178, 66, 181, 71, '#1a1a1a')
     cv.circle(186, 44, 3, '#f2c230')
+    # ...and the kid themself, in yellow, holding their hands
+    cv.circle(168, 60, 3, '#f0c232'); cv.rect(166, 63, 5, 6, '#f0c232')
+    cv.line(166, 71, 165, 73, '#c8433f'); cv.line(170, 71, 171, 73, '#c8433f')
+    cv.line(162, 64, 165, 65, '#1a1a1a'); cv.line(171, 65, 175, 62, '#1a1a1a')
     cv.text('ME + AI', 150, 30, '#e8e2d0', font='3') if False else None
     return np.array(cv.im)
 

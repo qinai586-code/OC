@@ -405,6 +405,7 @@ def s56(f):
         c_arm = (('arms_front', True), ('arm_f', ((6, -50), (10, -55), (12 + wav, -62))))
         cb = bust('claude', 'F', 'happy' if kc > 0.2 else 'calm', 'smile', pose_key=c_arm, bottom=-22)
         cv.blit(cb, 104, 126)
+        f.lyric_top = True
         kg = f.t - t_gpt
         if kg < 0:
             ge = 'side' if f.t > t_gpt_look else 'wide'
@@ -465,10 +466,17 @@ def s57(f):
     cv.rect(px0, py0, pw, ph, shades[lit])
     # the two tiny figures on stage + the kid's silhouette in the front row
     if lit > 0:
-        for who, x in (('claude', 148), ('gpt', 172)):
-            spr = render(who, make_pose('F'))
-            small = spr.arr[::3, ::3]
-            cv.blit(small, x - small.shape[1] // 2, py0 + ph - small.shape[0] - 2)
+        base = py0 + ph - 2
+        # Claude: copper hair, cream top, brown skirt, one light and one dark leg
+        cv.rect(146, base - 26, 7, 16, PAL.CLAUDE['H']); cv.rect(147, base - 25, 5, 5, PAL.CLAUDE['S'])
+        cv.rect(147, base - 19, 5, 6, PAL.CLAUDE['c']); cv.rect(147, base - 13, 5, 4, PAL.CLAUDE['p'])
+        cv.rect(148, base - 9, 1, 9, PAL.CLAUDE['i']); cv.rect(150, base - 9, 1, 9, PAL.CLAUDE['k'])
+        # ChatGPT: dark hair with two jade horns, black coat, one tail
+        cv.px(169, base - 27, PAL.GPT['J']); cv.px(174, base - 27, PAL.GPT['J'])
+        cv.rect(169, base - 26, 6, 9, PAL.GPT['k']); cv.rect(170, base - 24, 4, 4, PAL.GPT['S'])
+        cv.rect(168, base - 17, 8, 9, PAL.GPT['c']); cv.rect(170, base - 16, 4, 4, PAL.GPT['W'])
+        cv.rect(170, base - 8, 1, 8, PAL.GPT['l']); cv.rect(173, base - 8, 1, 8, PAL.GPT['l'])
+        cv.lines([(176, base - 8), (180, base - 4), (184, base - 5)], PAL.GPT['z']); cv.px(185, base - 6, PAL.GPT['y'])
     cv.rect(px0, py0 + ph - 2, pw, 2, '#3a2418')
     # the kid: a small yellow hood above the seat backs in the middle of the hall, lit by the last light
     ky = 144

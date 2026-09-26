@@ -473,8 +473,7 @@ def s12(f):
     # sweat of concentration
     if f.step(3) % 2:
         cv.px(x + 146, y + 30, '#bfe8ff')
-    f.cam['zoom'] = 1.08
-    f.cam['y'] = 94
+    f.cam.update(zoom=1.5, x=196, y=92)
 
 
 def s13(f):
@@ -512,8 +511,7 @@ def s13(f):
         ph = int(k * 8) % 4
         grade(cv, ramps[ph][1:], strength=clamp(k / 0.3) * 0.75)
         f.cam['rot'] = 0.03 * math.sin(k * 5)
-    f.cam['zoom'] = 1.08
-    f.cam['y'] = 94
+    f.cam.update(zoom=1.5, x=150, y=92)
 
 
 # ================================================================ 14 the shoggoth under the lens

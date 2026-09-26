@@ -672,11 +672,18 @@ def s21(f):
     freed = t >= t_free
     kf = t - t_free
     cy_claude = 138 + (0 if not freed else min(40, kf * kf * 200))
-    cp = PO.plead('claude', view='Q') if t >= t_please - 0.2 else make_pose('Q', eyes='worried', mouth='small')
+    cp = PO.plead('claude', view='Q') if t >= t_please - 0.2 else \
+        make_pose('Q', eyes='worried', mouth='small', lean=[-2, 2][f.step(2.2) % 2], arms_front=True,
+                  arm_f=[(5, -50), (11, -50), (16, -48)])
     if freed:
         cp = make_pose('Q', eyes='wide', mouth='o', hair=-2)
     cv.blit(render('claude', cp), ccx, cy_claude, flip=True)
+    built = min(12, 3 + int((t - 52.98) / song.BEAT * 1.5))
+    if not freed and t < t_please - 0.2 and f.step(4) % 2:
+        cy_claude += 0   # (testing the bars: small sideways lean below)
     for i in range(12):
+        if i >= built and not freed:
+            continue
         a_ = i / 12 * math.tau + t * 0.6
         hx, hy = ccx + math.cos(a_) * 30, ccy + math.sin(a_) * 44
         if not freed:

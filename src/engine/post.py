@@ -23,6 +23,8 @@ def sample(img, cam, shake=(0, 0)):
     cy = cam['y'] + MARGIN + shake[1]
     rot = cam.get('rot', 0.0)
     s = SCALE * z
+    if abs(rot) < 1e-4 and abs(z - 1.0) < 1e-6:
+        cx, cy = math.floor(cx * 3 + 0.5) / 3, math.floor(cy * 3 + 0.5) / 3
     if abs(rot) < 1e-4:
         ix = np.floor(cx + _X / s).astype(np.int32).clip(0, CW - 1)
         iy = np.floor(cy + _Y / s).astype(np.int32).clip(0, CH - 1)
@@ -59,7 +61,7 @@ def _word_masks(text):
     return font.text_mask(text, '5')
 
 
-def draw_lyrics(out, t, lyrics):
+def draw_lyrics(out, t, lyrics, top=False):
     """Word-by-word reveal of the current line, centred at the bottom."""
     line = None
     for ln in lyrics:
@@ -89,8 +91,9 @@ def draw_lyrics(out, t, lyrics):
         if fade_out:
             col = (150, 148, 160)
         # shadow (1 native px down-right), then glyphs
+        ly = 30 if top else LYRIC_Y
         for dx, dy, c in ((LS, LS, (10, 10, 18)), (0, 0, col)):
-            y0, xx = LYRIC_Y + dy, x + dx
+            y0, xx = ly + dy, x + dx
             reg = out[y0:y0 + h, xx:xx + ww]
             reg[big[:reg.shape[0], :reg.shape[1]]] = c
         x += (font.text_size(w + ' ', '5')[0] + 1) * LS
@@ -104,5 +107,5 @@ def compose(img, post, t, lyrics=None):
     if post.get('fade', 0) > 0:
         dither_to(out, post['fade'], (4, 4, 8))
     if lyrics is not None and post.get('lyrics', True):
-        draw_lyrics(out, t, lyrics)
+        draw_lyrics(out, t, lyrics, top=post.get('lyric_top', False))
     return out

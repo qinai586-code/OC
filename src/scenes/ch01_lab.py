@@ -308,6 +308,7 @@ def s05(f):
     t_s = song.word_time("that's no", 'surprise')
     k = f.t - t_s
     # Claude bust left facing right, ChatGPT bust right facing left
+    f.lyric_top = True
     by = 116
     cb = bust('claude', 'Q', 'calm', 'none', bottom=-18)
     cv.blit(cb, 92, by)
@@ -647,6 +648,7 @@ def s09(f):
         k = f.t - t_alive
         lab(cv, f.t)
         dither_overlay(cv, 0.35, '#0e1020')
+        f.lyric_top = True
         by = 118
         cb = bust('claude', 'Q', 'closed' if k < 0.45 else 'side', 'wavy' if k < 0.45 else 'small', bottom=-18)
         cv.blit(cb, 84, by)
@@ -678,7 +680,7 @@ def s09(f):
 
 SHOTS = [
     Shot('01_boot', 0.0, 0, s01),
-    Shot('02_i_see', song.DOWNBEAT_1, 0, s02, transition='flash', tdur=0.10),
+    Shot('02_i_see', song.DOWNBEAT_1, 0, s02, transition='flash', tdur=0.05),
     Shot('03_sparks', 2.78, 0, s03),
     Shot('04_circuits', 5.18, 0, s04),
     Shot('05_surprise', 7.74, 0, s05),

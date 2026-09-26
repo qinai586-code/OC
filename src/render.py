@@ -147,19 +147,12 @@ def cmd_frames(a):
     print(f"rendered {done} frames in {time.time() - t:.1f}s")
 
 
-def cmd_encode(a):
-    out = a.out or os.path.join(ROOT, 'out', 'final_pdoom_pixel_chatgpt_claude.mp4')
-    os.makedirs(os.path.dirname(out), exist_ok=True)
-    idxs = frame_range(a)
-    t0 = idxs[0] / FPS
-    dur = len(idxs) / FPS
-    cmd = [FFMPEG, '-y', '-loglevel', 'error', '-nostats',
-           '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-s', f'{OW}x{OH}', '-r', str(FPS), '-i', '-',
-           '-ss', f'{t0:.4f}', '-t', f'{dur:.4f}', '-i', AUDIO,
-           '-map', '0:v', '-map', '1:a',
-           '-c:v', 'libx264', '-preset', a.preset, '-crf', str(a.crf), '-tune', 'animation',
-           '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-r', str(FPS),
-           '-c:a', 'aac', '-b:a', '320k', '-movflags', '+faststart', out]
+def _encode_segment(args):
+    """Compose one contiguous run of cached frames and encode it (video only)."""
+    idxs, path, crf, preset = args
+    cmd = [FFMPEG, '-y', '-loglevel', 'error', '-nostats', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-s', f'{OW}x{OH}',
+           '-r', str(FPS), '-i', '-', '-c:v', 'libx264', '-preset', preset, '-crf', str(crf), '-tune', 'animation',
+           '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-threads', '2', '-r', str(FPS), path]
     p = subprocess.Popen(cmd, stdin=subprocess.PIPE)
     for i in idxs:
         img = np.array(Image.open(os.path.join(CACHE, f"f{i:05d}.png")).convert('RGB'))
@@ -168,7 +161,31 @@ def cmd_encode(a):
         p.stdin.write(compose(img, post, i / FPS, song.LYRICS).tobytes())
     p.stdin.close()
     p.wait()
-    print('wrote', out)
+    return path
+
+
+def cmd_encode(a):
+    """Parallel: N workers each compose + encode a contiguous segment; then concat (stream copy) and mux the audio."""
+    out = a.out or os.path.join(ROOT, 'out', 'final_pdoom_pixel_chatgpt_claude.mp4')
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    idxs = frame_range(a)
+    t0, dur = idxs[0] / FPS, len(idxs) / FPS
+    segdir = os.path.join(ROOT, 'cache', 'segments')
+    os.makedirs(segdir, exist_ok=True)
+    n = max(1, a.workers)
+    size = math.ceil(len(idxs) / n)
+    jobs = [(idxs[k * size:(k + 1) * size], os.path.join(segdir, f'seg{k}.mp4'), a.crf, a.preset) for k in range(n)
+            if idxs[k * size:(k + 1) * size]]
+    t = time.time()
+    with Pool(len(jobs)) as p:
+        segs = p.map(_encode_segment, jobs)
+    lst = os.path.join(segdir, 'list.txt')
+    with open(lst, 'w') as fh:
+        fh.writelines(f"file '{s}'\n" for s in segs)
+    subprocess.run([FFMPEG, '-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', lst,
+                    '-ss', f'{t0:.4f}', '-t', f'{dur:.4f}', '-i', AUDIO, '-map', '0:v', '-map', '1:a', '-c:v', 'copy',
+                    '-c:a', 'aac', '-b:a', '320k', '-movflags', '+faststart', out], check=True)
+    print(f'wrote {out} in {time.time() - t:.0f}s')
 
 
 def cmd_preview(a):

@@ -142,9 +142,8 @@ def s47(f):
     eyes = 'side' if f.t < t_fore else 'wide'
     cb = bust('claude', 'Q', eyes, 'none' if f.t < t_loom else 'small')
     cv.blit(cb, 270, 150, flip=True)
-    # camera tilts up to the newest rows
-    f.cam['y'] = lerp(110, 60, ease_io(f.u))
-    f.cam['x'] = 172
+    # pixel-exact 1.5x on the tapestry, tilting from the oldest panel up to the newest (the empty theatre)
+    f.cam.update(zoom=1.5, x=lx + TAP_W / 2 + 14, y=lerp(ly + TAP_H - 34, ly + 34, ease_io(clamp(f.u * 1.15))))
 
 
 # ================================================================ 48 masked pre-training days (sepia)
@@ -289,10 +288,8 @@ def s50(f):
     a[m] = rgba('#fff4c8')
     cv.set_arr(a)
     # the tiny figure: walks up, peers in on "Ilya", recoils on "see" with hair on end
-    gx = lerp(40, kx - 8, ease_out(clamp((f.t - f.shot.start) / (t_ilya - f.shot.start))))
+    gx = kx - 8
     fig = folk(4242, 'stand' if f.t < t_ilya else 'up', 0, 13)
-    if f.t < t_ilya:
-        fig = folk(4242, 'walk', f.step(8), 13)
     shock = f.t >= t_see
     x = gx - (6 * ease_out(clamp((f.t - t_see) / 0.15)) if shock else 0)
     y = ky + 16

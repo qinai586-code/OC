@@ -654,7 +654,8 @@ def s26(f):
     t_one = wt('One E', 'One')
     t_yeah = 68.24
     b_one = song.beat(145)
-    zeros = [b_one + (k + 1) * SIX for k in range(30)]
+    t_30, t_sec = wt('One E', 'thirty'), wt('One E', 'second')
+    zeros = [t_30 + (k + 1) * (t_sec - t_30) / 30 for k in range(30)]
     nz = sum(1 for z in zeros if f.t >= z)
     lead = tile_x(nz)
     # camera: follows the leading digit

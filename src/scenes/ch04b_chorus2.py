@@ -78,8 +78,10 @@ def s27(f):
 
 
 # ================================================================ 28 forward MLP, backward, repeat
+# The network lives in the upper band; ChatGPT runs a lane underneath it, so she never crosses a node.
 COLS = [44, 102, 160, 218, 276]
-ROWS = {0: [60, 90, 120], 1: [45, 75, 105, 135], 2: [45, 75, 105, 135], 3: [45, 75, 105, 135], 4: [75, 105]}
+ROWS = {0: [34, 58, 82], 1: [26, 46, 66, 86], 2: [26, 46, 66, 86], 3: [26, 46, 66, 86], 4: [46, 66]}
+LANE = 172
 
 
 @lru_cache(maxsize=1)
@@ -90,8 +92,10 @@ def net_layer():
         for y0 in ROWS[c]:
             for y1 in ROWS[c + 1]:
                 cv.line(COLS[c], y0, COLS[c + 1], y1, '#172230')
-    cv.rect(-12, 160, 344, 40, '#0a0e16')
-    cv.rect(-12, 160, 344, 1, '#223050')
+    cv.rect(-12, LANE, 344, 40, '#0a0e16')
+    cv.rect(-12, LANE, 344, 1, '#223050')
+    for x in range(-12, 332, 16):
+        cv.rect(x, LANE + 4, 8, 1, '#141c2c')
     return np.array(cv.im)
 
 
@@ -102,120 +106,136 @@ def s28(f):
     t_bw = wt('Forward MLP', 'backward,')
     t_rep = wt('Forward MLP', 'repeat')
     t = f.t
-    # runner position (0..1 across the net) and direction
+    epoch = 0
     if t < t_fw:
         u, d, phase = 0.0, 1, 'wait'
     elif t < t_bw:
         u, d, phase = clamp((t - t_fw) / (t_bw - t_fw - 0.15)), 1, 'fw'
+        epoch = 1
     elif t < t_rep:
         u, d, phase = 1 - clamp((t - t_bw) / (t_rep - t_bw)), -1, 'bw'
+        epoch = 1
     else:
-        per = max(0.12, 0.36 - (t - t_rep) * 0.25)
-        q = ((t - t_rep) / per) % 2
-        u, d, phase = (q, 1, 'rep') if q < 1 else (2 - q, -1, 'rep')
+        # each pass gets shorter: 0.30 s -> 0.12 s
+        tt, pas, dur = t - t_rep, 0, 0.30
+        while tt > dur and pas < 40:
+            tt -= dur
+            pas += 1
+            dur = max(0.12, dur * 0.86)
+        q = tt / dur
+        d = 1 if pas % 2 == 0 else -1
+        u = q if d > 0 else 1 - q
+        phase = 'rep'
+        epoch = 2 + pas // 2
     x = lerp(24, 296, u)
-    # light the nodes the runner has passed (jade forward, amber backward)
+    beat_on = ((t - song.PHASE) % song.BEAT) < 0.09
     for c, cx in enumerate(COLS):
-        lit_f = (phase in ('fw', 'rep') and x >= cx) or phase == 'bw'
-        lit_b = phase in ('bw', 'rep') and x <= cx and (phase == 'bw' or d < 0)
+        lit_f = (phase in ('fw', 'rep') and d > 0 and x >= cx) or phase == 'bw' or (phase == 'rep' and d < 0)
+        lit_b = (phase == 'bw' and x <= cx) or (phase == 'rep' and d < 0 and x <= cx)
         for y in ROWS[c]:
-            col = '#2a3a4a'
+            col = '#2a3a4a' if not (phase == 'wait' and beat_on) else '#3a5a6a'
             if lit_f:
                 col = '#4fb49b'
             if lit_b:
                 col = '#f2a84a'
             cv.circle(cx, y, 4, '#0b0e12')
             cv.circle(cx, y, 3, col)
-            if col != '#2a3a4a':
+            if col in ('#4fb49b', '#f2a84a'):
                 cv.px(cx - 1, y - 1, '#fbf8f2')
-    # the backprop wave sweeping the connections
-    if phase in ('bw', 'rep') and d < 0:
+    # the runner "touches" the column above her: a dotted beam up to the layer
+    nearest = min(COLS, key=lambda c: abs(c - x))
+    if phase != 'wait' and abs(nearest - x) < 10:
+        for yy in range(92, LANE - 80, 3):
+            cv.px(nearest, yy, '#95e3cc' if d > 0 else '#f2cd5a')
+    # backward wave through the connections
+    if d < 0 and phase in ('bw', 'rep'):
         for c in range(4):
             if COLS[c + 1] >= x:
                 for y0 in ROWS[c]:
                     for y1 in ROWS[c + 1]:
                         if (y0 + y1 + int(t * 20)) % 3 == 0:
                             cv.line(COLS[c], y0, COLS[c + 1], y1, '#8a5a2a')
-    # ChatGPT
+    labels = ['IN', 'MLP', 'MLP', 'MLP', 'OUT']
+    for c, cx in enumerate(COLS):
+        cv.text(labels[c], cx - len(labels[c]) * 2, 8, '#3b5a66', font='3')
+    cv.text(f'EPOCH {epoch}', 272, 104, '#95e3cc' if epoch else '#3b5a66', font='3')
     if phase == 'wait':
-        p = make_pose('P', eyes='sharp', mouth='none', bob=6, lean=4, arms_front=True,
+        # waiting at the start line, bouncing on the beat
+        p = make_pose('P', eyes='sharp', mouth='none', bob=6 if beat_on else 4, lean=4, arms_front=True,
                       leg_n=[(0, -29), (8, -20), (6, -3)], leg_f=[(1, -29), (-6, -16), (-10, -3)],
                       arm_n=[(2, -44), (6, -38), (8, -32)], arm_f=[(3, -44), (8, -38), (10, -33)])
-        cv.blit(render('gpt', p), x, 162)
+        cv.blit(render('gpt', p), x, LANE + 2)
     else:
         rate = 12 if phase != 'rep' else 20
         spr = render('gpt', PO.run(f.step(rate), 'gpt', eyes='sharp', mouth='grin'))
+        cv.blit(spr, x, LANE + 2, flip=d < 0)
         if phase == 'rep':
-            for j in range(1, 4):
-                cv.blit(Sprite(silhouette(spr.arr, ['#2c8574', '#1c5c52', '#123d38'][j - 1]), spr.ax, spr.ay), x - d * j * 10, 162, flip=d < 0)
-        cv.blit(spr, x, 162, flip=d < 0)
-    labels = ['IN', 'MLP', 'MLP', 'MLP', 'OUT']
-    for c, cx in enumerate(COLS):
-        cv.text(labels[c], cx - len(labels[c]) * 2, 24, '#3b5a66', font='3')
-    if phase == 'rep':
-        f.cam['zoom'] = 1.0 + 0.02 * math.sin(t * 30)
+            for j, yy in enumerate((LANE - 60, LANE - 44, LANE - 24)):
+                L = 18 + j * 6
+                cv.rect(snap(x - d * (14 + L)), yy, L, 1, '#2c8574' if d > 0 else '#a0701c')
 
 
 # ================================================================ 29 von Neumann's obsolete
-def old_computer(cv, x, y, blink):
-    """1950s machine, bottom-left at (x, y): CPU cabinet + MEMORY cabinet, one thin bus between."""
+def old_computer(cv, x, y, blink, power=1.0, wob=0):
+    """1950s machine, bottom-left at (x, y): CPU cabinet + MEMORY cabinet joined by one thin bus."""
     for i, (w, lab) in enumerate(((30, 'CPU'), (30, 'MEM'))):
-        bx = x + i * 44
+        bx = x + i * 44 + (wob if i == 0 else -wob)
         cv.rect(bx, y - 44, w, 44, '#6a6f78')
         cv.rect(bx, y - 44, w, 1, '#98a2b0')
         cv.rect(bx + 3, y - 40, w - 6, 14, '#2a2d33')
         for k in range(6):
-            on = (blink + k * 3 + i) % 4 == 0
-            cv.px(bx + 5 + k * 3, y - 36, '#f2c24a' if on else '#4a3a20')
-            cv.px(bx + 5 + k * 3, y - 32, '#5fe0a0' if (blink + k) % 3 == 0 else '#1a3a2a')
+            on = power > 0 and (blink + k * 3 + i) % 4 == 0
+            cv.px(bx + 5 + k * 3, y - 36, '#f2c24a' if on else '#3a2e18')
+            cv.px(bx + 5 + k * 3, y - 32, '#5fe0a0' if (power > 0 and (blink + k) % 3 == 0) else '#16261e')
         for k in range(2):
             cv.circle(bx + 9 + k * 12, y - 16, 5, '#2a2d33')
             cv.circle(bx + 9 + k * 12, y - 16, 2, '#98a2b0')
         cv.text(lab, bx + 9, y - 6, '#d2d8e0', font='3')
-    cv.rect(x + 30, y - 24, 14, 2, '#c8a040')   # the von Neumann bottleneck
+    cv.rect(x + 30, y - 24, 14, 2, '#c8a040' if power > 0 else '#5a4a20')   # the von Neumann bottleneck
 
 
 def s29(f):
     cv = f.cv
     t = f.t
-    t_neu = wt('Now von', "Neumann's")
     t_obs = wt('Now von', 'obsolete')
+    t_flick = t_obs - 0.55
     cv.fill('#2a2230')
     cv.rect(-12, -12, 344, 140, '#3a3040')
     for x in range(-12, 340, 40):
         cv.rect(x, -12, 1, 140, '#2a2230')
     cv.rect(-12, 128, 344, 70, '#5a4632')
     cv.rect(-12, 128, 344, 1, '#8e6a44')
-    # spotlights on the plinths
-    for px_ in (70, 250):
-        cv.poly([(px_ - 6, -12), (px_ + 6, -12), (px_ + 34, 128), (px_ - 34, 128)], '#443a4c')
-    # left plinth: a vase (just decor); right plinth: the machine
+    lit = t < t_obs
+    for px_, on in ((70, True), (252, lit)):
+        cv.poly([(px_ - 6, -12), (px_ + 6, -12), (px_ + 34, 128), (px_ - 34, 128)], '#443a4c' if on else '#352c3e')
     cv.rect(58, 108, 24, 20, '#c9c2b2'); cv.circle(70, 98, 8, '#6a8aa8'); cv.rect(67, 88, 6, 4, '#6a8aa8')
-    cv.rect(212, 108, 76, 20, '#c9c2b2')
-    cv.rect(212, 108, 76, 1, '#e2dccd')
-    # velvet rope
-    cv.lines([(196, 118), (206, 124), (216, 124), (226, 118)], '#8a1c24', width=2) if False else None
-    k_flick = t - (t_obs - 0.5)
-    tipped = clamp(k_flick / 0.35) if k_flick > 0 else 0.0
-    mx = 218 + snap(tipped * 30)
-    my = 108 + snap(tipped * tipped * 20)
-    old_computer(cv, mx, my, f.step(6))
-    # the glass case drops over it on "obsolete"
+    # the plinth; the machine stays on it: the tail knocks it, it wobbles, and powers down
+    PX, PW = 212, 80
+    cv.rect(PX, 108, PW, 20, '#c9c2b2')
+    cv.rect(PX, 108, PW, 1, '#e2dccd')
+    kf = t - t_flick
+    wob = 0
+    if 0 <= kf < 0.4:
+        wob = [2, -2, 1, -1, 1, 0][min(5, int(kf * 15))]
+    old_computer(cv, PX + 3, 108, f.step(6), power=1.0 if t < t_obs - 0.15 else 0.0, wob=wob)
+    if 0 <= kf < 0.12:
+        f.shake = (1.0, 0)
+    # the glass case drops exactly over plinth + machine on "obsolete"
     kc = t - t_obs
-    if kc > 0:
-        gy = min(0, -120 + kc * 900)
-        gx0 = 206
-        cv.frame(gx0, snap(gy) + 60, 108, 70, '#c8e0f0')
-        cv.line(gx0 + 6, snap(gy) + 64, gx0 + 20, snap(gy) + 80, '#e8f4fc')
-        if gy >= 0:
-            cv.rect(240, 136, 44, 9, '#c8a040')
-            cv.text('OBSOLETE', 242, 138, '#2a1c14', font='3')
+    if kc > -0.1:
+        top = min(58, -80 + (kc + 0.1) * 1100)
+        cv.frame(PX - 4, snap(top), PW + 8, 128 - snap(top), '#c8e0f0')
+        cv.line(PX, snap(top) + 4, PX + 14, snap(top) + 20, '#e8f4fc')
+        cv.rect(PX - 4, snap(top), PW + 8, 1, '#e8f4fc')
+        if top >= 58:
+            cv.rect(PX + 18, 114, 44, 9, '#c8a040')
+            cv.text('OBSOLETE', PX + 20, 116, '#2a1c14', font='3')
             if kc < 0.2:
                 f.shake = (1.2, 0.6)
-    # ChatGPT strolls past right-to-left, her tail flicks the machine
-    gx = lerp(330, 150, clamp((t - f.shot.start) / (t_obs - f.shot.start)))
-    p = PO.walk(f.step(9), 'gpt', eyes='side', mouth='smile')
-    if -0.05 < k_flick < 0.3:
+    # ChatGPT strolls past right-to-left; her tail flicks the CPU cabinet
+    gx = lerp(330, 150, clamp((t - f.shot.start) / (t_obs + 0.4 - f.shot.start)))
+    p = PO.walk(f.step(9), 'gpt', eyes='side' if t < t_obs else 'happy', mouth='smile')
+    if -0.05 < kf < 0.3:
         p['tail'] = [(-3, -35), (-10, -34), (-18, -40), (-24, -48), (-30, -50), (-36, -46)]
     cv.blit(render('gpt', p), gx, 150, flip=True)
 
@@ -326,6 +346,7 @@ def s31(f):
         cv.rect(hx - 1, 140, 8, 6, '#e8b020')
     if k > 0:
         speed_lines(cv, t, 31, 18, 0, 180, dirx=-1, speed=700, c='#3a3450', length=(20, 70))
+    f.lyric_top = True
     if k > 1.4:
         f.fade = clamp((k - 1.4) / 0.5) * 0.8
 

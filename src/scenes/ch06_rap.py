@@ -68,8 +68,6 @@ def s40(f):
     p = PO.fall(f.step(10), 'gpt')
     p['eyes'], p['mouth'] = 'happy', 'shout'
     cv.blit(render('gpt', p), 160 + math.sin(t * 3) * 6, 120)
-    if k < 0.12:
-        f.flash = 1 - k / 0.12
 
 
 # ================================================================ 41 STOP -> GO
@@ -292,6 +290,7 @@ def s45(f):
     t_ask = wt('RLHF', 'askew')
     cv.fill('#141828')
     dgrad(cv, -12, -12, 344, 204, ['#1e1a30', '#141828'])
+    f.lyric_top = True
     b = bust('gpt', 'F', 'open', 'none', bottom=-34)
     cv.blit(b, 160, 116)
     # the mask over her face; slips crooked on "askew", revealing darkness with eyes

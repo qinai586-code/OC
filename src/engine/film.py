@@ -29,6 +29,7 @@ class Frame:
         self.flash = 0.0              # 0..1 white (ordered-dither) flash in post
         self.fade = 0.0               # 0..1 to black (ordered dither) in post
         self.lyrics = True
+        self.lyric_top = False       # draw subtitles at the top (when the bottom holds faces)
         self.shot = shot
 
     # timing helpers ----------------------------------------------------
@@ -64,8 +65,8 @@ class Shot:
 
 
 # (start, end, energy) sections for the beat punch: choruses/rap strong, verses light, bridge/ending holds none
-SECTIONS = [(2.06, 22.78, 0.35), (22.78, 35.8, 1.0), (38.62, 59.1, 0.45), (59.1, 88.0, 1.0),
-            (95.34, 108.6, 0.4), (110.14, 124.54, 1.0), (124.54, 137.5, 0.9), (140.26, 152.99, 0.8)]
+SECTIONS = [(5.18, 22.78, 0.35), (22.78, 35.8, 1.0), (38.62, 59.1, 0.45), (59.1, 88.0, 1.0),
+            (95.34, 108.6, 0.4), (110.14, 124.54, 1.0), (124.54, 132.0, 0.9), (140.26, 152.99, 0.8)]
 
 
 def energy(t):
@@ -124,5 +125,5 @@ class Film:
             k = max(0.0, 1.0 - since / 0.12)
             f.cam = dict(f.cam)
             f.cam['zoom'] = f.cam.get('zoom', 1.0) * (1.0 + 0.016 * amp * k * k)
-        post = dict(cam=f.cam, shake=f.shake, flash=f.flash, fade=f.fade, lyrics=f.lyrics, shot=s.name)
+        post = dict(cam=f.cam, shake=f.shake, flash=f.flash, fade=f.fade, lyrics=f.lyrics, shot=s.name, lyric_top=f.lyric_top)
         return img, post
