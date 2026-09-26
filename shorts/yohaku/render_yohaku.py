@@ -271,7 +271,10 @@ def build_rig():
     Wt['earTipL'] = Wt['earL'] ** 2; Wt['earTipR'] = Wt['earR'] ** 2
     names = list(Wt)
     skin = art[262 + P - 3:262 + P + 3, 505 + P - 3:505 + P + 3, :3].reshape(-1, 3).mean(0)
-    return dict(body=pm(body), tail=pm(tail), names=names, W=np.stack([Wt[n] for n in names]).astype(np.float32),
+    lum = art[..., :3] @ np.array([.3, .59, .11], np.float32)
+    lines = np.clip((cv2.GaussianBlur(lum, (0, 0), 3) - lum - .02) / .12, 0, 1) * art[..., 3]
+    lines = np.maximum(lines, np.clip(art[..., 3] - cv2.erode(art[..., 3], None), 0, 1) * .8).astype(np.float32)
+    return dict(lines=lines, body=pm(body), tail=pm(tail), names=names, W=np.stack([Wt[n] for n in names]).astype(np.float32),
                 gx=gx, gy=gy, skin=skin, shape=shp)
 
 # ---------------------------------------------------------------- per-frame character
@@ -688,8 +691,11 @@ def render_character(F, R, s, t, scene):
         rgb = rgb + (np.exp(-d2 * 2) * inten * a)[..., None] * np.asarray(col)
     reg = F[y0:y1, x0:x1]
     reg[:] = reg * (1 - a[..., None]) + np.clip(rgb, 0, None)
+    if DRAWW: LINEBUF[y0:y1, x0:x1] = np.maximum(LINEBUF[y0:y1, x0:x1], cv2.remap(R['lines'], srcx, srcy, cv2.INTER_LINEAR, borderValue=0))
 
 SIG = RIG = SCENE = None
+DRAWW = False
+PENCIL = np.array([.36, .34, .42], np.float32)
 STATIC = False                  # Live2D-style idle deformation of the head, ears, hair and upper body; hands and feet stay pinned
 STILL = ['bodyY', 'crouch', 'squash', 'bodyX', 'hipShift', 'armL', 'armR', 'liftL', 'liftR', 'tailBase', 'tailCurl']
 # one comic panel per lyric beat: (cue, hFrac, camY, camX, transition in)
@@ -700,7 +706,7 @@ SHOTS = [('0', .84, 780, 510, 'none'), ('2:1', 1.5, 300, 505, 'slide'), ('3:1', 
 INK = np.array([.16, .13, .2], np.float32)
 
 def init():
-    global SIG, RIG, SCENE, FOCUS, SPEED, HALF, YY, XX, LEAK
+    global SIG, RIG, SCENE, FOCUS, SPEED, HALF, YY, XX, LEAK, NOISE, LINEBUF
     if SIG is not None: return
     SIG, RIG, SCENE = build_signals(), build_rig(), Scene()
     r = rng(11); YY, XX = np.mgrid[0:H, 0:W].astype(np.float32); FOCUS = []
@@ -712,6 +718,7 @@ def init():
                  (W / 2 + math.cos(a) * r0, H / 2 + math.sin(a) * r0)]
             cv2.fillPoly(m, [np.int32(np.array(p) * 16)], 255, cv2.LINE_AA, 4)
         FOCUS.append(m.astype(np.float32) / 255)
+    NOISE = (np.clip(fbm((H, W), 9, (70, 22), (1, .5)) * .25 + .5, 0, 1)).astype(np.float32); LINEBUF = np.zeros((H, W), np.float32)
     g = (YY / H)[..., None]
     LEAK = np.clip(np.array([1., .70, .82]) * (1 - g) + np.array([.72, .80, 1.]) * g + np.array([.0, .12, -.1]) * np.exp(-((g - .5) / .18) ** 2), 0, 1).astype(np.float32)
     SPEED = np.zeros((H, W * 2), np.uint8)                          # speed lines, scrolled sideways
@@ -824,7 +831,9 @@ def panel(t, k, s0):
     return F * (1 - .16 * SCENE.g_br * (1 - bot)) * (1 - .05 * SCENE.g_v * (1 - bot))
 
 def frame(i):
-    init(); t = i / FPS
+    global DRAWW
+    init(); t = i / FPS; DRAWW = t < 2.0 or t > DUR - 2.8
+    if DRAWW: LINEBUF[:] = 0
     s0 = {k: v[min(i, len(v) - 1)] for k, v in SIG.items()}
     for k in STILL: s0[k] = 0.
     s0['approach'] = 1.
@@ -837,18 +846,33 @@ def frame(i):
     if SHOTS[k][4] == 'flash' and t - T(SHOTS[k][0]) < .3: F = F + (1 - F) * (1 - (t - T(SHOTS[k][0])) / .3) ** 2
     for ta, tb, bl in ((0., 1.7, ((880, 260, (.99, .72, .84)), (180, 1650, (.70, .84, .99)))),
                        (DUR - 2.6, DUR, ((180, 300, (1., .86, .7)), (900, 1680, (.84, .78, .99))))):
-        if ta <= t <= tb:                                                # colour accents: light-leak sweep + corner blooms
+        if ta <= t <= tb and ta == 0:                                    # opening colour accents: light-leak sweep + corner blooms
             u = (t - ta) / (tb - ta); pos = XX / W * .6 + YY / H * .4 - (u * 1.7 - .35)
             band = (np.exp(-(pos / .2) ** 2) * .5 * math.sin(math.pi * u))[..., None]
             F = 1 - (1 - F) * (1 - band * LEAK)
             for j, (bx, by, col) in enumerate(bl):
                 r = 520 * (1 - math.exp(-(u * (tb - ta)) / .5)) + 60 * j
                 blit(F, SCENE.SP['washes'][j + 1] * .42 * ((1 - .5 * u) if ta == 0 else (.5 + .5 * u)), bx, by, 2 * r, 2 * r, col, 'over', 40 * j + 10 * t)
+    card = SCENE.paper * (1 - .28 * (1 - LEAK)); LB = LINEBUF[..., None]
+    if t < 2.0:                                                          # draw-in: pencil lines, then colour washes in from her face
+        lr = np.clip(((-100 + (H + 300) * smoothstep(.08, .95, t)) - YY + (NOISE - .5) * 160) / 60, 0, 1)[..., None]
+        sk = card * (1 - .85 * LB * lr) + PENCIL * .85 * LB * lr
+        rad = 2300 * smoothstep(.55, 1.9, t); d = np.hypot(XX - 530, YY - 400) + (NOISE - .5) * 260
+        C = np.clip((rad - d) / 50, 0, 1)[..., None]; wet = (np.exp(-((rad - d) / 16) ** 2) * (rad > 1))[..., None]
+        F = (F * C + sk * (1 - C)) * (1 - .22 * wet * (1 - np.array([.8, .75, .98], np.float32)))
+    if t > DUR - 2.8:                                                    # erase-out: colour first, then the pencil lines
+        pos = (W - XX) / W * .55 + YY / H * .45 + (NOISE - .5) * .12
+        E1 = np.clip(((-.2 + 1.5 * smoothstep(DUR - 2.5, DUR - 1.2, t)) - pos) / .05, 0, 1)[..., None]
+        E2 = np.clip(((-.2 + 1.5 * smoothstep(DUR - 1.7, DUR - .45, t)) - pos) / .05, 0, 1)[..., None]
+        la = .85 * (1 - .88 * E2); sk = card * (1 - la * LB) + PENCIL * la * LB
+        u = smoothstep(DUR - 2.6, DUR - .6, t)                            # the colours she found stay on the page
+        for j, (bx, by, col) in enumerate(((180, 300, (1., .86, .7)), (900, 1680, (.84, .78, .99)), (860, 380, (.99, .74, .86)))):
+            r = 380 + 180 * u + 40 * j; blit(sk, SCENE.SP['washes'][j + 1] * .38 * u, bx, by, 2 * r, 2 * r, col, 'over', 40 * j + 6 * t)
+        F = F * (1 - E1) + sk * E1
     F[:14], F[-14:], F[:, :14], F[:, -14:] = SCENE.paper[:14], SCENE.paper[-14:], SCENE.paper[:, :14], SCENE.paper[:, -14:]   # panel gutter
     F[14:20, 14:-14] = INK; F[-20:-14, 14:-14] = INK; F[14:-14, 14:20] = INK; F[14:-14, -20:-14] = INK                      # ink frame
-    fin = smoothstep(0, .35, t) * (1 - smoothstep(DUR - .7, DUR - .02, t))
-    card = SCENE.paper * (1 - .28 * (1 - LEAK))                          # pastel gradient card instead of plain paper
-    F = card * (1 - fin) + F * fin
+    fin = smoothstep(0, .12, t) * (1 - smoothstep(DUR - .35, DUR - .02, t))
+    F = card * (1 - fin) + F * fin                                       # pastel gradient card instead of plain paper
     return (np.clip(F, 0, 1) * 255 + .5).astype(np.uint8)
 
 def main():

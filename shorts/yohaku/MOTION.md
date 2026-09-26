@@ -143,9 +143,9 @@ The energy comes from the edit and comic effects:
 - **Cat ears:** each twitches on its own at irregular moments (flicking out over 6 f, easing back over 14 f), perks with her expressions, and has springy tips.
 - **Hair:** the side curtains, bangs and ahoge move with a soft, gusting breeze and follow the head.
 
-**Colour accents:**
-- The **opening** has a diagonal light-leak sweep with pink and blue watercolour blooms in the corners.
-- The **ending** has a warm-to-lavender sweep and blooms, then fades to a pastel gradient card instead of plain paper.
+**Drawn in, erased out:**
+- **Opening:** she is sketched onto the blank page in pencil line art (her own linework, drawn top to bottom). Then the colour washes in from her face outward with a wet watercolour edge, along with a light-leak sweep and corner blooms.
+- **Ending:** an eraser sweep lifts the colour off first, leaving the pencil sketch, then erases the lines. A faint trace and the pink, peach and lavender blooms stay on the pastel page, because 「白に戻るわけじゃない」 (it doesn't go back to white).
 
 The sections below describe the earlier deformation approach, which is still in `render_yohaku.py` behind `STATIC = False`.
 
