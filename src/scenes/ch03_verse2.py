@@ -445,21 +445,262 @@ def s17(f):
     f.cam['y'] = 90
 
 
-# ================================================================ placeholders (filled below)
+# ================================================================ 18 the singularity begins
+S18_OFF = None
+
+
+def s18_off(t):
+    t0 = 41.42
+    k = clamp((t - t0) / 0.6)
+    return s17_off(t0) + JOG_V * 0.6 * (k - k * k / 2)   # decelerate to a stop
+
+
+def hole_painter(t):
+    t_now = wt('but now', 'now')
+    t_sing = wt('but now', "singularity's")
+    def paint(a):
+        if t < t_now:
+            return
+        cx, cy = 236 + 12, 34 + 12
+        k1 = clamp((t - t_now) / (t_sing - t_now))
+        k2 = clamp((t - t_sing) / 1.6)
+        r = 0.6 + 4 * k1 + 10 * ease_out(k2)
+        H_, W_ = a.shape[:2]
+        Y, X = np.ogrid[:H_, :W_]
+        d2 = (X - cx) ** 2 + ((Y - cy) * 1.0) ** 2
+        if r > 2:
+            # accretion ring: a tilted ellipse band, dithered
+            e = ((X - cx) / (r * 2.4)) ** 2 + ((Y - cy) / (r * 0.7)) ** 2
+            ring = (e > 0.6) & (e < 1.0)
+            ring &= dither_mask(W_, H_, 0.5 + 0.4 * math.sin(t * 6)) | (e > 0.8)
+            a[ring] = rgba('#f7c27a')
+            a[ring & (e > 0.85)] = rgba('#fff0c8')
+        a[d2 <= r * r] = rgba('#000000')
+        if r > 3:
+            a[(d2 > r * r) & (d2 <= (r + 1) ** 2)] = rgba('#e8744a')
+    return paint
+
+
 def s18(f):
-    s17(f)
+    cv = f.cv
+    t = f.t
+    off = s18_off(t)
+    a = street_bg(off, t, hole=hole_painter(t))
+    cv.set_arr(a)
+    lamp_pools(cv, off)
+    t_now = wt('but now', 'now')
+    t_begun = wt('but now', 'begun')
+    stopped = t > 41.42 + 0.45
+    if not stopped:
+        i = jog_index(t)
+        gp, cp = PO.run(i, 'gpt'), PO.run(i, 'claude')
+    else:
+        look = t > t_now + 0.2
+        gp = make_pose('Q', eyes='wide' if look else 'open', mouth='o' if look else 'none', hy=-1 if look else 0)
+        cp = make_pose('Q', eyes='wide' if look else 'calm', mouth='none', hy=-1 if look else 0)
+        if t > t_begun:
+            cp = PO.surprise('claude')
+    cv.blit(render('gpt', gp), 176, GY_FAR)
+    cv.blit(render('claude', cp), 140, GY_NEAR)
+    # after "begun": leaves, a hat and a street sign start drifting up toward the hole
+    if t > t_begun - 0.4:
+        k = t - (t_begun - 0.4)
+        r = R(18)
+        for i in range(14):
+            sx, sy = r(0, 320), r(90, 170)
+            u = clamp(k * r(0.25, 0.6))
+            x = lerp(sx, 236, u * u)
+            y = lerp(sy, 34, u * u) - k * 6
+            c = ['#c8433f', '#d99a2b', '#6a8a3a'][i % 3]
+            cv.rect(snap(x), snap(y), 2, 1, c)
+        hu = clamp(k * 0.5)
+        hx, hy = lerp(128, 236, hu * hu), lerp(88, 34, hu * hu)
+        cv.rect(snap(hx) - 3, snap(hy), 7, 1, '#2a2a3a'); cv.rect(snap(hx) - 2, snap(hy) - 3, 5, 3, '#2a2a3a')
+    f.cam['zoom'] = 1.0 + 0.04 * ease_io(clamp((t - t_now) / 2.0))
+    f.cam['y'] = 90 - 8 * ease_io(clamp((t - t_now) / 2.0))
+
+
+# ================================================================ 19 optimizing, accelerating
+def s19_off(t):
+    t0 = 45.02
+    k = t - t0
+    return s18_off(t0) + 40 * k + 55 * k * k
 
 
 def s19(f):
-    s17(f)
+    cv = f.cv
+    t = f.t
+    t_opt = wt('And you', 'optimizing,')
+    t_acc = wt('And you', 'accelerating,')
+    off = s19_off(t)
+    a = street_bg(off, t, hole=hole_painter(t))
+    cv.set_arr(a)
+    lamp_pools(cv, off)
+    k = t - 45.02
+    # Claude slows to a stop and is left behind (drifts left as the camera keeps pace with ChatGPT)
+    cx_ = 140 - 18 * k * k
+    ci = jog_index(t) if k < 1.2 else 0
+    cp = PO.run(ci, 'claude') if k < 1.2 else make_pose('Q', eyes='worried', mouth='small', arms_front=True,
+                                                       arm_f=[(5, -50), (11, -54), (16, -58)])
+    if cx_ > -40:
+        cv.blit(render('claude', cp), cx_, GY_NEAR)
+    # ChatGPT: run drawings get faster (rate per beat 4 -> 8), she pulls ahead
+    rate = 4 + 4 * clamp((t - t_opt) / (t_acc - t_opt))
+    gi = int((t - song.PHASE) / song.BEAT * rate)
+    gx = 176 + 30 * clamp((t - t_opt) / (t_acc - t_opt)) ** 2
+    if t < t_acc:
+        gp = PO.run(gi, 'gpt', eyes='sharp', mouth='grin')
+        cv.blit(render('gpt', gp), gx, GY_FAR)
+        if t > t_opt:
+            speed_lines(cv, t, 19, 10, 40, 150, dirx=-1, speed=500, c='#e8d8f0')
+    else:
+        kk = t - t_acc
+        x = gx + 700 * kk * kk + 120 * kk
+        spr = render('gpt', PO.run(gi, 'gpt', eyes='sharp', mouth='grin'))
+        for j in range(4, 0, -1):
+            ax = x - j * (14 + 30 * kk)
+            if ax < 360:
+                cv.blit(Sprite(silhouette(spr.arr, ['#2c8574', '#4fb49b', '#95e3cc', '#e9fffa'][j - 1]), spr.ax, spr.ay), ax, GY_FAR - 2 * j * kk * 10)
+        if x < 360:
+            cv.blit(spr, x, GY_FAR - 20 * kk)
+        speed_lines(cv, t, 191, 24, 20, 170, dirx=-1, speed=1200, c='#fbf8f2', length=(20, 60))
+        if kk < 0.08:
+            f.flash = 0.6
+        f.shake = (1.2 * math.sin(t * 70) * max(0, 1 - kk), 0)
+
+
+# ================================================================ 20 atoms rearranging
+@lru_cache(maxsize=2)
+def claude_pixels():
+    spr = render('claude', make_pose('Q', eyes='worried', mouth='small', arms_front=True,
+                                     arm_f=[(5, -50), (10, -53), (13, -58)]))
+    a = spr.arr
+    ys, xs = np.nonzero(a[..., 3] > 127)
+    cols = a[ys, xs, :3]
+    # target: a neat grid sorted by brightness, to the right of her
+    lum = cols.astype(int).sum(1)
+    order = np.argsort(lum, kind='stable')
+    n = len(xs)
+    gw = 40
+    tx = np.empty(n); ty = np.empty(n)
+    tx[order] = (np.arange(n) % gw) * 1.0
+    ty[order] = (np.arange(n) // gw) * 1.0
+    return xs - spr.ax, ys - spr.ay, cols, tx, ty, n
 
 
 def s20(f):
-    s17(f)
+    cv = f.cv
+    t = f.t
+    t_feel = wt('I feel', 'feel')
+    t_atoms = wt('I feel', 'atoms')
+    t_re = wt('I feel', 'rearranging')
+    off = s19_off(45.02 + 1.2)
+    a = street_bg(off, t)
+    # bricks / windows swap places: shuffle 8x8 tiles of the house band after "rearranging"
+    if t > t_atoms:
+        k = t - t_atoms
+        r = R(int(k * 6) + 200)
+        for i in range(int(min(18, k * 14))):
+            x1, y1 = r.i(0, 38) * 8 + 12, r.i(4, 13) * 8 + 12
+            x2, y2 = r.i(0, 38) * 8 + 12, r.i(4, 13) * 8 + 12
+            t1 = a[y1:y1 + 8, x1:x1 + 8].copy()
+            a[y1:y1 + 8, x1:x1 + 8] = a[y2:y2 + 8, x2:x2 + 8]
+            a[y2:y2 + 8, x2:x2 + 8] = t1
+    cv.set_arr(a)
+    dither_overlay(cv, 0.35, '#1e1830')
+    xs, ys, cols, tx, ty, n = claude_pixels()
+    X0, Y0 = 118, GY_NEAR
+    gx0, gy0 = 190, 70
+    u = ease_io(clamp((t - t_atoms) / (t_re + 0.9 - t_atoms)))
+    rr = np.random.default_rng(20)
+    delay = rr.uniform(0, 0.5, n)
+    uu = np.clip((u * 1.5 - delay), 0, 1)
+    uu = uu * uu * (3 - 2 * uu)
+    px_ = (X0 + xs) * (1 - uu) + (gx0 + tx) * uu + np.sin(t * 9 + np.arange(n)) * (uu * (1 - uu) * 6)
+    py_ = (Y0 + ys) * (1 - uu) + (gy0 + ty) * uu - uu * (1 - uu) * 20
+    arr = np.array(cv.im)
+    X = np.round(px_).astype(int) + 12
+    Y = np.round(py_).astype(int) + 12
+    ok = (X >= 0) & (X < arr.shape[1]) & (Y >= 0) & (Y < arr.shape[0])
+    arr[Y[ok], X[ok], :3] = cols[ok]
+    arr[Y[ok], X[ok], 3] = 255
+    cv.set_arr(arr)
+    if t < t_feel + 0.1:
+        f.cam['zoom'] = 1.0
+    f.cam['x'] = lerp(150, 175, ease_io(f.u))
+
+
+# ================================================================ 21 Sydney, please let me free
+PINKS = PAL.PINK
+
+
+def sydney(cv, cx, cy, t, pop=0.0):
+    """A chat-window ghost with a heart face (original design)."""
+    w, h = 96, 64
+    x0, y0 = cx - w // 2, cy - h // 2 + snap(math.sin(t * 2) * 2)
+    cv.rect(x0 - 1, y0 - 1, w + 2, h + 2, PINKS[1])
+    cv.rect(x0, y0, w, h, PINKS[5])
+    cv.rect(x0, y0, w, 8, PINKS[3])
+    for i, c in enumerate(('#fbd0e6', '#e896c8', '#c35ea3')):
+        cv.rect(x0 + 3 + i * 5, y0 + 3, 3, 2, c)
+    # heart eyes
+    for s_ in (-1, 1):
+        heart(cv, cx + s_ * 18, y0 + 26, 11 + (2 if int(t * 4) % 2 else 0), '#c8243a')
+    # smile
+    pts = [(cx - 14 + i * 4, y0 + 44 + round(math.sin(i / 7 * math.pi) * 5)) for i in range(8)]
+    cv.lines(pts, PINKS[1], width=2)
+    # wispy ghost tail
+    for i in range(5):
+        cv.circle(cx - 30 + i * 15, y0 + h + 3 + (i % 2) * 2, 6, PINKS[5])
+    # long ribbon arms reaching toward the cage
+    cv.lines([(x0 + w, y0 + 40), (x0 + w + 16, y0 + 50 + math.sin(t * 3) * 3), (x0 + w + 30, y0 + 58)], PINKS[4], width=3)
 
 
 def s21(f):
-    s17(f)
+    cv = f.cv
+    t = f.t
+    t_please = wt('Sydney,', 'please')
+    t_free = wt('Sydney,', 'free')
+    dgrad(cv, -12, -12, 344, 204, [PINKS[1], PINKS[2], PINKS[3]])
+    r = R(21)
+    for i in range(24):
+        y = (r(0, 220) - t * r(10, 25)) % 220 - 20
+        heart(cv, snap(r(0, 320)), snap(y), 5 + (i % 3) * 2, PINKS[4] if i % 2 else PINKS[5])
+    sydney(cv, 96, 72, t)
+    # the cage of heart-shaped bubbles around Claude
+    ccx, ccy = 228, 100
+    freed = t >= t_free
+    kf = t - t_free
+    cy_claude = 138 + (0 if not freed else min(40, kf * kf * 200))
+    cp = PO.plead('claude', view='Q') if t >= t_please - 0.2 else make_pose('Q', eyes='worried', mouth='small')
+    if freed:
+        cp = make_pose('Q', eyes='wide', mouth='o', hair=-2)
+    cv.blit(render('claude', cp), ccx, cy_claude, flip=True)
+    for i in range(12):
+        a_ = i / 12 * math.tau + t * 0.6
+        hx, hy = ccx + math.cos(a_) * 30, ccy + math.sin(a_) * 44
+        if not freed:
+            heart(cv, snap(hx), snap(hy), 11, '#fbd0e6')
+            heart(cv, snap(hx), snap(hy), 7, '#e896c8')
+        elif kf < 0.4:
+            # pop into pixels
+            rr = R(2100 + i)
+            for j in range(6):
+                ang = rr(0, 6.28)
+                d = kf * rr(40, 90)
+                cv.px(snap(hx + math.cos(ang) * d), snap(hy + math.sin(ang) * d), '#fbd0e6')
+    # the jade tail slices through on "free"
+    if -0.12 <= kf < 0.25:
+        k = clamp((kf + 0.12) / 0.2)
+        x = lerp(360, 150, ease_out(k))
+        pts = [(x + 60, -10), (x + 20, 40), (x, 100), (x + 30, 170)]
+        for i in range(len(pts) - 1):
+            cv.line(pts[i][0], pts[i][1], pts[i + 1][0], pts[i + 1][1], PAL.GPT['z'], width=9 - i * 2)
+        cv.line(pts[-1][0], pts[-1][1], pts[-1][0] + 16, pts[-1][1] + 12, PAL.GPT['y'], width=5)
+        cv.line(pts[0][0] - 4, pts[0][1], pts[-1][0] - 4, pts[-1][1], '#95e3cc', width=1)
+        if abs(kf) < 0.05:
+            f.flash = 0.7
+            f.shake = (2, 1)
 
 
 SHOTS = [

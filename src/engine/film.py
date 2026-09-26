@@ -63,6 +63,18 @@ class Shot:
         return f
 
 
+# (start, end, energy) sections for the beat punch: choruses/rap strong, verses light, bridge/ending holds none
+SECTIONS = [(2.06, 22.78, 0.35), (22.78, 35.8, 1.0), (38.62, 59.1, 0.45), (59.1, 88.0, 1.0),
+            (95.34, 108.6, 0.4), (110.14, 124.54, 1.0), (124.54, 137.5, 0.9), (140.26, 152.99, 0.8)]
+
+
+def energy(t):
+    for a, b, e in SECTIONS:
+        if a <= t < b:
+            return e
+    return 0.0
+
+
 class Film:
     def __init__(self, shots, duration):
         self.shots = sorted(shots, key=lambda s: s.start)
@@ -102,5 +114,15 @@ class Film:
                 x = int(CW * k)
                 img = img.copy()
                 img[:, x:] = pimg[:, x:]
+        # music-driven motion: a small camera punch on every beat, scaled by section energy
+        e = energy(t)
+        if e > 0:
+            import song
+            since = (t - song.PHASE) % song.BEAT
+            on_bar = int(round((t - since - song.PHASE) / song.BEAT)) % 4 == 0
+            amp = e * (1.0 if on_bar else 0.55)
+            k = max(0.0, 1.0 - since / 0.12)
+            f.cam = dict(f.cam)
+            f.cam['zoom'] = f.cam.get('zoom', 1.0) * (1.0 + 0.016 * amp * k * k)
         post = dict(cam=f.cam, shake=f.shake, flash=f.flash, fade=f.fade, lyrics=f.lyrics, shot=s.name)
         return img, post

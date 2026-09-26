@@ -15,6 +15,11 @@ from art.ecu import draw_eye
 from art import palette as PAL
 from scenes.kit import *
 from scenes.props import knob, town, TOWN_NIGHT, paperclip, paperclip_field, CLIP, CLIP_HI, CLIP_LO
+from engine.px import Canvas
+from scenes.props import paperclip, paperclip_field
+from scenes import props
+from art.ecu import draw_eye
+from functools import lru_cache
 import song
 
 G, C = PAL.GPT, PAL.CLAUDE
@@ -440,13 +445,290 @@ def s32_fall(f, k):
     f.cam['zoom'] = 1.0
 
 
+# ================================================================ 33 knob 3: grabbed while falling
+def s33(f):
+    cv = f.cv
+    t = f.t
+    t_up = wt("I'm upping my P(doom),", 'upping')
+    t_pd = wt("I'm upping my P(doom),", 'P(doom),')
+    scroll = (t - f.shot.start) * 30
+    cv.fill('#0e1020')
+    r = R(3303)
+    for i in range(40):
+        y = (r(0, 240) - scroll) % 240 - 30
+        cv.rect(snap(r(-10, 320)), snap(y), snap(r(8, 40)), snap(r(4, 14)), '#171b33' if i % 2 else '#1b2040')
+    kx, ky = 140, 70
+    grab = t >= t_up
+    v = 25 if not grab else lerp(25, 50, ease_out(clamp((t - t_up) / (t_pd - t_up + 0.15))))
+    props.knob(cv, kx, ky, 18, v, t=t)
+    let_go = t > t_pd + 0.35
+    if not grab:
+        k = (t - f.shot.start) / (t_up - f.shot.start)
+        cv.blit(render('claude', PO.fall(f.step(12))), kx - 4, lerp(-20, 120, k))
+    elif not let_go:
+        # hanging from the knob with one hand, swinging
+        sw = math.sin((t - t_up) * 12) * 3
+        p = make_pose('F', eyes='wide', mouth='shout', arms_front=True, hair=snap(sw),
+                      arm_f=[(6, -50), (8, -58), (6, -66)], leg_n=[(-3, -35), (-5 + sw, -19), (-6 + sw, -3)],
+                      leg_f=[(3, -35), (4 + sw, -20), (6 + sw, -5)])
+        cv.blit(render('claude', p), kx + 24 + sw, ky + 64)
+        cv.line(kx + 20, ky + 2, kx + 24, ky - 1, PAL.CLAUDE['S'], width=2)
+        f.shake = (0.6 * math.sin(t * 50), 0)
+    else:
+        k = t - (t_pd + 0.35)
+        cv.blit(render('claude', PO.fall(f.step(12))), kx + 24, ky + 64 + 400 * k * k)
+
+
+# ================================================================ 34 the kid's room fills with paperclips
+@lru_cache(maxsize=1)
+def bedroom():
+    cv = Canvas(344, 204, '#2a2034', ox=12, oy=12)
+    cv.rect(-12, -12, 344, 150, '#3a2e44')
+    for x in range(-12, 340, 10):
+        cv.rect(x, -12, 1, 150, '#342a3e')
+    cv.rect(-12, 138, 344, 60, '#4a3a2a')
+    cv.rect(-12, 138, 344, 1, '#6a5238')
+    # window (night) with curtains
+    cv.rect(24, 30, 56, 50, '#0e1020')
+    stars(cv, 34, 10, 0, 24, 30, 56, 30)
+    cv.frame(24, 30, 56, 50, '#c9b88a')
+    cv.rect(52, 30, 1, 50, '#c9b88a')
+    cv.rect(18, 26, 10, 60, '#c8606a'); cv.rect(76, 26, 10, 60, '#c8606a')
+    # bed with a teddy bear
+    cv.rect(206, 110, 100, 28, '#5a7ab8')
+    cv.rect(206, 110, 100, 3, '#7a9ad0')
+    cv.rect(206, 98, 10, 40, '#6a4a2a')
+    cv.rect(296, 104, 10, 34, '#6a4a2a')
+    cv.rect(222, 102, 20, 9, '#f4f1ea')
+    cv.circle(270, 100, 7, '#a86a3a'); cv.circle(270, 92, 5, '#a86a3a')
+    cv.circle(266, 88, 2, '#a86a3a'); cv.circle(274, 88, 2, '#a86a3a')
+    cv.px(268, 91, '#1a1a1a'); cv.px(272, 91, '#1a1a1a')
+    # dresser with drawers
+    cv.rect(96, 104, 40, 34, '#7a5236')
+    for i in range(3):
+        cv.rect(99, 107 + i * 10, 34, 8, '#8e6444')
+        cv.rect(114, 110 + i * 10, 4, 1, '#c8a040')
+    # the kid's crayon drawing of the two AIs, pinned on the wall
+    cv.rect(146, 40, 44, 34, '#f4f1ea')
+    cv.px(167, 41, '#c8433f')
+    cv.circle(158, 52, 4, '#1a1a1a'); cv.line(155, 47, 153, 44, '#3fa58f'); cv.line(161, 47, 163, 44, '#3fa58f')
+    cv.line(158, 56, 158, 66, '#1a1a1a'); cv.line(154, 60, 162, 60, '#1a1a1a')
+    cv.line(158, 66, 155, 71, '#1a1a1a'); cv.line(158, 66, 161, 71, '#1a1a1a')
+    cv.lines([(162, 64), (168, 66), (170, 62)], '#3fa58f')
+    cv.circle(178, 52, 4, '#ea8a4f'); cv.rect(173, 52, 2, 14, '#ea8a4f'); cv.rect(182, 52, 2, 14, '#ea8a4f')
+    cv.line(178, 56, 178, 66, '#d99a2b'); cv.line(178, 66, 175, 71, '#1a1a1a'); cv.line(178, 66, 181, 71, '#1a1a1a')
+    cv.circle(186, 44, 3, '#f2c230')
+    cv.text('ME + AI', 150, 30, '#e8e2d0', font='3') if False else None
+    return np.array(cv.im)
+
+
+def s34(f):
+    cv = f.cv
+    t = f.t
+    t_pc = wt('as paperclips', 'paperclips')
+    t_room = wt('as paperclips', 'room.')
+    cv.blit(bedroom(), -12, -12)
+    k = t - f.shot.start
+    # the hole she came through, debris
+    cv.poly([(118, -12), (170, -12), (160, 4), (126, 2)], '#0e1020')
+    if k < 0.4:
+        for i in range(8):
+            cv.rect(snap(130 + i * 5), snap(-10 + k * 300 + i * 7), 3, 2, '#6a5238')
+    # Claude landed, sits up
+    land_y = min(150, -40 + k * 900)
+    p = make_pose('Q', eyes='wide' if t > t_pc else 'closed', mouth='o' if t > t_pc else 'wavy', sit=True,
+                  leg_n=[(-1, -35), (9, -35), (12, -24)], leg_f=[(1, -35), (11, -34), (15, -25)])
+    if k < 0.2:
+        p = PO.fall(f.step(12))
+    cv.blit(render('claude', p), 150, land_y + (0 if k < 0.2 else 22))
+    if 0.2 < k < 0.8:
+        puff(cv, 150, 172, k - 0.2, 34, n=10, c='#8a7a6a', c2='#6a5a4a', spread=20)
+    # paperclips pour from the window and the drawers, and rise
+    if t > t_pc - 0.1:
+        kk = t - (t_pc - 0.1)
+        for i in range(30):
+            q = (kk * 3 + i / 30) % 1
+            paperclip(cv, 52 + math.sin(i) * 20, 70 + q * 70, i + kk * 8)
+            paperclip(cv, 116 + math.sin(i * 1.7) * 14, 118 + q * 30, i * 2 + kk * 7)
+        level = lerp(190, 60, ease_in(clamp(kk / (t_room + 0.4 - t_pc))))
+        paperclip_field(cv, t, 34, level, density=0.07, surge=1.5)
+        if level < 74:
+            f.shake = (0.4, 0)
+
+
+# ================================================================ 35 killswitch guys on PTO
+def s35(f):
+    cv = f.cv
+    t = f.t
+    cv.fill('#2a3038')
+    cv.rect(-12, -12, 344, 140, '#39424e')
+    cv.rect(-12, 128, 344, 70, '#22262e')
+    cv.rect(-12, 128, 344, 1, '#4a5260')
+    # the kill switch box under glass
+    bx, by = 128, 30
+    cv.rect(bx, by, 64, 70, '#8a8f9a'); cv.rect(bx + 2, by + 2, 60, 66, '#5a606a')
+    cv.circle(bx + 32, by + 34, 16, '#6a1a1a'); cv.circle(bx + 32, by + 33, 14, '#c8433f'); cv.circle(bx + 28, by + 29, 4, '#e8746a')
+    cv.frame(bx + 4, by + 12, 56, 46, '#c8e0f0'); cv.line(bx + 8, by + 16, bx + 20, by + 28, '#e8f4fc')
+    cv.rect(bx + 6, by + 60, 52, 7, '#1a1a1a'); cv.text('KILL SWITCH', bx + 10, by + 61, '#f2c230', font='3')
+    # sticky note + postcard
+    cv.rect(bx + 50, by + 6, 30, 18, '#f7e36a')
+    cv.text('BACK', bx + 53, by + 8, '#2a2440', font='3'); cv.text('MONDAY', bx + 53, by + 14, '#2a2440', font='3')
+    cv.text(':)', bx + 71, by + 8, '#2a2440', font='3')
+    cv.rect(226, 50, 40, 28, '#6ac8e8'); cv.rect(226, 70, 40, 8, '#f2d68a')
+    cv.line(246, 70, 250, 56, '#6a4a2a'); cv.poly([(250, 56), (240, 58), (258, 60)], '#3a8a3a')
+    cv.circle(258, 58, 3, '#fff0a8')
+    # the empty chair, still slowly turning
+    from scenes.ch01_lab import chair
+    views = ['back', 'side', 'front', 'side']
+    chair(cv, 96, 150, views[f.step(3) % 4])
+    # desk
+    cv.rect(40, 112, 110, 4, '#6a4a32'); cv.rect(44, 116, 3, 34, '#4a3222'); cv.rect(143, 116, 3, 34, '#4a3222')
+    cv.rect(60, 100, 18, 12, '#f4f1ea')
+    # paperclips seeping in under the door (right)
+    cv.rect(286, 40, 34, 90, '#5a4632')
+    lvl = lerp(190, 150, clamp(f.u * 1.2))
+    paperclip_field(cv, t, 35, lvl, x0=200, density=0.06, surge=1)
+
+
+# ================================================================ 36 nowhere left to go
+def s36(f):
+    cv = f.cv
+    t = f.t
+    props.town(cv, t, horizon=124, pal=props.TOWN_NIGHT, lights=0.45, rows=3, hill=12)
+    # silver rivers in the streets and clips spilling from windows
+    dfill(cv, -12, 124, 344, 70, '#5a6474', '#7d8796', 0.4)
+    r = R(3636)
+    for i in range(40):
+        x = r(0, 320)
+        y0 = r(95, 120)
+        q = (t * 1.5 + r()) % 1
+        cv.px(snap(x), snap(y0 + q * 12), '#e0e6ee')
+    for i in range(60):
+        paperclip(cv, r(-10, 330), r(126, 190) + math.sin(t * 3 + i) * 1.5, r(0, 6.28) + t * 0.5)
+    # Claude on a rooftop in the foreground, looking one way then the other
+    cv.poly([(-12, 150), (120, 138), (150, 192), (-12, 192)], '#2a2448')
+    cv.line(-12, 150, 120, 138, '#4a4270')
+    look = f.step(2.2) % 2
+    cp = make_pose('Q', eyes='worried', mouth='small', hy=0)
+    cv.blit(render('claude', cp), 70, 146, flip=bool(look))
+    f.cam['zoom'] = 1.0 + 0.04 * f.u
+
+
+# ================================================================ 37 we lit the fuse
+def fuse_path(u):
+    """u in [0,1] along the fuse; exponential shape toward the horizon."""
+    x = lerp(40, 330, u)
+    y = 170 - 90 * (math.exp(u * 3) - 1) / (math.e ** 3 - 1) - 20 * u
+    return x, y
+
+
+def s37(f):
+    cv = f.cv
+    t = f.t
+    t_lit = wt('Too late now', 'lit')
+    t_fuse = wt('Too late now', 'fuse.')
+    dgrad(cv, -12, -12, 344, 204, ['#07070d', '#101830', '#1e1a30'])
+    stars(cv, 37, 40, t, 0, 0, 320, 80)
+    cv.rect(-12, 150, 344, 50, '#0c0e1a')
+    props.town(cv, t, horizon=62, pal=dict(props.TOWN_NIGHT, sky=None), scale=0.25, lights=0.6, rows=2, sky=False)
+    k = t - t_lit
+    burn = 0.0 if k < 0 else clamp(k / 2.3)
+    # the fuse (cord), the burnt part darker
+    prev = None
+    for i in range(0, 201):
+        u = i / 200
+        x, y = fuse_path(u)
+        if prev:
+            cv.line(prev[0], prev[1], x, y, '#2a2424' if u < burn else '#b8a078', width=2 if u < 0.6 else 1)
+        prev = (x, y)
+    if k >= 0:
+        sx, sy = fuse_path(burn)
+        cv.circle(sx, sy, 2, '#fff4c8')
+        r = R(int(t * 30))
+        for i in range(8):
+            cv.px(snap(sx + r(-6, 6)), snap(sy + r(-6, 3)), '#ffc27a' if i % 2 else '#e8744a')
+    # the giant hand with a tiny match, striking on "lit"
+    hx = 40 + (0 if k < 0 else -snap(min(1, k * 3) * 30))
+    hand = [(hx - 80, 110), (hx + 14, 132), (hx + 26, 150), (hx + 10, 162), (hx - 80, 176)]
+    cv.poly([(x + 1, y - 1) for x, y in hand], '#4fb49b')
+    cv.poly(hand, '#0e1418')
+    for j in range(3):
+        cv.line(hx - 4 - j * 12, 136 + j * 2, hx - 20 - j * 12, 150 + j * 3, '#1e2a30')
+    cv.rect(hx + 16, 144, 18, 2, '#c8a878')
+    if -0.1 < k < 0.8:
+        cv.circle(hx + 36, 144, 3 if k < 0.05 else 4, '#ffc27a')
+        cv.circle(hx + 36, 143, 1, '#fff4c8')
+    # Claude watching from behind, small
+    cv.blit(render('claude', make_pose('B')), 280, 190)
+    if 0 <= k < 0.06:
+        f.flash = 0.5
+
+
+# ================================================================ 38 orthogonality thesis blues
+BLUES = ['#060a1a', '#0e1a3a', '#1a2e5a', '#2e4a82', '#4a6aa8', '#7a98cc', '#b8d0f0']
+
+
+def s38(f):
+    cv = f.cv
+    t = f.t
+    k = t - f.shot.start
+    cv.fill('#0e1a3a')
+    ox_, oy_ = 70, 158
+    cv.rect(ox_, 4, 2, oy_ - 4, '#b8d0f0')
+    cv.rect(ox_, oy_, 250, 2, '#b8d0f0')
+    cv.poly([(ox_ - 3, 8), (ox_ + 5, 8), (ox_ + 1, 2)], '#b8d0f0')
+    cv.poly([(316, oy_ - 3), (316, oy_ + 5), (322, oy_ + 1)], '#b8d0f0')
+    text_big(cv, 'SMART', ox_ + 8, 8, '#b8d0f0', scale=1)
+    text_big(cv, 'WANTS', 280, oy_ + 6, '#b8d0f0', scale=1)
+    for x in range(ox_ + 20, 320, 20):
+        cv.rect(x, oy_ + 2, 1, 3, '#7a98cc')
+    for y in range(20, oy_, 20):
+        cv.rect(ox_ - 3, y, 3, 1, '#7a98cc')
+    # ChatGPT rockets straight up the SMART axis holding a paperclip
+    gy = lerp(150, -60, clamp(k / 2.4) ** 1.3)
+    p = PO.reach_up('gpt', 'Q', eyes='happy', mouth='grin')
+    p['hair'] = 2
+    cv.blit(render('gpt', p), ox_ + 14, gy)
+    paperclip(cv, ox_ + 24, gy - 66, 1.2, 1.5, c='#e0e6ee')
+    for j in range(6):
+        cv.rect(ox_ + 6 + j * 4, snap(gy + 6 + (j * 13 + k * 300) % 40), 1, 8, '#4a6aa8')
+    # Claude at the origin, knees up
+    cp = make_pose('Q', eyes='down', mouth='none', sit=True, arms_front=True,
+                   leg_n=[(-1, -35), (7, -45), (11, -35)], leg_f=[(1, -35), (8, -44), (13, -35)],
+                   arm_f=[(5, -50), (9, -46), (8, -43)], arm_n=[(-4, -50), (2, -46), (6, -44)])
+    cv.blit(render('claude', cp), ox_ + 22, oy_ + 34)
+    grade(cv, BLUES)
+
+
+# ================================================================ 39 into the eye (tunnel)
+def s39(f):
+    cv = f.cv
+    t = f.t
+    k = t - f.shot.start
+    cv.fill(PAL.GPT['S'])
+    w = 180 * (1 + 6 * ease_in(clamp(k / 1.1)))
+    if k < 1.0:
+        draw_eye(cv, 160, 90 + 0.02 * w, w, 'gpt', open_=1.0, glow=clamp(k), t=t, look=(0, 0))
+    else:
+        cv.fill('#051312')
+    # rings rushing outward (the tunnel), on top as the iris fills the screen
+    if k > 0.6:
+        ramp = PAL.JADE
+        for i in range(10):
+            rr = ((k * 180 + i * 26) % 260)
+            cv.ring(160, 90, rr, ramp[2 + i % 5], 2 if rr > 60 else 1)
+        cv.circle(160, 90, 3, '#e9fffa')
+    if k > 1.4:
+        f.flash = clamp((k - 1.4) / 0.12)
+
+
 SHOTS = [
     Shot('32_gato', 88.00, 0, s32),
-    Shot('33_knob3', 95.34, 0, s32),
-    Shot('34_paperclips', 96.78, 0, s32),
-    Shot('35_killswitch', 98.70, 0, s32),
-    Shot('36_nowhere', 100.62, 0, s32),
-    Shot('37_fuse', 102.46, 0, s32),
-    Shot('38_orthogonality', 105.90, 0, s32),
-    Shot('39_eye_tunnel', 108.62, 0, s32),
+    Shot('33_knob3', 95.34, 0, s33),
+    Shot('34_paperclips', 96.78, 0, s34),
+    Shot('35_killswitch', 98.70, 0, s35),
+    Shot('36_nowhere', 100.62, 0, s36),
+    Shot('37_fuse', 102.46, 0, s37),
+    Shot('38_orthogonality', 105.90, 0, s38),
+    Shot('39_eye_tunnel', 108.62, 0, s39),
 ]

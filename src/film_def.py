@@ -26,4 +26,10 @@ for ch in CHAPTERS:
     except Exception as e:
         print(f'[film_def] {ch} failed to import: {e!r}', file=sys.stderr)
         traceback.print_exc(limit=2)
+# section-boundary transitions (motion design): flashes on chorus entries, dissolves on soft cuts
+TRANS = {'17_jog': ('dither', 0.30), '22_knob2': ('flash', 0.10), '46_knob4': ('flash', 0.10),
+         '32_gato': ('dither', 0.45), '54_seats': ('flash', 0.08), '57_lights_out': ('dither', 0.25)}
+for sh in shots:
+    if sh.name in TRANS and sh.transition == 'cut':
+        sh.transition, sh.tdur = TRANS[sh.name]
 FILM = Film(shots, song.DURATION)

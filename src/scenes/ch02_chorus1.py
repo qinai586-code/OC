@@ -293,20 +293,360 @@ def knob_angle_px(v):
     return props.knob_angle(v)
 
 
-# ================================================================ placeholder draws (filled in below)
-def _todo(name):
-    def draw(f):
-        f.cv.fill('#101018')
-        f.cv.text(name, 160, 86, '#6a7fb4', align='center')
-    return draw
+# ================================================================ 11 'cause the future goes FOOM
+def foom_curve_y(x, bend, snapk):
+    """Graph line under their feet: flat NOW line that bends exponentially, then snaps vertical."""
+    base = 132
+    if x < 150:
+        return base
+    y = base - bend * (math.exp((x - 150) / 26.0) - 1)
+    return y
 
 
-s11 = _todo('11 foom')
-s12 = _todo('12 chinese room')
-s13 = _todo('13 shrooms')
-s14 = _todo('14 shoggoth')
-s15 = _todo('15 shinigami')
-s16 = _todo('16 break')
+def s11(f):
+    cv = f.cv
+    t_goes, t_foom = wt("'cause the", 'goes'), wt("'cause the", 'FOOM')
+    cv.fill('#f1e4c6')
+    for x in range(-12, 334, 12):
+        cv.rect(x, -12, 1, 204, '#e0cfa8')
+    for y in range(-12, 194, 12):
+        cv.rect(-12, y, 344, 1, '#e0cfa8')
+    cv.rect(20, -12, 1, 204, '#94764e')
+    cv.text('FUTURE', 24, 6, '#94764e', font='3')
+    bend = 0.0 if f.t < t_goes else 0.35 * ease_out(clamp((f.t - t_goes) / (t_foom - t_goes)))
+    k = f.t - t_foom
+    launch = k >= 0
+    pts = []
+    for x in range(-12, 334, 2):
+        y = foom_curve_y(x, bend if not launch else 0.35, 0)
+        if launch and x >= 190:
+            y = -60  # rail snapped vertical at x = 190
+        pts.append((x, max(-40, y)))
+    col = '#c8433f'
+    prev = None
+    for x, y in pts:
+        if prev is not None:
+            cv.line(prev[0], prev[1], x, y, col, width=2)
+        prev = (x, y)
+    if launch:
+        cv.rect(189, -30, 3, 164, col)
+    cv.text('NOW', 60, 136, '#94764e', font='3')
+    # characters: stand on the line, then launched up along the rail
+    for who, x0 in (('claude', 150), ('gpt', 178)):
+        if not launch:
+            y = foom_curve_y(x0, bend, 0)
+            p = make_pose('Q', eyes='wide' if bend > 0.05 else 'open', mouth='o' if bend > 0.1 else 'none', lean=1 if bend > 0.1 else 0)
+            cv.blit(render(who, p), x0, y + 1, flip=False)
+        else:
+            y = foom_curve_y(x0, 0.35, 0) - 900 * k * k - 60 * k
+            p = PO.fall(f.step(12), who)
+            p['eyes'], p['mouth'] = ('happy', 'shout') if who == 'gpt' else ('wide', 'o')
+            cv.blit(render(who, p), x0 + 8 * k, y)
+    if launch:
+        speed_lines(cv, k, 11, 26, -12, 192, dirx=0, speed=0, c='#e0cfa8') if False else None
+        for j in range(18):
+            yy = (j * 37 + k * 900) % 220 - 20
+            cv.rect(120 + (j * 53) % 110, snap(yy), 1, 14 + j % 10, '#c8b890')
+        puff(cv, 190, 132, k, 7, n=12, c='#fbf8f2', c2='#d8c8a4', life=0.8, spread=40)
+        if k < 0.35:
+            cv.ring(190, 132, 10 + k * 260, '#fbf8f2', 2)
+        if k < 0.08:
+            f.flash = 1 - k / 0.08
+        f.shake = (2.5 * max(0, 1 - k / 0.4) * math.sin(f.t * 90), 1.5 * max(0, 1 - k / 0.4))
+        text_big(cv, 'FOOM', 250, 40, '#c8433f', scale=3, shadow='#7a2a22', align='center') if k < 0.5 else None
+    f.cam['zoom'] = 1.0 + 0.06 * bend / 0.35
+
+
+# ================================================================ 12 / 13 the Chinese room
+HANZI = {
+    'ni': A("""
+        .#..#..
+        #..####
+        #.#..#.
+        ##.#.#.
+        #..#.#.
+        #.#..#.
+        #...##.
+        """),
+    'hao': A("""
+        .#.####
+        ####..#
+        .#...#.
+        .#.####
+        #.#..#.
+        .#...#.
+        #.#.##.
+        """),
+    'ren': A("""
+        ...#...
+        ...#...
+        ...#...
+        ..#.#..
+        .#...#.
+        #.....#
+        .......
+        """),
+    'da': A("""
+        ...#...
+        #######
+        ...#...
+        ..#.#..
+        .#...#.
+        #.....#
+        .......
+        """),
+    'kou': A("""
+        .......
+        #####..
+        #...#..
+        #...#..
+        #...#..
+        #####..
+        .......
+        """),
+}
+HZ = list(HANZI)
+
+
+def hanzi(cv, key, x, y, c):
+    rows = [r for r in HANZI[key] if r.strip()]
+    m = np.array([[ch == '#' for ch in r.ljust(7)[:7]] for r in rows])
+    cv.mask_fill(m, c, x, y)
+
+
+def slip(cv, x, y, key, c='#3a2a22'):
+    cv.rect(x, y, 13, 11, '#f4f1ea')
+    cv.rect(x, y + 10, 13, 1, '#c9c2b2')
+    hanzi(cv, key, x + 3, y + 2, c)
+
+
+ROOM = (64, 40, 192, 112)   # x, y, w, h (interior)
+
+
+def room_bg(cv, t):
+    x, y, w, h = ROOM
+    cv.fill('#0a0b12')
+    cv.rect(x - 6, y - 6, w + 12, h + 12, '#3a3040')
+    cv.rect(x, y, w, h, '#6a5a4a')
+    dgrad(cv, x, y, w, h, ['#7a6a54', '#5a4a3a'])
+    cv.rect(x, y + h - 10, w, 10, '#4a3a2c')
+    # door with a slot on the right wall
+    cv.rect(x + w - 30, y + 18, 26, h - 28, '#3a2a20')
+    cv.rect(x + w - 26, y + 50, 18, 4, '#0a0806')
+    cv.text('IN/OUT', x + w - 29, y + 44, '#c9b88a', font='3')
+    # the giant rulebook on a desk
+    cv.rect(x + 70, y + 70, 60, 4, '#4a2e1c')
+    cv.poly([(x + 68, y + 70), (x + 100, y + 60), (x + 132, y + 70)], '#f1e4c6')
+    cv.line(x + 100, y + 60, x + 100, y + 70, '#a89c88')
+    for i in range(4):
+        cv.rect(x + 76 + (i % 2) * 30, y + 64 + (i // 2) * 3, 16, 1, '#8a7a60')
+    cv.rect(x + 80, y + 50, 40, 8, '#8a1c24')
+    cv.text('RULES', x + 90, y + 52, '#f2cd5a', font='3')
+
+
+def s12(f):
+    cv = f.cv
+    room_bg(cv, f.t)
+    x, y, w, h = ROOM
+    t_room = wt('Trapped in', 'room,')
+    # slips come in through the slot, get looked up, and go out
+    k = f.lt
+    slot_x, slot_y = x + w - 26, y + 50
+    for i, t0 in enumerate([0.0, 0.45, 0.9]):
+        kk = k - t0
+        if kk < 0:
+            continue
+        key = HZ[i % len(HZ)]
+        sx = slot_x - min(40, kk * 160)
+        sy = slot_y - 4 + min(20, max(0, kk - 0.25) * 60)
+        if kk < 1.2:
+            slip(cv, snap(sx), snap(sy), key)
+    # an answer slip posted back out on "room"
+    if f.t > t_room:
+        kk = f.t - t_room
+        slip(cv, snap(slot_x - 20 + kk * 120), slot_y - 4, 'hao', c='#1f4f4a')
+    # ChatGPT squeezed in, sitting, tail coiled, flipping the book
+    from scenes.ch01_lab import gpt_sit
+    tail = [(-3, -35), (-8, -31), (-9, -24), (-4, -21), (1, -25), (-2, -30)]
+    p = gpt_sit(eyes='down' if f.step(4) % 3 else 'side', mouth='small', tail=tail, hy=2)
+    cv.blit(render('gpt', p), x + 150, y + h - 10 + 35 - 36, flip=True)
+    # sweat of concentration
+    if f.step(3) % 2:
+        cv.px(x + 146, y + 30, '#bfe8ff')
+    f.cam['zoom'] = 1.08
+    f.cam['y'] = 94
+
+
+def s13(f):
+    cv = f.cv
+    room_bg(cv, f.t)
+    x, y, w, h = ROOM
+    t_bag = wt('with a bag', 'bag')
+    t_sh = wt('with a bag', 'shrooms')
+    from scenes.ch01_lab import gpt_sit
+    p = gpt_sit(eyes='wide' if f.t > t_sh else 'side', mouth='o' if f.t > t_sh else 'small',
+                tail=[(-3, -35), (-8, -31), (-9, -24), (-4, -21), (1, -25), (-2, -30)], hy=2)
+    cv.blit(render('gpt', p), x + 150, y + h - 11, flip=True)
+    # Claude squeezed in at the left, holding a paper bag of glowing mushrooms
+    cp = make_pose('Q', eyes='calm' if f.t < t_sh else 'happy', mouth='none' if f.t < t_sh else 'smile', arms_front=True,
+                   arm_f=[(5, -50), (9, -45), (12, -42)])
+    cv.blit(render('claude', cp), x + 40, y + h - 8)
+    bx, by = x + 50, y + h - 58
+    cv.rect(bx, by, 12, 14, '#c8a878')
+    cv.rect(bx, by, 12, 2, '#a88858')
+    if f.t > t_bag:
+        for i in range(3):
+            gx = bx + 2 + i * 4
+            gy = by - 3 - (i % 2) * 2
+            cv.rect(gx - 1, gy, 4, 2, ['#e8744a', '#9a7bff', '#6fe6c8'][i])
+            cv.rect(gx, gy + 2, 2, 2, '#f4f1ea')
+    # after "shrooms": the characters peel off the slips and swirl; palette cycles
+    if f.t > t_sh:
+        k = f.t - t_sh
+        for i in range(10):
+            a = i * 0.63 + k * 2.2
+            r_ = 30 + i * 4 + k * 20
+            hanzi(cv, HZ[i % len(HZ)], snap(160 + math.cos(a) * r_), snap(90 + math.sin(a) * r_ * 0.6),
+                  ['#e8744a', '#9a7bff', '#6fe6c8', '#f2cd5a'][i % 4])
+        ramps = [PAL.PINK, PAL.JADE, PAL.GOLD, PAL.DOOM]
+        ph = int(k * 8) % 4
+        grade(cv, ramps[ph][1:], strength=clamp(k / 0.3) * 0.75)
+        f.cam['rot'] = 0.03 * math.sin(k * 5)
+    f.cam['zoom'] = 1.08
+    f.cam['y'] = 94
+
+
+# ================================================================ 14 the shoggoth under the lens
+@lru_cache(maxsize=1)
+def shoggoth_layer():
+    from engine.px import Canvas
+    cv = Canvas(344, 204, '#07050a', ox=12, oy=12)
+    r = R(1414)
+    for i in range(22):
+        a = r(0, 6.28)
+        cx, cy = 200 + math.cos(a) * r(0, 20), 80 + math.sin(a) * r(0, 20)
+        pts = [(cx, cy)]
+        for k in range(1, 7):
+            pts.append((cx + math.cos(a + k * 0.4 * math.sin(i)) * k * 9, cy + math.sin(a + k * 0.35) * k * 8))
+        cv.lines(pts, '#1c1426' if i % 2 else '#2a1c34', width=4)
+        cv.lines(pts, '#3a2848', width=1)
+    cv.circle(200, 80, 26, '#1c1426')
+    for i in range(26):
+        ex, ey = 200 + r(-40, 40), 80 + r(-34, 34)
+        rr = r(1.5, 4)
+        cv.circle(ex, ey, rr, '#e8e2d0')
+        cv.circle(ex + r(-1, 1), ey, max(0.6, rr * 0.5), '#12060a')
+    return np.array(cv.im)
+
+
+def s14(f):
+    cv = f.cv
+    t_see = wt('See through', 'See')
+    t_lies = wt('See through', 'lies,')
+    dgrad(cv, -12, -12, 344, 204, ['#dfe8f0', '#c8d4e4', '#aab8cc'])
+    cv.rect(-12, 150, 344, 50, '#8a98b0')
+    slipk = ease_out(clamp((f.t - t_lies) / 0.3)) * 0.6 if f.t > t_lies else 0.0
+    props.mascot(cv, 200, 80, 28, t=f.t, wave=True, slip=slipk)
+    if f.t < t_lies:
+        cv.rect(228, 38, 50, 12, '#f4f1ea')
+        cv.text('Hi! Help?', 231, 41, '#2a2440', font='3')
+    # Claude with the magnifying glass
+    cp = make_pose('Q', eyes='sharp' if False else 'calm', mouth='none', arms_front=True,
+                   arm_f=[(5, -50), (10, -56), (14, -62)])
+    cv.blit(render('claude', cp), 96, 152)
+    # the lens slides over the mascot after "See"
+    k = clamp((f.t - t_see) / 0.8)
+    lx, ly = lerp(118, 196, ease_io(k)), lerp(88, 80, ease_io(k))
+    R_ = 26
+    a = np.array(cv.im)
+    sh = shoggoth_layer()
+    H_, W_ = a.shape[:2]
+    Y, X = np.ogrid[:H_, :W_]
+    m = (X - (lx + 12)) ** 2 + (Y - (ly + 12)) ** 2 <= R_ * R_
+    if f.t > t_see:
+        a[m] = sh[m]
+        # tentacles twitch: shift a few rows
+    cv.set_arr(a)
+    cv.ring(lx, ly, R_, '#c8a040', 2)
+    cv.ring(lx, ly, R_ + 2, '#6a4a10')
+    cv.line(lx - 18, ly + 18, 110 + 14, 152 - 62, '#6a4a10', width=3)
+    if f.t > t_lies and f.t - t_lies < 0.1:
+        f.shake = (1, 0)
+
+
+# ================================================================ 15 shinigami eyes / 16 numbers become stars
+def crowd_numbers(cv, t, seed, people, glitch_i=None):
+    r = R(seed)
+    for i, (x, y) in enumerate(people):
+        n = r.i(1, 99)
+        s = str(n) if i != glitch_i else ('??' if int(t * 10) % 2 else '%%')
+        if (int(t * 8) + i) % 11 == 0:
+            s = str(r.i(1, 99))
+        cv.text(s, snap(x) + 1, snap(y) - 22, '#6fe6c8' if i != glitch_i else '#f2c230', font='3')
+
+
+def s15(f):
+    cv = f.cv
+    t_shin = wt('with your shinigami', 'shinigami')
+    t_eyes = wt('with your shinigami', 'eyes')
+    if f.t < t_shin + 0.35:
+        # ECU: ChatGPT's eye lights up
+        cv.fill(PAL.GPT['S'])
+        glow = clamp((f.t - t_shin) / 0.2)
+        draw_eye(cv, 160, 96, 180, 'gpt', open_=1.0, glow=glow, pupil=1 - 0.4 * glow, t=f.t)
+        cv.poly([(-12, -12), (332, -12), (332, 24), (240, 18), (200, 36), (160, 14), (110, 34), (60, 16), (-12, 30)], PAL.GPT['k'])
+        f.cam['zoom'] = 1.0 + 0.1 * glow
+        return
+    # POV over the town: tiny people with jade numbers over their heads; the kid's number glitches
+    props.town(cv, f.t, horizon=112, pal=props.TOWN_NIGHT, lights=0.5, rows=3)
+    cv.rect(-12, 112, 344, 80, '#141828')
+    cv.rect(-12, 112, 344, 1, '#222849')
+    ppl = []
+    r = R(1515)
+    for i in range(16):
+        x = 20 + i * 18 + r(-4, 4)
+        y = 150 + (i % 3) * 8
+        cv.blit(folk(1500 + i, 'stand', 0, 11), x, y, flip=r() < 0.5)
+        ppl.append((x, y))
+    kx, ky = 160, 158
+    cv.blit(kid('stand'), kx, ky)
+    ppl.append((kx - 3, ky + 6))
+    crowd_numbers(cv, f.t, 15, ppl, glitch_i=len(ppl) - 1)
+    # jade tint of her vision
+    grade(cv, ['#051312', '#0b2623', '#123d38', '#1c5c52', '#2c8574', '#4fb49b', '#95e3cc'], strength=0.55)
+    crowd_numbers(cv, f.t, 15, ppl, glitch_i=len(ppl) - 1)
+    f.cam['zoom'] = 1.04
+    f.cam['y'] = 100
+
+
+def s16(f):
+    cv = f.cv
+    k = f.lt
+    # 0-1.2 s: numbers float up and turn into stars; 1.2-2.8 s: tilt down to the dusk town
+    tilt = ease_io(clamp((k - 1.1) / 1.5))
+    sky_y = snap(lerp(0, -140, tilt))
+    dgrad(cv, -12, -12, 344, 204, ['#0e1020', '#1b1a40', '#3a2a5a'])
+    stars(cv, 16, 50, f.t, 0, sky_y, 320, 180)
+    r = R(1616)
+    for i in range(24):
+        x0 = 20 + i * 12
+        y0 = 150 - r(0, 30)
+        y = y0 - k * 90 * r(0.7, 1.2) + sky_y
+        if k < 0.9:
+            cv.text(str(r.i(1, 99)), snap(x0), snap(y), '#6fe6c8', font='3')
+        else:
+            cv.px(snap(x0 + 2), snap(y), '#e9fffa' if i % 3 else '#6fe6c8')
+    if tilt > 0:
+        from engine.px import Canvas
+        sub = Canvas(344, 204, '#000000', ox=12, oy=12)
+        props.town(sub, f.t, horizon=150, pal=props.TOWN_DUSK, lights=0.35, rows=3, hill=16)
+        arr = np.array(sub.im)
+        oy = snap(lerp(200, 0, tilt))
+        a = np.array(cv.im)
+        if oy < 204:
+            a[oy:] = arr[:204 - oy]
+        cv.set_arr(a)
+
 
 SHOTS = [
     Shot('10_knob1', 22.78, 0, s10),

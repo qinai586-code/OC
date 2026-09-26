@@ -303,7 +303,7 @@ def draw_claude(p):
     # thigh ribbon on white leg
     hip, knee, _ = near_leg
     ry = wt
-    rx = round(lerp(hip[0], knee[0], (ry - hip[1]) / (knee[1] - hip[1])))
+    rx = round(lerp(hip[0], knee[0], (ry - hip[1]) / ((knee[1] - hip[1]) or 1)))
     P.put(poly_mask([(rx - 2, ry), (rx + 2, ry), (rx + 2, ry), (rx - 2, ry)]) & (limb_mask([hip, knee], [5, 4])), C['r'])
     # --- skirt
     sw = p['skirt']
