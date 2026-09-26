@@ -888,7 +888,7 @@ def main():
         t = float(sys.argv[sys.argv.index('--frame') + 1]); init()
         cv2.imwrite(os.path.join(OUT, 'frame.png'), cv2.cvtColor(frame(int(round(t * FPS))), cv2.COLOR_RGB2BGR)); return
     import imageio_ffmpeg
-    ff = imageio_ffmpeg.get_ffmpeg_exe(); n = int(round(DUR * FPS)); path = os.path.join(OUT, 'yohaku.mp4')
+    ff = imageio_ffmpeg.get_ffmpeg_exe(); n = int(round(DUR * FPS)); path = os.environ.get('OUTFILE', os.path.join(OUT, 'yohaku.mp4'))
     p = subprocess.Popen([ff, '-y', '-loglevel', 'error', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-s', f'{W}x{H}', '-r', str(FPS), '-i', '-',
                           '-i', AUDIO, '-c:v', 'libx264', '-preset', 'slow', '-crf', '18', '-pix_fmt', 'yuv420p', '-profile:v', 'high',
                           '-c:a', 'aac', '-b:a', '256k', '-shortest', '-movflags', '+faststart', path], stdin=subprocess.PIPE)

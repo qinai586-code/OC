@@ -1,3 +1,4 @@
 render/*
 !render/yohaku.mp4
 __pycache__/
+*.tmp.mp4
