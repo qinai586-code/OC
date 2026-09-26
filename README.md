@@ -10,7 +10,7 @@ An original animated music short, about 2:05 long, starring fictional anime pers
 | [docs/SONG.md](docs/SONG.md) | the song concept, the full original lyrics, the production brief (150 BPM, D major, instrumentation, vocals) and the beat map |
 | [STORYBOARD.md](STORYBOARD.md) | 37 shots with timings, the reads for each, camera and transitions |
 | [docs/TECH.md](docs/TECH.md) | the 60 fps engine, the motion contract, the scale system, the character interface (character design is handed to ChatGPT) and the QA plan |
-| [shorts/yohaku/MOTION.md](shorts/yohaku/MOTION.md) | a separate 24.7 s clip for the user's cat-eared OC: the music cut, the motion design and a beat-locked motion timeline |
+| [shorts/yohaku/MOTION.md](shorts/yohaku/MOTION.md) | a separate 27.4 s clip for the user's cat-eared OC: the final video (`shorts/yohaku/render/yohaku.mp4`), the music cut, the motion design and the renderer |
 
 The engine is based on [ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase) (MIT; see LICENSE), reorganised for 60 fps continuous motion.
 
