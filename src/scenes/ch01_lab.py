@@ -308,13 +308,14 @@ def s05(f):
     t_s = song.word_time("that's no", 'surprise')
     k = f.t - t_s
     # Claude bust left facing right, ChatGPT bust right facing left
-    cb = bust('claude', 'Q', 'calm', 'none')
-    cv.blit(cb, 92, 150)
+    by = 116
+    cb = bust('claude', 'Q', 'calm', 'none', bottom=-18)
+    cv.blit(cb, 92, by)
     arm = (('arms_front', True), ('arm_f', ((5, -50), (11, -50), (16, -53))))
-    gb = bust('gpt', 'Q', 'happy' if k > 0 else 'open', 'grin' if k > 0 else 'smile', pose_key=arm)
-    cv.blit(gb, 246, 150, flip=True)
+    gb = bust('gpt', 'Q', 'happy' if k > 0 else 'open', 'grin' if k > 0 else 'smile', pose_key=arm, bottom=-18)
+    cv.blit(gb, 246, by, flip=True)
     # popper in ChatGPT's raised hand (bust hand at local (16,-53) x2, flipped)
-    hx, hy = 246 - 2 * 16, 150 + 2 * (-53 - (-54)) - 2 * 1
+    hx, hy = 246 - 2 * 16, by + 2 * (-53 - (-54)) - 2 * 1
     popper(cv, hx - 14, hy, k)
     # the streamers and confetti
     if k > 0:
@@ -322,11 +323,11 @@ def s05(f):
         # streamers draped on Claude's head (settle after 0.35 s)
         if k > 0.3:
             for i, (x0, c) in enumerate(((76, '#f2c230'), (86, '#e05a6a'), (98, '#6fd3bb'), (106, '#9a7bff'))):
-                pts = [(x0, 94), (x0 + 2, 100), (x0 - 1, 108), (x0 + 1, 116)]
+                pts = [(x0, 60), (x0 + 2, 66), (x0 - 1, 74), (x0 + 1, 82)]
                 cv.lines(pts[:2 + min(2, int((k - 0.3) * 20))], c)
             for i in range(10):
                 x = 70 + (i * 37) % 44
-                cv.rect(x, 92 + (i * 5) % 6, 2, 1, ('#f2c230', '#e05a6a', '#6fd3bb', '#f4f1ea')[i % 4])
+                cv.rect(x, 58 + (i * 5) % 6, 2, 1, ('#f2c230', '#e05a6a', '#6fd3bb', '#f4f1ea')[i % 4])
     f.cam['x'] = 160 - 3 * ease_io(f.u)
 
 
@@ -507,9 +508,26 @@ def s07(f):
                 if (yy + f.step(20)) % 3:
                     cv.px(tp_x - 11 + (yy - tp_y) // 8, yy, '#c98a3a')
     f.cam['x'] = 180
-    if k >= 0.07:
-        # the BOSS mug label, drawn big enough to read
-        text_big(cv, 'BOSS', cx + 6, cy - 10 - 66, '#1f4f4a', scale=1, font='3')
+    if k >= 0.16:
+        # insert: the spun-around boss, smug, raising her BOSS mug
+        lab(cv, f.t)
+        dither_overlay(cv, 0.3, '#0e1020')
+        cv.rect(96, 128, 128, 60, '#1b1f27')
+        cv.rect(96, 128, 128, 1, '#2d333f')
+        arm = (('arms_front', True), ('arm_f', ((6, -50), (10, -50), (12, -55))))
+        gb = bust('gpt', 'F', 'sharp', 'smile', pose_key=arm, bottom=-18)
+        cv.blit(gb, 160, 116)
+        mx, my = 170, 88
+        cv.rect(mx, my, 18, 20, '#f4f1ea')
+        cv.rect(mx + 18, my + 5, 4, 9, '#f4f1ea')
+        cv.rect(mx + 19, my + 7, 2, 5, '#1b1f27')
+        cv.rect(mx, my, 18, 1, '#ffffff')
+        cv.rect(mx + 15, my + 1, 3, 19, '#d8d2c8')
+        cv.text('BOSS', mx + 2, my + 8, '#1f4f4a', font='3')
+        for j in range(3):
+            yy = my - 3 - ((f.step(8) + j * 2) % 6)
+            cv.px(mx + 5 + j * 4, yy, '#d8d2c8')
+        f.cam['x'] = 160
 
 
 # ================================================================ 08 / 09 the dragon shadow
@@ -586,6 +604,8 @@ def s08(f):
     if k >= 0:
         # breathing shadow, head top-right
         dragon_shadow(cv, f.t, 150, 50 + math.sin(f.t * 2.4) * 2, scale=1.05, jaw=0.1 + 0.1 * math.sin(f.t * 1.5))
+        cv.rect(-12, LAB_FLOOR, 344, 50, '#141018')
+        cv.rect(-12, LAB_FLOOR, 344, 1, '#2a1c18')
     # the lamp on the floor
     cv.rect(236, LAB_FLOOR - 6, 10, 6, '#2d333f')
     cv.poly([(238, LAB_FLOOR - 6), (244, LAB_FLOOR - 6), (250, LAB_FLOOR - 14), (232, LAB_FLOOR - 14)], '#c8b070' if k >= 0 else '#3a3528')
@@ -611,10 +631,12 @@ def s09(f):
         cp = PO.plead('claude', view='Q')
         spr = render('claude', cp)
         from engine.px import silhouette
-        sh = silhouette(spr.arr, '#2e1c15')
-        big = np.repeat(np.repeat(sh, 1, 0), 1, 1)
-        cv.blit(big, 70 - spr.ax, 128 - spr.ay)
+        from engine.scalex import scale2x
+        sh = scale2x(silhouette(spr.arr, '#2e1c15'))
+        cv.blit(sh, 64 - 2 * spr.ax, 146 - 2 * spr.ay)
         dragon_shadow(cv, f.t, 164 - 20 * ease_in(lunge), 60 + 20 * ease_in(lunge), scale=1.1, jaw=clamp(jaw), lunge=0)
+        cv.rect(-12, LAB_FLOOR, 344, 50, '#141018')
+        cv.rect(-12, LAB_FLOOR, 344, 1, '#2a1c18')
         # Claude, pleading, at the lower left
         blit_char(cv, 'claude', cp, 110, LAB_FLOOR + 14)
         if f.t > t_eat:
@@ -625,16 +647,20 @@ def s09(f):
         k = f.t - t_alive
         lab(cv, f.t)
         dither_overlay(cv, 0.35, '#0e1020')
-        cb = bust('claude', 'Q', 'closed' if k < 0.45 else 'side', 'wavy' if k < 0.45 else 'small')
-        cv.blit(cb, 84, 156)
+        by = 118
+        cb = bust('claude', 'Q', 'closed' if k < 0.45 else 'side', 'wavy' if k < 0.45 else 'small', bottom=-18)
+        cv.blit(cb, 84, by)
         chew = f.step(10) % 2
-        arm = (('arms_front', True), ('arm_f', ((5, -50), (9, -49), (11, -53))))
-        gb = bust('gpt', 'Q', 'happy', 'chew' if chew else 'grin', pose_key=arm)
-        cv.blit(gb, 232, 156, flip=True)
-        # the cookie (bitten), held at ChatGPT's mouth, then offered
         off = ease_out(clamp((k - 0.9) / 0.25))
-        ckx = snap(lerp(214, 180, off))
-        cky = snap(lerp(104, 118, off))
+        if off < 0.5:
+            arm = (('arms_front', True), ('arm_f', ((5, -50), (9, -52), (6, -57))))
+        else:
+            arm = (('arms_front', True), ('arm_f', ((5, -50), (11, -50), (17, -52))))
+        gb = bust('gpt', 'Q', 'happy', 'chew' if chew and off < 0.5 else 'grin', pose_key=arm, bottom=-18)
+        cv.blit(gb, 232, by, flip=True)
+        # the cookie (bitten), held at ChatGPT's mouth, then offered toward Claude
+        ckx = snap(lerp(222, 196, off))
+        cky = snap(lerp(by - 6, by - 2, off))
         cv.circle(ckx, cky, 7, '#d8a860')
         cv.circle(ckx - 7, cky - 3, 3, '#0e1020' if False else '#d8a860')
         for dx, dy in ((-3, -2), (2, 1), (-1, 3), (3, -3)):
@@ -645,8 +671,8 @@ def s09(f):
         if k < 0.5:
             confetti(cv, k, 11, 12, (ckx + 4, cky), spread=70, speed=80, grav=200,
                      colors=('#d8a860', '#b07a40', '#e8c890'))
-        if k < 0.06:
-            text_big(cv, 'CRUNCH', 250, 40, '#fbf8f2', scale=2, shadow='#0e1020', align='center')
+        if k < 0.1:
+            text_big(cv, 'CRUNCH', 230, 30, '#fbf8f2', scale=2, shadow='#0e1020', align='center')
             f.shake = (1.0, 0.5)
 
 

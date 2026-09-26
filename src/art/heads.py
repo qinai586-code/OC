@@ -288,4 +288,6 @@ MOUTHS = {  # 3 wide x 2 tall, centred on MOUTH anchor
     'shout': ["mmm", "emm"],
     'frown': ["...", "mm."],
     'wavy': ["m.m", ".m."],
+    'grin': ["mmm", ".m."],
+    'chew': ["mm.", "..."],
 }
