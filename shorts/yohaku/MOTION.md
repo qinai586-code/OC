@@ -138,6 +138,15 @@ The energy comes from the edit and comic effects:
   - blush hatching and > < eyes for the pink boop
   - hearts for eye contact and the final slow blink
 
+**Live2D-promo idle layer** (`IDLE = True`). Hands and feet are pinned: they move less than 0.2 px.
+- **Faint sway and breathing:** the upper body sways about ±1° from the hips and breathes, with the head following a beat late and a slight 3D-style turn.
+- **Cat ears:** each twitches on its own at irregular moments (flicking out over 6 f, easing back over 14 f), perks with her expressions, and has springy tips.
+- **Hair:** the side curtains, bangs and ahoge move with a soft, gusting breeze and follow the head.
+
+**Colour accents:**
+- The **opening** has a diagonal light-leak sweep with pink and blue watercolour blooms in the corners.
+- The **ending** has a warm-to-lavender sweep and blooms, then fades to a pastel gradient card instead of plain paper.
+
 The sections below describe the earlier deformation approach, which is still in `render_yohaku.py` behind `STATIC = False`.
 
 ## 5b. The rendered version: acting from one design sheet

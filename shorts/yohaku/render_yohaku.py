@@ -20,6 +20,7 @@ AUDIO = os.path.join(HERE, 'audio', 'yohaku_cut.wav')
 OUT = os.path.join(HERE, 'render')
 W, H, FPS, DUR = 1080, 1920, 60, 27.355
 CUT = t_of('5:1')
+IDLE = True                            # Live2D-promo idle (head, ears, hair, faint sway) instead of full-body acting
 P, STEP = 160, 4                       # canvas pad around the art; coarse warp-grid step
 FEET, CH_H = (510., 1495.), 1435.      # ground contact (art px) and character height
 cv2.setNumThreads(1)
@@ -139,7 +140,7 @@ def spring(rx, ry, f, z, gain, dt, reset, kicks=(), wind=None, ts=None, ph=0.0):
     for i in range(len(rx)):
         if i in kick: v[0] += kick[i]
         fw = wind[i] * (math.sin(1.3 * ts[i] + ph) + .6 * math.sin(2.9 * ts[i] + 1 + ph)) if wind is not None else 0
-        a = -w * w * o - 2 * z * w * v - gain * np.array([ax[i] - fw * 40, ay[i]])
+        a = -w * w * o - 2 * z * w * v - gain * np.array([ax[i] - fw * 90, ay[i]])
         v += a * dt; o += v * dt; out[i] = o
     return out
 
@@ -152,6 +153,20 @@ def build_signals():
     dt = 1 / 240; ts = np.arange(0, DUR + .05, dt); reset = int(round(CUT / dt))
     S = {k: curve(v, ts) for k, v in K.items()}
     for k, (f, z) in FOLLOW.items(): S[k] = follow(S[k], f, z, dt, reset)
+    if IDLE:   # Live2D-promo idle: faint upper-body sway, lagging head, breathing; no hop/trot/arms/legs
+        sway = .7 * np.sin(2 * np.pi * .2 * ts) + .25 * np.sin(2 * np.pi * .37 * ts + 1.)
+        for k in ('bodyY', 'crouch', 'squash', 'armL', 'armR', 'liftL', 'tailBase', 'tailCurl', 'trot', 'knead', 'idle'): S[k] = S[k] * 0
+        S['approach'] = S['approach'] * 0 + 1; S['rise'] = S['rise'] * .5; S['bodyRoll'] = sway
+        S['headRoll'] = .35 * S['headRoll'] + follow(sway * 2.2, 1.2, .6, dt, -1)
+        S['headPitch'] = .4 * S['headPitch']; S['headYaw'] = .4 * S['headYaw'] + .1 * np.sin(2 * np.pi * .16 * ts + .5)
+        r = rng(5)                                                      # cat-ear twitches at irregular moments, each ear on its own
+        for side in 'LR':
+            tw = np.zeros_like(ts); tt = r.uniform(.3, 1.2)
+            while tt < DUR:
+                u = (ts - tt) * 60; amp = r.uniform(4, 7) * (1 if r.random() < .7 else -1)
+                tw += amp * np.where((u >= 0) & (u < 6), np.sin(u / 6 * np.pi / 2), np.where((u >= 6) & (u < 20), np.cos((u - 6) / 14 * np.pi / 2), 0))
+                tt += r.uniform(1.4, 3.2)
+            S['earTw' + side] = tw
     # procedural layers: idle rock, sleeve kneading, eighth-note trot, breathing
     S['bodyX'] = np.zeros_like(ts)
     S['hipShift'] = S['idle'] * 4.5 * np.sin(2 * np.pi * .23 * ts)
@@ -175,7 +190,7 @@ def build_signals():
     rl = np.radians(S['headRoll'] + S['bodyRoll'])
     hx = S['bodyX'] + 260 * np.sin(rl) + S['headYaw'] * 6; hy = -S['bodyY'] + S['crouch'] - S['squash'] * 1250 - S['rise'] * 14 + S['headPitch'] * .5
     px = S['bodyX'] + 620 * np.sin(np.radians(S['bodyRoll'])); py = -S['bodyY'] + S['crouch'] - S['squash'] * 620
-    wind = np.where(ts > CUT, 1.0, .6)
+    wind = np.where(ts > CUT, 1.0, .6) if not IDLE else .85 + .35 * np.sin(2 * np.pi * .09 * ts) ** 2    # soft breeze with slow gusts
     S['hairL'] = spring(hx, hy, 1.4, .33, 1.0, dt, reset, wind=wind, ts=ts)
     S['hairR'] = spring(hx, hy, 1.55, .33, 1.0, dt, reset, wind=wind, ts=ts, ph=.7)
     S['ahoge'] = spring(hx, hy, 4.5, .2, 1.2, dt, reset)
@@ -264,15 +279,16 @@ def controllers(s):
     """Forward transforms per controller: (pivot, angle deg, tx, ty). Positive angle = clockwise on screen."""
     yaw, pitch = s['headYaw'], s['headPitch']
     r, sw = float(s['earRot']), float(s['earSwivel'])
-    base = r * (14 if r < 0 else 5)                      # flatten = tips out and down, perk = tips in and up
-    aL = base + (10 * sw if sw < 0 else 8 * sw)          # swivel < 0: both ears turn back; > 0: both lean toward screen-right
-    aR = -base + (-10 * sw if sw < 0 else 8 * sw)
+    base = r * ((8 if r < 0 else 4) if IDLE else (14 if r < 0 else 5))                      # flatten = tips out and down, perk = tips in and up
+    k = .6 if IDLE else 1.
+    aL = float(np.clip(base + k * (10 * sw if sw < 0 else 8 * sw) - float(s.get('earTwL', 0)), -16, 16))   # twitch = tip flicks outward
+    aR = float(np.clip(-base + k * (-10 * sw if sw < 0 else 8 * sw) + float(s.get('earTwR', 0)), -16, 16))
     return {
-        'head': (NECK, s['headRoll'], yaw * 2, pitch * .5), 'face': (NECK, 0, yaw * 10, pitch * .35), 'bangs': (NECK, 0, yaw * 6, pitch * .2),
+        'head': (NECK, s['headRoll'], yaw * 2, pitch * .5), 'face': (NECK, 0, yaw * 10, pitch * .35), 'bangs': (NECK, 0, yaw * 6 + s['hairL'][0] * .3, pitch * .2),
         'earL': (EARL_P, aL, 0, 0), 'earR': (EARR_P, aR, 0, 0),
         'earTipL': (EARL_P, 0, *s['earTipL']), 'earTipR': (EARR_P, 0, *s['earTipR']),
         'ahoge': (AHOGE_P, np.clip(s['ahoge'][0] * .5, -25, 25), 0, 0),
-        'hairL': (NECK, 0, s['hairL'][0] * .8, s['hairL'][1] * .3), 'hairR': (NECK, 0, s['hairR'][0] * .8, s['hairR'][1] * .3),
+        'hairL': (NECK, 0, s['hairL'][0] * 1.5, s['hairL'][1] * .3), 'hairR': (NECK, 0, s['hairR'][0] * 1.5, s['hairR'][1] * .3),
         'upper': (NECK, 0, 0, -s['rise'] * 14), 'chest': (NECK, 0, 0, -s['breath']), 'crouch': (NECK, 0, 0, s['crouch']),
         'skirt': (NECK, 0, s['skirt'][0], 0), 'legL': (NECK, 0, 0, -s['liftL']), 'legR': (NECK, 0, 0, -s['liftR']),
         'armL': (ARML_P, float(np.clip(s['armL'], -1.5, 12)), 0, 0), 'armR': (ARMR_P, -float(np.clip(s['armR'], -1.5, 12)), 0, 0),
@@ -283,7 +299,7 @@ def warp_field(R, s):
     """Inverse of the forward deformation on the coarse grid, by fixed-point iteration: src = x - F(src)."""
     tr = controllers(s); names = R['names']; Wm = R['W']
     x, y = R['gx'], R['gy']; sx, sy = x.copy(), y.copy()
-    for _ in range(5):
+    for _ in range(3):
         fx = np.zeros_like(x); fy = np.zeros_like(y)
         mx, my = sx / STEP, sy / STEP
         for i, n in enumerate(names):
@@ -615,7 +631,7 @@ class Scene:
 # ---------------------------------------------------------------- frame
 def body_affine(s, z, camx, camy):
     """canvas px -> screen px for the whole character (scale about the feet, squash-stretch, roll, hop), then camera."""
-    app, sq, rl = s['approach'], s['squash'], math.radians(.15 * s['bodyRoll'])
+    app, sq, rl = s['approach'], s['squash'], math.radians(0. if IDLE else .15 * s['bodyRoll'])
     sx, sy = app * (1 - .5 * sq), app * (1 + sq); c, sn = math.cos(rl), math.sin(rl)
     A = np.array([[c * sx, -sn * sy], [sn * sx, c * sy]])
     fx, fy = FEET[0] + P, FEET[1] + P
@@ -674,9 +690,8 @@ def render_character(F, R, s, t, scene):
     reg[:] = reg * (1 - a[..., None]) + np.clip(rgb, 0, None)
 
 SIG = RIG = SCENE = None
-STATIC = True                   # expressions only: the art itself never deforms
-STILL = ['bodyY', 'crouch', 'squash', 'bodyRoll', 'bodyX', 'hipShift', 'rise', 'breath', 'headRoll', 'headPitch', 'headYaw',
-         'earRot', 'earSwivel', 'armL', 'armR', 'liftL', 'liftR', 'tailBase', 'tailCurl']
+STATIC = False                  # Live2D-style idle deformation of the head, ears, hair and upper body; hands and feet stay pinned
+STILL = ['bodyY', 'crouch', 'squash', 'bodyX', 'hipShift', 'armL', 'armR', 'liftL', 'liftR', 'tailBase', 'tailCurl']
 # one comic panel per lyric beat: (cue, hFrac, camY, camX, transition in)
 SHOTS = [('0', .84, 780, 510, 'none'), ('2:1', 1.5, 300, 505, 'slide'), ('3:1', 1.12, 470, 510, 'wipe'), ('4:1', 1.45, 310, 505, 'halftone'),
          ('5:1', .8, 760, 510, 'flash'), ('6:1', 1.08, 560, 520, 'wipe'), ('7:1', 1.1, 520, 560, 'slide'), ('8:1', 1.45, 310, 505, 'iris'),
@@ -685,7 +700,7 @@ SHOTS = [('0', .84, 780, 510, 'none'), ('2:1', 1.5, 300, 505, 'slide'), ('3:1', 
 INK = np.array([.16, .13, .2], np.float32)
 
 def init():
-    global SIG, RIG, SCENE, FOCUS, SPEED, HALF, YY, XX
+    global SIG, RIG, SCENE, FOCUS, SPEED, HALF, YY, XX, LEAK
     if SIG is not None: return
     SIG, RIG, SCENE = build_signals(), build_rig(), Scene()
     r = rng(11); YY, XX = np.mgrid[0:H, 0:W].astype(np.float32); FOCUS = []
@@ -697,6 +712,8 @@ def init():
                  (W / 2 + math.cos(a) * r0, H / 2 + math.sin(a) * r0)]
             cv2.fillPoly(m, [np.int32(np.array(p) * 16)], 255, cv2.LINE_AA, 4)
         FOCUS.append(m.astype(np.float32) / 255)
+    g = (YY / H)[..., None]
+    LEAK = np.clip(np.array([1., .70, .82]) * (1 - g) + np.array([.72, .80, 1.]) * g + np.array([.0, .12, -.1]) * np.exp(-((g - .5) / .18) ** 2), 0, 1).astype(np.float32)
     SPEED = np.zeros((H, W * 2), np.uint8)                          # speed lines, scrolled sideways
     for k in range(70):
         y = int(r.uniform(0, H)); x = int(r.uniform(0, 2 * W)); L = int(r.uniform(150, 700))
@@ -811,17 +828,27 @@ def frame(i):
     s0 = {k: v[min(i, len(v) - 1)] for k, v in SIG.items()}
     for k in STILL: s0[k] = 0.
     s0['approach'] = 1.
-    for k in ('hairL', 'hairR', 'ahoge', 'earTipL', 'earTipR', 'cuffL', 'cuffR', 'skirt', 'tail'): s0[k] = np.zeros(2)
+    for k in ('cuffL', 'cuffR', 'skirt'): s0[k] = np.zeros(2)
     k = max(j for j, sh in enumerate(SHOTS) if T(sh[0]) <= t)
     F = panel(t, k, s0)
     if k + 1 < len(SHOTS):
         tn, typ = T(SHOTS[k + 1][0]), SHOTS[k + 1][4]; d = .35 if typ == 'dissolve' else .16
         if typ not in ('cut', 'flash') and t > tn - d: F = mix(F, panel(t, k + 1, s0), typ, (t - tn + d) / d, t)
     if SHOTS[k][4] == 'flash' and t - T(SHOTS[k][0]) < .3: F = F + (1 - F) * (1 - (t - T(SHOTS[k][0])) / .3) ** 2
+    for ta, tb, bl in ((0., 1.7, ((880, 260, (.99, .72, .84)), (180, 1650, (.70, .84, .99)))),
+                       (DUR - 2.6, DUR, ((180, 300, (1., .86, .7)), (900, 1680, (.84, .78, .99))))):
+        if ta <= t <= tb:                                                # colour accents: light-leak sweep + corner blooms
+            u = (t - ta) / (tb - ta); pos = XX / W * .6 + YY / H * .4 - (u * 1.7 - .35)
+            band = (np.exp(-(pos / .2) ** 2) * .5 * math.sin(math.pi * u))[..., None]
+            F = 1 - (1 - F) * (1 - band * LEAK)
+            for j, (bx, by, col) in enumerate(bl):
+                r = 520 * (1 - math.exp(-(u * (tb - ta)) / .5)) + 60 * j
+                blit(F, SCENE.SP['washes'][j + 1] * .42 * ((1 - .5 * u) if ta == 0 else (.5 + .5 * u)), bx, by, 2 * r, 2 * r, col, 'over', 40 * j + 10 * t)
     F[:14], F[-14:], F[:, :14], F[:, -14:] = SCENE.paper[:14], SCENE.paper[-14:], SCENE.paper[:, :14], SCENE.paper[:, -14:]   # panel gutter
     F[14:20, 14:-14] = INK; F[-20:-14, 14:-14] = INK; F[14:-14, 14:20] = INK; F[14:-14, -20:-14] = INK                      # ink frame
-    fin = smoothstep(0, .25, t) * (1 - smoothstep(DUR - .5, DUR - .02, t))
-    F = SCENE.paper * (1 - fin) + F * fin
+    fin = smoothstep(0, .35, t) * (1 - smoothstep(DUR - .7, DUR - .02, t))
+    card = SCENE.paper * (1 - .28 * (1 - LEAK))                          # pastel gradient card instead of plain paper
+    F = card * (1 - fin) + F * fin
     return (np.clip(F, 0, 1) * 255 + .5).astype(np.uint8)
 
 def main():
