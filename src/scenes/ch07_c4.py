@@ -232,29 +232,65 @@ def frame_rect():
 
 
 def s49(f):
+    """Recursive self-upgrade: no camera zoom (pixel-pure). A tunnel of nested frames drawn natively,
+    stepping one level deeper on every beat; the version number jumps on each beat."""
     cv = f.cv
-    per = song.BEAT            # one upgrade per beat
-    n = int((f.t - f.shot.start) / per)
-    ph = ((f.t - f.shot.start) / per) % 1.0
-    lvl = min(n, len(VERS) - 1)
-    outer = upgrade_scene(lvl)
-    inner_src = upgrade_scene(min(lvl + 1, len(VERS) - 1))
-    # the picture inside the frame = the next version, downsampled by 3 (a small, low-res picture)
-    fx, fy, fw, fh = frame_rect()
-    view = inner_src[12:192, 12:332]
-    small = view[::3, ::3][:fh, :fw]
-    arr = outer.copy()
-    hh, ww = small.shape[:2]
-    oy_, ox_ = 12 + fy + (fh - hh) // 2, 12 + fx + (fw - ww) // 2
-    arr[oy_:oy_ + hh, ox_:ox_ + ww] = small
-    cv.blit(arr, -12, -12)
-    # zoom into the frame across each beat; at the beat the picture "enhances" into the next version
-    z = 1.0 + (fw and (320 / fw - 1.0)) * ease_in(ph) * 0.999
-    cx = lerp(160, fx + fw / 2, ease_in(ph))
-    cy = lerp(90, fy + fh / 2, ease_in(ph))
-    f.cam.update(x=cx, y=cy, zoom=z)
-    if ph < 0.08 and n > 0:
-        f.flash = 0.5 * (1 - ph / 0.08)
+    t = f.t
+    t_rec = wt('to recursive', 'recursive')
+    t_up = wt('to recursive', 'self-upgrade')
+    beats = (t - t_rec) / song.BEAT
+    n = max(0, int(math.floor(beats))) if t >= t_rec else 0
+    fr = beats - math.floor(beats) if t >= t_rec else 0.0
+    lvl = n + ease_out(clamp(fr / 0.35))          # snaps forward on the beat, then holds
+    glow = min(5, n + (1 if t >= t_up else 0))
+    dgrad(cv, -12, -12, 344, 204, ['#06070d', ['#101830', '#132038', '#162844', '#1a3050', '#1e3a5c', '#224468'][glow]])
+    for i in range(glow):
+        cv.ring(160, 80, 44 + i * 16 + (2 if fr < 0.1 else 0), ['#1c3a4a', '#2c5a5a', '#3a7a6a', '#4fb49b', '#95e3cc'][i])
+    cv.rect(-12, 150, 344, 50, '#0c0e1a')
+    cv.rect(-12, 150, 344, 1, '#223050')
+    # the held frame and the tunnel inside it
+    fx, fy, fw, fh = 104, 38, 112, 70
+    cx, cy = fx + fw / 2, fy + fh / 2
+    cv.rect(fx - 4, fy - 4, fw + 8, fh + 8, '#c8a040')
+    cv.rect(fx - 2, fy - 2, fw + 4, fh + 4, '#f2cd5a')
+    cv.rect(fx, fy, fw, fh, '#0a0c16')
+    base = 0.72
+    for k in range(14, -1, -1):
+        s_ = base ** (k - (lvl % 1.0))
+        if s_ > 0.999:
+            continue
+        w, h = fw * s_, fh * s_
+        if w < 3:
+            continue
+        x0, y0 = snap(cx - w / 2), snap(cy - h / 2)
+        col = ['#f2cd5a', '#c8a040', '#8a6a20'][(k + int(lvl)) % 3]
+        cv.frame(x0, y0, snap(w), snap(h), col)
+        # two tiny figures at the foot of each nested picture (hand-placed pixels, not downsampled)
+        if w > 24:
+            fy_ = y0 + snap(h) - 3
+            cv.rect(x0 + snap(w * 0.3), fy_ - snap(h * 0.35), max(1, snap(w * 0.05)), snap(h * 0.3), PAL.CLAUDE['H'])
+            cv.rect(x0 + snap(w * 0.65), fy_ - snap(h * 0.35), max(1, snap(w * 0.05)), snap(h * 0.3), PAL.GPT['k'])
+            cv.px(x0 + snap(w * 0.65), fy_ - snap(h * 0.35) - 1, PAL.GPT['J'])
+    cv.circle(cx, cy, 1, '#fff0a8')
+    # the two holding the frame; both flare on "self-upgrade"
+    flare = pulse(t - t_up, 0.25)
+    for who, x, flip in (('claude', 86, False), ('gpt', 234, True)):
+        p = make_pose('Q', eyes='happy' if t >= t_up else 'open', mouth='smile', arms_front=True)
+        p['arm_f'] = [(5, -50), (11, -55), (15, -61)]
+        spr = render(who, p)
+        if flare > 0.5:
+            cv.blit(Sprite(silhouette(spr.arr, '#f6ab70' if who == 'claude' else '#6fe6c8'), spr.ax, spr.ay), x, 152, flip=flip)
+        else:
+            cv.blit(spr, x, 152, flip=flip)
+    if t >= t_up:
+        r = R(49)
+        for i in range(16):
+            y = 150 - ((t - t_up) * r(30, 60) + r(0, 80)) % 90
+            cv.px(snap(r(60, 260)), snap(y), '#95e3cc' if i % 2 else '#fff0a8')
+    ver = VERS[min(n, len(VERS) - 1)] if t >= t_rec else 'v1'
+    text_big(cv, ver, 160, 118, '#95e3cc' if n < 5 else '#fff0a8', scale=1, align='center')
+    if t >= t_rec and fr < 0.06:
+        f.flash = 0.25
 
 
 # ================================================================ 50 / 51 the keyhole
@@ -306,31 +342,33 @@ def s50(f):
 
 
 def s51(f):
+    """We'll never know: the keyhole goes dark on "know", then the camera pulls back one step per beat
+    (the band is still playing hard), stars landing on the drums."""
     cv = f.cv
-    t_never = wt("We'll never", 'never')
     t_know = wt("We'll never", 'know')
     k = f.t - t_know
     cv.fill('#050407')
-    # night plain, stars appear as we pull back
-    pull = ease_io(clamp((f.t - t_know) / 2.4))
-    stars(cv, 51, int(10 + 90 * pull), f.t, colors=('#2a3050', '#6a7fb4', '#d2d8e0'))
+    if k < 0:
+        pull, nstar = 0.0, 8
+    else:
+        nb = int(k / song.BEAT)
+        fr = (k / song.BEAT) % 1.0
+        steps = 6
+        pull = min(1.0, (min(nb, steps) + ease_out(clamp(fr / 0.3)) * (1 if nb < steps else 0)) / steps)
+        nstar = 8 + nb * 16
+    stars(cv, 51, min(110, nstar), f.t, colors=('#2a3050', '#6a7fb4', '#d2d8e0'))
     hz = snap(lerp(170, 132, pull))
     cv.rect(-12, hz, 344, 80, '#0a0a10')
     cv.rect(-12, hz, 344, 1, '#1a1a28')
-    # the door shrinks as the camera pulls back (redrawn at each scale: it's just rectangles)
-    s = lerp(1.0, 0.28, pull)
-    w, h = 64 * s, 140 * s
+    s_ = lerp(1.0, 0.28, pull)
+    w, h = 64 * s_, 140 * s_
     x, y = 160 - w / 2, hz - h
     light = 1.0 if f.t < t_know else 0.0
     kx, ky = door(cv, snap(x), snap(y), snap(w), snap(h), light, f.t)
-    if f.t < t_know:
-        # the light flickers once before it goes
-        if 0 <= t_know - f.t < 0.12 and f.step(30) % 2:
-            cv.circle(kx, ky, 2, '#050407')
-    # the little figure left sitting beside the door, looking at it
+    if 0 <= t_know - f.t < 0.12 and f.step(30) % 2:
+        cv.circle(kx, ky, 2, '#050407')
     if pull > 0.3:
-        fig = folk(4242, 'stand', 0, 13)
-        cv.blit(fig, snap(x - 10 * s - 4), hz)
+        cv.blit(folk(4242, 'stand', 0, 13), snap(x - 10 * s_ - 4), hz)
     f.cam['zoom'] = 1.0
 
 

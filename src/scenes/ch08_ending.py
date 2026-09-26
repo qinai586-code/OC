@@ -290,9 +290,13 @@ def spot_composite(cv, lit_arr, dim_arr, cx, cy, rx, ry):
 def s54(f):
     """Reverse angle: every seat is empty. The spotlight searches the rows; nobody."""
     cv = f.cv
-    k = f.lt
-    sx = 160 + math.sin(k * 1.1 - 1.2) * 118
-    sy = 118 + math.sin(k * 0.7 + 0.4) * 22
+    # the spotlight jumps to a new block of seats on every other beat (and finds nobody)
+    stops = [(52, 132), (236, 104), (120, 150), (276, 146), (84, 98), (196, 128), (32, 150), (160, 108), (250, 136)]
+    q = (f.t - f.shot.start) / (song.BEAT * 2)
+    i, fr = int(q), q % 1.0
+    a0, a1 = stops[i % len(stops)], stops[(i + 1) % len(stops)]
+    e = ease_out(clamp(fr / 0.3))
+    sx, sy = lerp(a0[0], a1[0], e), lerp(a0[1], a1[1], e)
     spot_composite(cv, hall_from_stage(True), hall_from_stage(False), sx, sy, 40, 30)
     # the lip of the stage in the foreground, the performers' feet and shadows
     cv.rect(-12, 170, 344, 22, '#3a1e12')
@@ -382,7 +386,7 @@ def s56(f):
                 x = 160 + n * sw - sw / 2 + (sw / 2 if ri else 0)
                 cv.rect(snap(x), snap(y - sh), sw - 4, sh, CUR['m'] if (n + ri) % 2 else CUR['d'])
                 cv.rect(snap(x), snap(y - sh), sw - 4, 3, CUR['l'])
-        spr = kid('wave' if f.step(4) % 2 == 0 else 'wave2')
+        spr = kid('wave' if int((f.t - song.PHASE) / (song.BEAT / 2)) % 2 == 0 else 'wave2')
         # the kid at 2x for this insert (a deliberate chunky close-up, like the busts)
         from engine.scalex import scale2x
         big = scale2x(spr.arr)
@@ -401,7 +405,7 @@ def s56(f):
         cv.blit(stage_bg(True), -12, -12)
         dither_overlay(cv, 0.5, '#1a0e0a')
         kc = f.t - t_claude
-        wav = f.step(5) % 2
+        wav = int((f.t - song.PHASE) / (song.BEAT / 2)) % 2
         c_arm = (('arms_front', True), ('arm_f', ((6, -50), (10, -55), (12 + wav, -62))))
         cb = bust('claude', 'F', 'happy' if kc > 0.2 else 'calm', 'smile', pose_key=c_arm, bottom=-22)
         cv.blit(cb, 104, 126)
@@ -415,7 +419,7 @@ def s56(f):
             gb = bust('gpt', 'F', 'happy', 'smile', pose_key=g_arm, bottom=-22)
         # tail peeking up behind her shoulder, wagging after she decides
         if kg > 0:
-            sw_ = [0, 3, 6, 3][f.step(8) % 4]
+            sw_ = [0, 3, 6, 3][int((f.t - song.PHASE) / (song.BEAT / 2)) % 4]
             pts = [(262, 150), (274, 132), (280 + sw_, 112), (276 + sw_ * 1.5, 94)]
             for i in range(len(pts) - 1):
                 cv.line(pts[i][0], pts[i][1], pts[i + 1][0], pts[i + 1][1], PAL.GPT['z'], width=5 - i)

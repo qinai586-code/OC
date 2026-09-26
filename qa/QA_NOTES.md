@@ -39,3 +39,13 @@ parallel encoder.
 
 Still open: the scale thread (giant vs normal-size ChatGPT across the rap) is not fully consistent; no match cut
 between FOOM and the Chinese room.
+
+## Revision 3 (review from 2:10 to the end)
+
+* 49 recursive self-upgrade rebuilt without camera zoom (the zoom had magnified the outer scene into chunky mixed
+  pixels and left an empty, stride-downsampled inner picture). Now a tunnel of nested frames drawn natively steps one
+  level deeper on every beat, the version number jumps per beat (v1, v2, v4, v16...), both flare in their own colours
+  on "self-upgrade".
+* 51 "We'll never know": the band keeps playing hard, so after the keyhole goes dark on "know" the pull-back moves in
+  steps on the beats and stars land on the drums; a light beat punch is back for 132-137.5.
+* 54 the searching spotlight jumps to a new block of seats every two beats; 56 the waves alternate on half-beats.
