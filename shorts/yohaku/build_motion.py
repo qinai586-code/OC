@@ -13,7 +13,7 @@ BEATS = [0.274, 0.762, 1.226, 1.69, 2.178, 2.666, 3.153, 3.641, 4.105, 4.593, 5.
          6.961, 7.426, 7.937, 8.424, 8.889, 9.376, 9.864, 10.328, 10.816, 11.303, 11.791, 12.255, 12.743,
          13.207, 13.695, 14.183, 14.647, 15.111, 15.622, 16.087, 16.574, 17.062, 17.526, 18.014, 18.502,
          18.966, 19.454, 19.918, 20.406, 20.893, 21.381, 21.868, 22.333, 22.82, 23.285, 23.773, 24.26]
-DUR = 24.70
+DUR = 27.355
 IBI = (BEATS[-1] - BEATS[0]) / (len(BEATS) - 1)
 
 
@@ -132,10 +132,12 @@ RIG = {
    'sleeveCuffs': [2.0, 1.6, .4, .35], 'cardiganHem': [1.8, 1.5, .45, .4], 'skirtHem': [2.4, 2.0, .6, .55]},
  'limits': {'skirtHemSwayMax_h': .03, 'camHeightMin_h': .5, 'camTiltMin_deg': 0}}
 
-out = {
+def build():
+ return {
  'title': 'Yohaku (余白の向こうへ) 24.7 s motion timeline', 'fps': FPS, 'duration': DUR,
- 'audio': {'file': 'audio/yohaku_cut.wav', 'source': '余白の向こうへ (user-supplied track)', 'srcIn': 39.20, 'srcOut': 63.90,
-           'fadeIn': 0.12, 'fadeOut': [23.80, 24.70]},
+ 'audio': {'file': 'audio/yohaku_cut.wav', 'source': '余白の向こうへ (user-supplied track)', 'srcIn': 39.20, 'fadeIn': 0.12,
+           'splice': {'at': 23.285, 'chorusFadeOut': 0.70, 'endingSrc': [137.88, 141.95], 'endingGainDb': 4,
+                      'why': 'bar 12 sits on A; the song ends on A, so the final chord rings out instead of a mid-chorus fade'}},
  'tempo': {'bpm': 123.05, 'beats': BEATS, 'bars': [BEATS[i] for i in range(0, len(BEATS), 4)], 'chorusDownbeat': t_of('5:1')},
  'shots': [{'id': 'A', 'in': 0, 'out': t_of('5:1'), 'desc': 'one continuous push-in: full body to chest-up'},
            {'id': 'B', 'in': t_of('5:1'), 'out': DUR, 'desc': 'cut on the hop; tracking side-3/4, then a slow arc to frontal'}],
@@ -148,6 +150,13 @@ out = {
  'events': [{'cue': c, 't': float(c) if c[0].isdigit() and ':' not in c else t_of(c), 'kind': k} for c, k in EVENTS],
  'fx': [{'cue': c, 't': t_of(c), 'kind': k, 'desc': d} for c, k, d in FX]}
 
-p = pathlib.Path(__file__).with_name('motion.json')
-p.write_text(json.dumps(out, ensure_ascii=False, indent=1))
-print('wrote', p, 'chorus downbeat', out['tempo']['chorusDownbeat'], 'keys', sum(len(v) for v in CH.values()))
+
+def main():
+  p = pathlib.Path(__file__).with_name('motion.json')
+  out = build()
+  p.write_text(json.dumps(out, ensure_ascii=False, indent=1))
+  print('wrote', p, 'chorus downbeat', out['tempo']['chorusDownbeat'], 'keys', sum(len(v) for v in CH.values()))
+
+
+if __name__ == '__main__':
+    main()

@@ -1,17 +1,22 @@
 {
  "title": "Yohaku (余白の向こうへ) 24.7 s motion timeline",
  "fps": 60,
- "duration": 24.7,
+ "duration": 27.355,
  "audio": {
   "file": "audio/yohaku_cut.wav",
   "source": "余白の向こうへ (user-supplied track)",
   "srcIn": 39.2,
-  "srcOut": 63.9,
   "fadeIn": 0.12,
-  "fadeOut": [
-   23.8,
-   24.7
-  ]
+  "splice": {
+   "at": 23.285,
+   "chorusFadeOut": 0.7,
+   "endingSrc": [
+    137.88,
+    141.95
+   ],
+   "endingGainDb": 4,
+   "why": "bar 12 sits on A; the song ends on A, so the final chord rings out instead of a mid-chorus fade"
+  }
  },
  "tempo": {
   "bpm": 123.05,
@@ -95,7 +100,7 @@
   {
    "id": "B",
    "in": 7.937,
-   "out": 24.7,
+   "out": 27.355,
    "desc": "cut on the hop; tracking side-3/4, then a slow arc to frontal"
   }
  ],
@@ -2343,7 +2348,7 @@
    },
    {
     "cue": "13:4",
-    "t": 24.7,
+    "t": 24.74,
     "v": 1.95,
     "ease": "io"
    }

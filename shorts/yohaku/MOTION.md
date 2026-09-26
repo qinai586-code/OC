@@ -1,11 +1,13 @@
 # Yohaku: 24.7 s character motion design
 
-A short music clip for the user's original cat-eared character, set to the track 『余白の向こうへ』. This covers **motion design only**: no character images are generated here.
+A short music clip for the user's original cat-eared character, set to the track 『余白の向こうへ』. **The finished video is `render/yohaku.mp4`.** No new character art was generated; the only drawing of her is the user's design sheet, animated by smooth deformation.
 
 | File | What it is |
 |---|---|
 | `../../reference/oc_yohaku_design.webp` | **OC design.** The visual authority for her look: silver hair, ahoge, cat ears and tail, blue X clip with a black ribbon, oversized cream cardigan with a cat pocket, sailor collar, light-blue bow, bandage on her right knee, mismatched socks (white with a blue bow / black with a cat face), brown loafers |
-| `audio/yohaku_cut.wav` | **Music.** Source 39.20–63.90 s of the track (24.70 s, 123 BPM, 0.12 s fade-in, 0.9 s fade-out) |
+| `render/yohaku.mp4` | **The final video:** 1080×1920, 60 fps, H.264 + AAC, 27.36 s |
+| `render_yohaku.py` | renders it: the user's art under soft-weight warp deformers, the procedural paper and watercolour world, FX and camera. `--sheet 1,4.5,8` makes a contact sheet |
+| `audio/yohaku_cut.wav` | **Music.** Source 39.20–62.49 s, then the song's own final chord (137.88–141.95 s) spliced on the next downbeat. 27.36 s, 123 BPM |
 | `motion.json` | the timeline: beat map, 31 continuous channels, arm key poses, footsteps, accents, FX and camera |
 | `build_motion.py` | generates `motion.json` from musical cues (`bar:beat+frames`). Re-cut the audio → replace `BEATS` → re-run |
 | *(not in repo)* the screen-recorded MV `.mov` | **Visual/motion reference only**: harmony of character and world, natural movement. Nothing else is taken from it |
@@ -22,7 +24,11 @@ Measured structure of the full 2:24 track (librosa: beats, energy, a self-simila
 
 **Chosen: the last 4 bars of the pre-chorus plus the first 8 bars of chorus 1.**
 - **The energy arc is the empathy arc.** The loudness roughly doubles at the chorus downbeat (RMS 0.12 → 0.24). A held breath comes right before it (vocal gap at 7.4–7.9 s in the clip). The timid-to-brave arc is already in the music, so the acting only has to ride it.
-- **The start is clean.** The cut starts in the vocal gap at 39.2 s, so no word is clipped. It ends on the phrase 「全部この手で選んでいく」, with the fade finished before the next line.
+- **The start is clean.** The cut starts in the vocal gap at 39.2 s, so no word is clipped.
+- **The ending resolves instead of fading out mid-chorus.** Bar 12 (「選んでいく」) sits on an A chord, and the song itself ends on A.
+  - On the next downbeat, the song's final chord (from 2:17.9) strikes and rings out naturally for 4 s.
+  - The chorus fades out under it over 0.7 s (equal-power).
+  - The chord comes in 4 dB louder, ducked during the overlap, so it lands rather than drops away.
 - **The lyrics fit the OC's own design:**
   - 「正解じゃなくていい」 ("it doesn't have to be the right answer"): her mismatched socks
   - 「消えそうな青も にじんだ桃色も」 ("the fading blue and the blurred pink"): her blue eyes and ribbon, and her blush
@@ -43,7 +49,7 @@ Measured structure of the full 2:24 track (librosa: beats, energy, a self-simila
 | 7–8 | 11.79 | まだ知らない色を拾いながら |
 | 9–10 | 15.62 | 消えそうな青も にじんだ桃色も |
 | 11–12 | 19.45 | 全部この手で選んでいく |
-| tail | 23.29–24.70 | fade |
+| end | 23.29–27.36 | the song's final A chord rings out |
 
 ---
 
@@ -108,7 +114,37 @@ Times are clip seconds. The exact values for every channel are in `motion.json`.
 | **10** (17.53) にじんだ桃色も | A soft-focus pink bead **boops her left cheek**: her eyes squeeze shut, shoulders scrunch and ears flatten. Then she giggles (the shoulders shake on eighth notes) and touches her cheek with her left sleeve. The pink splash *becomes* her blush. | Blush goes .55 → .85. Eye-smile .9. |
 | **11** (19.45) 全部この手で | She blinks, then **makes eye contact for the first time** (eyes first, head 8 f later, body turning square). She holds her cupped, glowing hands out toward the viewer and leans in 0.08 h, head tilted 10°, with a proud, shy smile. | The ears come forward, the tail rises (.9) and curls. |
 | **12** (21.38) 選んでいく | She lifts her hands overhead and **the colours release into the sky**, washing the upper frame. The camera tilts up 10° with her gaze. On beat 3 she looks back down to the viewer. On beat 4, a closed-eye smile. | Awe: mouth .35, pupils 1.2. |
-| **tail** (23.29–24.70) | Her eyes open to camera. Then a **slow blink**: 12 f to close, a 10 f hold, 14 f to open. One last ear flick at 24.3. Breathing continues to the last frame. | The tail curls into a soft question-mark. |
+| **end** (23.29–27.36) | The final chord strikes. Her eyes open to the camera. At 24.26, a **slow blink**: 12 f to close, a 10 f hold, 14 f to open. At 25.2, a small head tilt to the other side and a last ear flick. Breathing continues, and the picture fades back to paper over the last 0.5 s. | The tail settles into a soft question-mark curl. Petals of colour drift down. |
+
+## 5b. The rendered version: acting from one design sheet
+
+There is only one drawing of her, a front view. So the render keeps every beat and emotion above, but plays the big full-body moves in place:
+
+| Plan above (needs more key drawings) | What `render/yohaku.mp4` does |
+|---|---|
+| the bead lands on her fingertip | it lands on her **nose**: she goes cross-eyed, says "ah", the tail twitches |
+| she hops over the margin line | she **hops toward the camera** across the cut and lands in the colour bloom |
+| trot across the roof of the page | **trot in place toward us**: steps on eighth notes, colour pools slide past toward the camera |
+| paw swipe, clap-catch | a **sleeve-flap swipe**; the bead bounces back and pops on her ear (she ducks, ear flick) |
+| she cups the fading blue | it drifts into her **blue bow**, which lights up (「消えそうな青」) |
+| she offers the colours, then releases them | the colours **orbit her**; she flaps both sleeves and they shoot up into the sky |
+| camera arc to frontal | framing and height changes only |
+
+**Deformation, not cutouts.** About 20 warp controllers work like Live2D deformers, not like cutout layers:
+- They cover the head, face and bangs parallax, each ear and ear tip, the ahoge, both hair curtains, shoulders, breathing, crouch, skirt, legs, arms and cuffs.
+- Each has a blurred weight map. The weights overlap, so the art bends continuously.
+- The field is inverted by fixed-point iteration, so limbs move out over the background without tearing.
+
+**The face is edited on the art itself before the warp:**
+- **Gaze and pupils** are re-sampled inside each eye.
+- **Lids close** by squeezing the real eye art down under the lash line. When shut, they become a drawn lid line: a soft U when calm, a ^ arch when happy.
+- **The mouth** gets smile warps and a small open shape. **Blush** is painted on.
+
+**Motion:**
+- The tail is its own layer behind the body, bent more toward the tip.
+- Everything secondary (hair, ahoge, ear tips, cuffs, skirt, tail) runs on springs driven by the body's acceleration, with wind after the bloom.
+
+**Full turns and reaches** (the `motion.json` plan) need a turnaround and a few pose drawings of the OC. Once those exist, the same controllers and timings apply.
 
 ## 6. Smooth, not puppet-like: the method
 
