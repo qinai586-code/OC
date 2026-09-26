@@ -152,15 +152,18 @@ def build_signals():
     S = {k: curve(v, ts) for k, v in K.items()}
     for k, (f, z) in FOLLOW.items(): S[k] = follow(S[k], f, z, dt, reset)
     # procedural layers: idle rock, sleeve kneading, eighth-note trot, breathing
-    S['bodyX'] = S['idle'] * 5 * np.sin(2 * np.pi * .23 * ts)
-    S['bodyRoll'] = S['bodyRoll'] + S['idle'] * .8 * np.sin(2 * np.pi * .23 * ts - .6)
-    kn = S['knead'] * 1.6 * np.sin(2 * np.pi * .9 * ts); S['armL'] = S['armL'] + kn; S['armR'] = S['armR'] - kn
+    S['bodyX'] = np.zeros_like(ts)
+    S['hipShift'] = S['idle'] * 4.5 * np.sin(2 * np.pi * .23 * ts)
+    S['bodyRoll'] = S['bodyRoll'] + S['idle'] * 1.2 * np.sin(2 * np.pi * .23 * ts - .6)
+    kn = S['knead'] * 1.4 * (.5 + .5 * np.sin(2 * np.pi * .9 * ts)); S['armL'] = S['armL'] + kn; S['armR'] = S['armR'] + S['knead'] * 1.4 * (.5 - .5 * np.sin(2 * np.pi * .9 * ts))
+    S['headRoll'] = S['headRoll'] + .9 * np.sin(2 * np.pi * .17 * ts + 1) + .5 * np.sin(2 * np.pi * .41 * ts)
+    S['headPitch'] = S['headPitch'] + .9 * np.sin(2 * np.pi * .13 * ts + 2)
     ph = 2 * (beat_index(ts) - beat_index(np.array([T('6:1')]))[0]); fr = np.mod(ph, 1); up = np.sin(np.pi * fr)
     odd = np.mod(np.floor(ph), 2) == 1; tr = S['trot']
-    S['liftL'] = S['liftL'] + tr * 20 * up * (~odd); S['liftR'] = tr * 20 * up * odd
-    S['bodyY'] = S['bodyY'] + tr * 9 * up; S['crouch'] = S['crouch'] + tr * 7 * (1 - up)
-    S['bodyRoll'] = S['bodyRoll'] + tr * 2.2 * np.sin(np.pi * ph)
-    S['armL'] = S['armL'] + tr * 7 * np.sin(np.pi * ph); S['armR'] = S['armR'] - tr * 7 * np.sin(np.pi * ph)
+    S['liftL'] = S['liftL'] + tr * 11 * up * (~odd); S['liftR'] = tr * 11 * up * odd       # one heel lifts, the other foot stays planted
+    S['crouch'] = S['crouch'] + tr * 11 * (1 - up)                                         # knees take the bounce; nothing leaves the ground
+    S['bodyRoll'] = S['bodyRoll'] + tr * 2.5 * np.sin(np.pi * ph); S['hipShift'] = S['hipShift'] + tr * 4 * np.sin(np.pi * ph)
+    S['armL'] = S['armL'] + tr * 6 * np.clip(np.sin(np.pi * ph), 0, 1); S['armR'] = S['armR'] + tr * 6 * np.clip(-np.sin(np.pi * ph), 0, 1)
     S['breath'] = S['breathPx'] * np.sin(2 * np.pi * np.cumsum(S['breathHz']) * dt)
     bl = np.zeros_like(ts)
     for c in BLINKS:
@@ -171,7 +174,7 @@ def build_signals():
     rl = np.radians(S['headRoll'] + S['bodyRoll'])
     hx = S['bodyX'] + 260 * np.sin(rl) + S['headYaw'] * 6; hy = -S['bodyY'] + S['crouch'] - S['squash'] * 1250 - S['rise'] * 14 + S['headPitch'] * .5
     px = S['bodyX'] + 620 * np.sin(np.radians(S['bodyRoll'])); py = -S['bodyY'] + S['crouch'] - S['squash'] * 620
-    wind = np.where(ts > CUT, 1.0, .35)
+    wind = np.where(ts > CUT, 1.0, .6)
     S['hairL'] = spring(hx, hy, 1.4, .33, 1.0, dt, reset, wind=wind, ts=ts)
     S['hairR'] = spring(hx, hy, 1.55, .33, 1.0, dt, reset, wind=wind, ts=ts, ph=.7)
     S['ahoge'] = spring(hx, hy, 4.5, .2, 1.2, dt, reset)
@@ -213,8 +216,9 @@ AHOGE, AHOGE_P = [(450, 28), (500, 28), (496, 95), (458, 95)], (476, 95)
 ARML, ARML_P = [(420, 405), (400, 520), (372, 700), (362, 875), (252, 875), (258, 700), (300, 520), (355, 425)], (392, 440)
 ARMR, ARMR_P = [(600, 405), (622, 520), (650, 700), (662, 875), (768, 875), (760, 700), (718, 520), (665, 425)], (628, 440)
 SKIRT = [(368, 790), (655, 790), (668, 885), (360, 885)]
-LEGL = [(418, 1140), (506, 1140), (510, 1500), (425, 1500)]
-LEGR = [(508, 1140), (610, 1140), (590, 1500), (506, 1500)]
+LEGL = [(418, 1140), (507, 1140), (507, 1500), (425, 1500)]
+LEGR = [(507, 1140), (610, 1140), (590, 1500), (507, 1500)]
+HIP = (510, 880)
 TAIL, TAIL_B, TAIL_L = [(338, 876), (404, 876), (406, 1010), (336, 1010)], (386, 874), 128.
 NECK = (500, 372)
 EYES = [dict(c=(459, 268), a=31, b=21, ang=-6, i=(462, 269), r=19, side=-1),
@@ -235,16 +239,19 @@ def build_rig():
     dist = lambda p: np.hypot(ax - p[0], ay - p[1])
     face = np.zeros(shp, np.float32); cv2.ellipse(face, (500 + P, 283 + P), (82, 58), 0, 0, 360, 1, -1); face = cv2.GaussianBlur(face, (0, 0), 14)
     hl, hr = co(poly(HAIRL, 10, shp)), co(poly(HAIRR, 10, shp)); rh = cl((ay - 300) / 300)
-    arml, armr = co(poly(ARML, 16, shp)), co(poly(ARMR, 16, shp))
+    arml, armr = co(poly(ARML, 10, shp)), co(poly(ARMR, 10, shp))
+    # sleeves billow from the outer edge: weight 0 along the inner edge (hands, skirt, cardigan front), 1 from 60 px outward
+    fl = arml * cl((ay - 470) / 250) * cl(((400 - (ay - 470) * 38 / 405) - ax) / 60)
+    fr = armr * cl((ay - 470) / 250) * cl((ax - (620 + (ay - 470) * 42 / 405)) / 60)
     Wt = {
         'head': np.maximum(co(poly(HEAD, 14, shp)), (hl + hr) * (1 - rh) * .9), 'face': co(face), 'bangs': co(poly(BANGS, 12, shp)),
         'earL': co(poly(EARL, 5, shp)) * cl(dist(EARL_P) / 80) ** .8, 'earR': co(poly(EARR, 5, shp)) * cl(dist(EARR_P) / 85) ** .8,
         'ahoge': co(poly(AHOGE, 4, shp)) * cl((95 - ay) / 55),
         'hairL': hl * rh, 'hairR': hr * rh, 'upper': cl((600 - ay) / 180), 'chest': cl((650 - ay) / 250),
         'crouch': cl((FEET[1] - ay) / (FEET[1] - 880)), 'skirt': co(poly(SKIRT, 8, shp)) * cl((ay - 800) / 80),
-        'legL': co(poly(LEGL, 4, shp)) * cl((ay - 1160) / 190), 'legR': co(poly(LEGR, 4, shp)) * cl((ay - 1160) / 190),
-        'armL': arml * cl((ay - 440) / 230), 'armR': armr * cl((ay - 440) / 230),
-        'cuffL': arml * cl((ay - 740) / 80), 'cuffR': armr * cl((ay - 740) / 80)}
+        'legL': co(poly(LEGL, 2, shp)) * cl((ay - 1180) / 150), 'legR': co(poly(LEGR, 2, shp)) * cl((ay - 1180) / 150),
+        'armL': fl, 'armR': fr, 'cuffL': fl * cl((ay - 720) / 90), 'cuffR': fr * cl((ay - 720) / 90),
+        'spine': cl((880 - ay) / 450), 'hip': cl((FEET[1] - ay) / (FEET[1] - 880))}
     Wt['earTipL'] = Wt['earL'] ** 2; Wt['earTipR'] = Wt['earR'] ** 2
     names = list(Wt)
     skin = art[262 + P - 3:262 + P + 3, 505 + P - 3:505 + P + 3, :3].reshape(-1, 3).mean(0)
@@ -267,8 +274,9 @@ def controllers(s):
         'hairL': (NECK, 0, s['hairL'][0] * .8, s['hairL'][1] * .3), 'hairR': (NECK, 0, s['hairR'][0] * .8, s['hairR'][1] * .3),
         'upper': (NECK, 0, 0, -s['rise'] * 14), 'chest': (NECK, 0, 0, -s['breath']), 'crouch': (NECK, 0, 0, s['crouch']),
         'skirt': (NECK, 0, s['skirt'][0], 0), 'legL': (NECK, 0, 0, -s['liftL']), 'legR': (NECK, 0, 0, -s['liftR']),
-        'armL': (ARML_P, s['armL'], 0, 0), 'armR': (ARMR_P, -s['armR'], 0, 0),
-        'cuffL': (ARML_P, 0, *(s['cuffL'] * .7)), 'cuffR': (ARMR_P, 0, *(s['cuffR'] * .7))}
+        'armL': (ARML_P, float(np.clip(s['armL'], -1.5, 12)), 0, 0), 'armR': (ARMR_P, -float(np.clip(s['armR'], -1.5, 12)), 0, 0),
+        'cuffL': (ARML_P, 0, *np.clip(s['cuffL'] * .6, -8, 8)), 'cuffR': (ARMR_P, 0, *np.clip(s['cuffR'] * .6, -8, 8)),
+        'spine': (HIP, float(np.clip(s['bodyRoll'], -7, 7)), 0, 0), 'hip': (HIP, 0, float(s['hipShift']), 0)}
 
 def warp_field(R, s):
     """Inverse of the forward deformation on the coarse grid, by fixed-point iteration: src = x - F(src)."""
@@ -434,6 +442,9 @@ class Scene:
         yy, xx = np.mgrid[0:H, 0:W]; vig = 1 - .04 * (((xx - W / 2) / (W / 2)) ** 2 + ((yy - H / 2) / (H / 2)) ** 2)
         self.grain = (vig * (1 - .018 * np.clip(fbm((H, W), 3, (1.2, 3), (1, .5)) * .5 + .5, 0, 1)))[..., None].astype(np.float32)
         self.SP = make_sprites()
+        self.g_tl = np.clip(1 - np.hypot(xx / W, yy / H) / 1.15, 0, 1)[..., None].astype(np.float32) ** 1.6       # light from the top-left
+        self.g_br = np.clip(1 - np.hypot((W - xx) / W, (H - yy) / H) / 1.2, 0, 1)[..., None].astype(np.float32) ** 1.4  # cool tint at the bottom-right
+        self.g_v = (yy / H)[..., None].astype(np.float32)
         tb = T('5:1+16')
         self.bloom = [(tb + .08 * i, 510 + dx, 1495 + dy, R, PASTEL[i % 5], i % 4, r.uniform(0, 360)) for i, (dx, dy, R) in enumerate(
             [(0, 0, 1500), (-420, -500, 1300), (430, -620, 1350), (-200, -1250, 1500), (300, -1500, 1450), (0, -800, 1700), (-600, 200, 900), (650, 150, 950)])]
@@ -597,7 +608,7 @@ class Scene:
 # ---------------------------------------------------------------- frame
 def body_affine(s, z, camx, camy):
     """canvas px -> screen px for the whole character (scale about the feet, squash-stretch, roll, hop), then camera."""
-    app, sq, rl = s['approach'], s['squash'], math.radians(s['bodyRoll'])
+    app, sq, rl = s['approach'], s['squash'], math.radians(.15 * s['bodyRoll'])
     sx, sy = app * (1 - .5 * sq), app * (1 + sq); c, sn = math.cos(rl), math.sin(rl)
     A = np.array([[c * sx, -sn * sy], [sn * sx, c * sy]])
     fx, fy = FEET[0] + P, FEET[1] + P
@@ -627,10 +638,10 @@ def render_character(F, R, s, t, scene):
     ty0, ty1 = int(np.clip(tb[1] - tr_ - y0, 0, y1 - y0)), int(np.clip(tb[1] + tr_ - y0, 0, y1 - y0))
     tx0, tx1 = int(np.clip(tb[0] - tr_ - x0, 0, x1 - x0)), int(np.clip(tb[0] + tr_ - x0, 0, x1 - x0))
     cxt, cyt = cx[ty0:ty1, tx0:tx1], cy[ty0:ty1, tx0:tx1]
-    dxs, dys = cxt - bx, cyt - (by + s['crouch'])
+    dxs, dys = cxt - (bx + s['hipShift']), cyt - (by + s['crouch'])
     rr = np.hypot(dxs, dys) / TAIL_L
     wave = 6 * math.sin(2 * math.pi * .7 * t) * np.clip(rr, 0, 1.3)
-    th = np.radians(s['tailBase'] + s['tailCurl'] * np.clip(rr, 0, 1.3) ** 2 + wave + np.clip(s['tail'][0] * .35, -30, 30) * np.clip(rr, 0, 1.3) ** 1.5)
+    th = np.radians(min(s['tailBase'] * .42, 30) + .5 * s['tailCurl'] * np.clip(rr, 0, 1.3) ** 2 + 1.6 * wave + np.clip(s['tail'][0] * .35, -30, 30) * np.clip(rr, 0, 1.3) ** 1.5)
     c, sn = np.cos(th), np.sin(th)
     tsx = (bx + c * dxs + sn * dys).astype(np.float32); tsy = (by + -sn * dxs + c * dys).astype(np.float32)
     layer = body
@@ -669,6 +680,11 @@ def frame(i):
     render_character(F, RIG, s, t, SCENE)
     SCENE.fx_front(F, t, s)
     F = F * SCENE.grain
+    u = smoothstep(CUT, CUT + 1.2, t); w12 = smoothstep(T('12:1'), T('12:3'), t)
+    top = np.array([1., .86, .78]) * (1 - u) + np.array([.99, .80, .92]) * u * (1 - w12) + np.array([1., .92, .80]) * u * w12
+    bot = np.array([.80, .87, 1.]) * (1 - u) + np.array([.76, .80, 1.]) * u
+    F = 1 - (1 - F) * (1 - (.20 + .08 * w12) * SCENE.g_tl * top)                      # screen: soft warm light
+    F = F * (1 - .16 * SCENE.g_br * (1 - bot)) * (1 - .05 * SCENE.g_v * (1 - bot))    # multiply: cool depth
     fin = smoothstep(0, .25, t) * (1 - smoothstep(DUR - .5, DUR - .02, t))
     F = SCENE.paper * (1 - fin) + F * fin
     return (np.clip(F, 0, 1) * 255 + .5).astype(np.uint8)

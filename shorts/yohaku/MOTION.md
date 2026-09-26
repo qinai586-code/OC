@@ -124,8 +124,8 @@ There is only one drawing of her, a front view. So the render keeps every beat a
 |---|---|
 | the bead lands on her fingertip | it lands on her **nose**: she goes cross-eyed, says "ah", the tail twitches |
 | she hops over the margin line | she **hops toward the camera** across the cut and lands in the colour bloom |
-| trot across the roof of the page | **trot in place toward us**: steps on eighth notes, colour pools slide past toward the camera |
-| paw swipe, clap-catch | a **sleeve-flap swipe**; the bead bounces back and pops on her ear (she ducks, ear flick) |
+| trot across the roof of the page | **trot in place toward us**: the knees bounce on eighth notes and one heel lifts while the other foot stays planted; colour pools slide past toward the camera |
+| paw swipe, clap-catch | a **sleeve-billow swipe**; the bead bounces back and pops on her ear (she ducks, ear flick) |
 | she cups the fading blue | it drifts into her **blue bow**, which lights up (「消えそうな青」) |
 | she offers the colours, then releases them | the colours **orbit her**; she flaps both sleeves and they shoot up into the sky |
 | camera arc to frontal | framing and height changes only |
@@ -141,8 +141,17 @@ There is only one drawing of her, a front view. So the render keeps every beat a
 - **The mouth** gets smile warps and a small open shape. **Blush** is painted on.
 
 **Motion:**
+- **Nothing folds:**
+  - Sleeves billow from their outer edge like fabric; their weight is zero along the hands, the skirt edge and the cardigan front, so cuffs never smear over the skirt.
+  - The legs split crisply between the feet, so one foot can lift while the other stays planted.
+- **Nothing is stiff:**
+  - Sway is a spine bend about the hips plus a hip weight-shift, never the whole image rotating.
+  - Her head always drifts slightly.
+  - The trot bounces in the knees instead of lifting the whole picture off the ground.
 - The tail is its own layer behind the body, bent more toward the tip.
 - Everything secondary (hair, ahoge, ear tips, cuffs, skirt, tail) runs on springs driven by the body's acceleration, with wind after the bloom.
+
+**Colour:** soft full-screen gradient accents: a warm light from the top-left and a cool tint from the bottom-right. They move from peach and blue on the paper page, to pink and lavender after the bloom, to warm gold at the sky release.
 
 **Full turns and reaches** (the `motion.json` plan) need a turnaround and a few pose drawings of the OC. Once those exist, the same controllers and timings apply.
 
