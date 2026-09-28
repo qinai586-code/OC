@@ -10,6 +10,10 @@ cinematic dark electronic art-pop, anime sci-fi requiem, 130 BPM, driving sidech
 
 male vocals, male choir, baritone, tenor, male narrator, rap, EDM drop, trap
 
+## Model
+
+**v6** (Pro). Not v6-wild: it trades control for experiment, and control is what protects the structure and the no-male-voice rule. Not v6-mini: lower fidelity for the organ, choir and two voices. No Custom Model: it trains on uploads, and the only obvious reference (P(doom)) isn't ours.
+
 ## Settings changed from v1
 
 Style Influence 80%, Weirdness 35%. Everything else as before (Vocal Gender Female, Custom duration about 2:50-3:00, Personalize Off).
@@ -135,7 +139,7 @@ Run V2 exactly as written: no lyric, story or prompt changes before listening.
 
 Roles: Claude measures structure (proxies), the director judges perception, ChatGPT and Claude interpret why a take worked or failed. #7 is never overridden by a metric.
 
-Escalation (stems require Suno Studio 2.0, a Premier feature; check the account first):
+Escalation (per ChatGPT's check of Suno's docs: Pro includes Auto Split / Split from Mix with vocal extraction; Premier adds Advanced Split and Studio 2.0 multitrack. The director's account shows the Pro v6 model):
 - only #2 fails → chorus 2 tag becomes "calm close female melodic spoken-word, restrained half-sung delivery".
 - identity fails but the music works → keep the arrangement, export stems, and rebuild the two vocals as separate tracks; Claude does the mix (levels, reverb and stereo width: A wide and wet, B centred and dry).
 - never throw away a take whose music works.
