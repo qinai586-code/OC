@@ -14,3 +14,9 @@ An original animated music short, about 2:05 long, starring fictional anime pers
 The engine is based on [ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase) (MIT; see LICENSE), reorganised for 60 fps continuous motion.
 
 The character reference art the user supplied is in `reference/`.
+
+## Other projects in this repo
+
+| Project | Status |
+|---|---|
+| [simulated-universe/](simulated-universe/README.md): *Where We Live Is a Simulated Universe*, a 2:53 pixel-art music video about our own world (a simulation, no gods, death as a return to universal consciousness) | design, awaiting review |
