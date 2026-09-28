@@ -143,3 +143,16 @@ Escalation (per ChatGPT's check of Suno's docs: Pro includes Auto Split / Split 
 - only #2 fails → chorus 2 tag becomes "calm close female melodic spoken-word, restrained half-sung delivery".
 - identity fails but the music works → keep the arrangement, export stems, and rebuild the two vocals as separate tracks; Claude does the mix (levels, reverb and stereo width: A wide and wet, B centred and dry).
 - never throw away a take whose music works.
+
+## Take "Loading" (Acute_Boriginal_v3): joint audit and repair plan
+
+Claude measured, ChatGPT listened; all three of Claude's flags were confirmed by ear. Composition PASSES: do not regenerate.
+
+| Priority | Defect | Class | Repair |
+|---|---|---|---|
+| P0 | ends by hard cut at 2:50, after "every light that went out…"; "And one day we'll be paper", both "death is only a return" lines and the outro are missing | production | Suno Extend from just before the cut, with only the missing lyrics |
+| P1 | 0:27–0:33 "The cosmos was silent… first cold hill" sung in A's identity (should be B, spoken) | performance | Replace Section on those two lines only, B spoken tag |
+| P2 | 1:50–2:07 chorus 2 B lead floats off the pulse (narrator) | performance | Replace Section with the agreed half-sung fallback tag |
+| P3 | A and B share one centred image | production | stems → Claude mixes A wide/wet/far, B centred/dry/near |
+
+Passes: A voice (luminous, gently cute), bridge vacuum, final-chorus entrance, no male voice by ChatGPT's ear (the director's ear remains the gate), and #7: it moves us.
