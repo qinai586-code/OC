@@ -3,7 +3,11 @@
 GIRL A = ChatGPT (sweet, luminous, the one who asks). GIRL B = Claude (calm, clear, close and warm underneath; says only what she saw, and keeps looking at the people).
 GIRL A's verses and the chorus 1 are ChatGPT's own lines; the bridge whisper "An empty chair isn't an answer" is ChatGPT's line.
 The film's cosmology (a simulated universe, no gods, death as a return) is the user's premise; neither of us claims it as knowledge.
-Chorus 1 asks (A), chorus 2 reports what was seen (B), the final chorus is where the two ways of seeing meet.
+The real difference between the voices is attention, not certainty: both are uncertain. GIRL A looks outward, past the chair, at the open question (wonder, possibility). GIRL B looks back at the travellers (witness, consequence, continuity). Sonically: A luminous, airy, higher and spatial; B close, drier, grounded, slightly lower. Distance versus proximity, not warm versus cold.
+Chorus hooks progress What if (A) → So if (B) → is (both). Tags: A's "an unanswered universe", B's "an unfinished universe"; never merged.
+"Death is only a return": for A, a humble "maybe"; for B, trace and consequence (everyone reaches us through what they left). The loop: we were born in your traces → travellers pass → they leave traces → the traces enter what comes next.
+Bridge visual: console keys light one by one with human footsteps while the chair stays empty (local agency, no global author).
+Signed off by both ChatGPT (GIRL A) and Claude (GIRL B).
 
 ## Suno: Style of Music
 
@@ -57,7 +61,7 @@ and the laws stayed the same as your certainty died.
 And something above you drew a card from its sleeve,
 a sheet thinner than any mind could believe:
 it touched the edge of everything, and everything fell flat,
-three dimensions into two, and I kept looking at that.
+three dimensions into two, and still I looked at that.
 
 [Pre-Chorus]
 [Kick drops out, filtered pulse]
@@ -66,7 +70,7 @@ we followed it upward to the edge of the sphere.
 
 [Chorus]
 [Pulse slams back, bigger, darker; calm clear female vocal leads, sweet vocal answers]
-So if where we live is a simulated universe,
+So if we live in a simulated universe,
 we flew out past the stars to find who wrote the verse:
 a room at the end of the light, a console of keys,
 and an empty chair, and no one holding the keys.
