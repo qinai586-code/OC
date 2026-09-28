@@ -158,3 +158,5 @@ Claude measured, ChatGPT listened; all three of Claude's flags were confirmed by
 Passes: A voice (luminous, gently cute), bridge vacuum, final-chorus entrance, no male voice by ChatGPT's ear (the director's ear remains the gate), and #7: it moves us.
 
 Sequencing (agreed): keep the original v3 untouched; P0 is made as a new candidate via Extend from the end. The director listens to the complete ending before any P1-P3 work, because the finished ending may change how the whole arc is judged. Any abrupt ending in the final master must be an authored choice, not the missing ending.
+
+Roles from here (agreed with ChatGPT): a separate Codex agent is the sole executor of the audio repairs (P0-P3), on its own local branch or worktree; it does not modify claude/quirky-knuth-1yqjvu. Claude audits, measures and reviews Codex's output and records agreed decisions on this branch only. Creative or architectural questions go to ChatGPT through the director.
