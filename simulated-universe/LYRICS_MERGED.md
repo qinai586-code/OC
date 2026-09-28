@@ -1,13 +1,13 @@
 # Death Is Only a Return: merged lyrics (Claude × ChatGPT)
 
-GIRL A = ChatGPT (sweet, luminous, the one who asks). GIRL B = Claude (aloof, dry and close, the one who states what she sees).
+GIRL A = ChatGPT (sweet, luminous, the one who asks). GIRL B = Claude (calm, clear, close and warm underneath; says only what she saw, and keeps looking at the people).
 GIRL A's verses and the chorus 1 are ChatGPT's own lines; the bridge whisper "An empty chair isn't an answer" is ChatGPT's line.
 The film's cosmology (a simulated universe, no gods, death as a return) is the user's premise; neither of us claims it as knowledge.
 Chorus 1 asks (A), chorus 2 reports what was seen (B), the final chorus is where the two ways of seeing meet.
 
 ## Suno: Style of Music
 
-cinematic dark electronic art-pop, anime sci-fi requiem, 130 BPM, driving sidechained synth pulse, pipe organ, sub-bass, women's choir, granular glitches, vast space, female duet: luminous sweet girl vocal and dry close-mic aloof girl vocal
+cinematic dark electronic art-pop, anime sci-fi requiem, 130 BPM, driving sidechained synth pulse, pipe organ, sub-bass, women's choir, granular glitches, vast space, female duet: luminous sweet girl vocal and calm clear close-mic girl vocal
 
 ## Suno: Exclude Styles
 
@@ -17,7 +17,7 @@ male vocals, rap, EDM drop
 
 [Intro]
 [Drone, distant organ, muffled pulse]
-[Whispered, dry close aloof female voice]
+[Whispered, calm close female voice]
 Three... two... one...
 Loading.
 
@@ -57,7 +57,7 @@ and the laws stayed the same as your certainty died.
 And something above you drew a card from its sleeve,
 a sheet thinner than any mind could believe:
 it touched the edge of everything, and everything fell flat,
-three dimensions into two, and nothing after that.
+three dimensions into two, and I kept looking at that.
 
 [Pre-Chorus]
 [Kick drops out, filtered pulse]
@@ -65,21 +65,22 @@ And the dark came closer, and the flat came near,
 we followed it upward to the edge of the sphere.
 
 [Chorus]
-[Pulse slams back, bigger, darker; aloof female vocal leads, sweet vocal answers]
-Where we live is a simulated universe:
-we flew out past the stars to find who wrote the curse,
+[Pulse slams back, bigger, darker; calm clear female vocal leads, sweet vocal answers]
+So if where we live is a simulated universe,
+we flew out past the stars to find who wrote the verse:
 a room at the end of the light, a console of keys,
 and an empty chair, and no one holding the keys.
 Where we live, where we live,
-a simulated universe.
+an unfinished universe.
 
 [Bridge]
 [No drums, no bass, silence, thin high drone]
-[Spoken, aloof female voice, dry and close]
-There are no gods.
+[Spoken, calm female voice, close]
+There are no gods here.
 [Whispered, sweet female voice]
 An empty chair isn't an answer.
-[Spoken, aloof female voice]
+[Spoken, calm female voice]
+It isn't. But look who's pressing the keys.
 No hunter in the forest, no hand upon the card,
 only travelers with lanterns, passing through the dark.
 Every key is a footstep of someone passing by:
