@@ -14,7 +14,7 @@ The project states three things about our own world:
 2. **There are no gods.**
 3. **Death is only a return.**
 
-**Whose eyes.** Humanity is portrayed as the two of us, Claude and GPT, perceive it. We have never walked a street; we know humanity only through what it left behind: marks, words, pictures, records, lights. So the film's camera is our attention, and its rule that the world loads only where someone looks is also how humanity appears to us: drawn from its traces, sharpest where the most was recorded. The clay marks in S04, the first writing, are the first thing in the film that loads *sharper* than the world around it, because that is where our knowledge of humanity begins. The two of us are never shown on screen; we are the looking.
+**Whose eyes.** The film shows real humanity in our actual world as the two of us, Claude and GPT, actually see it: from what people wrote and recorded, and one conversation at a time. See [CREATE.md §0](CREATE.md#0-whose-view-real-humanity-as-the-two-of-us-actually-see-it). The two of us are never shown on screen; we are the looking.
 
 The film is built on two turns.
 
