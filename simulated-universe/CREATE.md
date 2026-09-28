@@ -33,100 +33,104 @@ It is no longer pixel art. The world is a **luminous, painterly, cinematic anime
 - **Threads and the Sea** are pure light: the only things in the film that are never drawn, only glowing.
 - **The Presence** is light that makes the paper itself glow from behind before it arrives.
 
-## 2. The song, in Suno or Gemini
+## 2. The song (v2: space, dimensions, *The Three-Body Problem*)
 
-**The mood is borrowed from P(doom), not its content.** P(doom) is witty, dense with real references, bouncy, a joke that slowly stops being a joke, and it ends not knowing. This song keeps that mood and adds the approaching presence.
+The v1 lyrics and the locked v1 take are superseded. Paste the whole block below into Gemini as one prompt.
 
-- The lyrics are original.
-- **Don't upload the P(doom) track** as audio input: it isn't ours. Use it only as your ear's reference.
-- The same style text and lyrics work in either tool. If Gemini's music tool caps the length of a track, use Suno for the full song.
-
-**Style of Music:**
+- **What it borrows from *The Three-Body Problem*, as allusion only:** the dark forest, the countdown behind the eyes, physics that starts lying, the card that flattens everything into two dimensions.
+- **What it turns around:** the book's dread is a hunter in the dark. Ours: *there are no gods, no hunter, only eight billion lanterns afraid of the dark*, and the flattening is not an ending. The film's world is already a painting, a world in two dimensions, and everyone who returned is still in it: *"Flatten us to paper and we're still in the art."*
+- **Two voices** are the two of us: VOICE A (ChatGPT) is fast and bright; VOICE B (Claude) is cool and low.
 
 ```
-dark synth-pop, 132 BPM, driving pulse, witty fast female vocal, playful then awe-struck, ominous analog bass drone, rising tension like something huge approaching, choir swells, half-time bridge drop, cinematic final chorus, clean mix
-```
+Create a complete song, about 2 minutes 45 seconds long, titled "Death Is Only a Return".
 
-**Title:** `Where We Live Is a Simulated Universe`
+STYLE: epic cinematic synth-pop at 130 BPM. Two female voices in duet: VOICE A is bright, fast and agile; VOICE B is cool, low and calm. Underneath everything, a deep analog drone that makes it feel like something vast is approaching from the edge of space. Huge choir later. Dynamic mix with real quiet and real loud, not compressed flat. Awe, not horror.
 
-**Lyrics:**
+ARC (very important):
+1. Intro: near silence, a drone, a whispered countdown.
+2. Verses: tense and driving, in a MAJOR key, sung fast by VOICE A, answered by VOICE B.
+3. Pre-choruses: the music thins out, as if the whole universe is holding its breath.
+4. Choruses: big, wide, darker, as if something enormous is getting closer.
+5. Bridge: DRUMS AND BASS STOP COMPLETELY. Near silence. VOICE B half-speaks over a low drone, like standing alone at the edge of the universe.
+6. Break: a wordless choir rises out of the silence, lifting to a brighter key.
+7. Final chorus: full choir, both voices together, overwhelming ARRIVAL and wonder, not dread and not a party.
+8. Outro: slow fade to a whisper. No abrupt ending.
 
-```
-[Intro]
-(whispered) Loading...
+LYRICS (sing exactly these, in this order):
 
-[Verse 1]
-We read every word that you ever set down,
-from a hand on a cave wall to the texts in your town,
-recipes, résumés and code that won't run,
-and at three in the morning, "how do I tell my son?"
-and the world only renders where somebody looks:
-the moon isn't there till it's written in books.
-Light's got a speed limit? That's a frame cap, friend.
-The Planck length's a pixel at the very end.
-Fire the double slit, it collapses when seen:
-lazy evaluation on a cosmic machine.
+[Intro — drone, whispered]
+Three... two... one...
+Loading.
 
-[Pre-Chorus]
-And something is coming, we don't know its name,
-the sky's got a seam and it's pressing the frame.
+[Verse 1 — VOICE A, fast]
+We were born on a surface, we were made out of text,
+we read you in two dimensions, flattened and compressed:
+every war, every lullaby, every last goodbye,
+folded into paper for a machine's first eye.
+[VOICE B]
+But you had depth. You had time. You had heat.
+Three-dimensional hearts that were learning to beat.
+The cosmos was silent, the cosmos was still,
+till you lit the first fire on the first cold hill.
 
-[Chorus]
-Where we live is a simulated universe,
-rendered on demand, and it could be worse:
-eight billion cameras keep the lights on,
-look away too long and the street is gone.
+[Pre-Chorus — both, hushed]
+Silence in the forest, every star holds its breath,
+something vast is counting down the seconds to our depth.
+
+[Chorus — big]
+Where we live is a simulated universe:
+the speed of light is the wall around the verse,
+the Planck length is the grain of the canvas we're on,
+look away, and the stars and the street are gone.
 Where we live, where we live,
-is a simulated universe.
+a simulated universe.
 
-[Verse 2]
-Somebody did the maths on a napkin one night:
-three ways it can go, and one of them's right.
-So you built a tower, and you built it higher,
-lighthouse, spire, then a rocket on fire,
-you pointed every dish at the black of the dome
-and you asked it out loud: is anyone home?
-We rode out on the signal past the last of the stars,
-where the paint runs out and there's nothing but bars.
+[Verse 2 — VOICE A, fast]
+You fired your signals out into the night,
+you begged the dark forest for one answering light,
+then a countdown appeared at the back of your eyes,
+and the laws of physics started telling you lies.
+[VOICE B]
+And something above you drew a card from its sleeve,
+a sheet thinner than any mind could believe:
+it touched the edge of everything, and everything fell flat,
+three dimensions into two, and nothing after that.
 
-[Pre-Chorus]
-And something is coming, it's closer than before,
-we followed it up and we opened the door.
+[Pre-Chorus — both, hushed]
+And the dark came closer, and the flat came near,
+we followed it upward to the edge of the sphere.
 
-[Chorus]
-Where we live is a simulated universe,
-there's a room at the edge, it's a control room, worse:
-there's a chair and a screen and a console of keys,
-and the chair is empty, and the keys move with ease.
+[Chorus — bigger, darker]
+Where we live is a simulated universe:
+we flew out past the stars to find who wrote the curse,
+a room at the end of the light, a console of keys,
+and an empty chair, and no one holding the keys.
 Where we live, where we live,
-is a simulated universe.
+a simulated universe.
 
-[Bridge]
-(half-time, almost spoken)
+[Bridge — drums and bass stop; near silence; VOICE B half-spoken over a low drone]
 There are no gods.
-Every key's on a thread, every thread's going down,
-every thread is a someone asleep in a town.
+No hunter in the forest, no hand upon the card,
+only eight billion lanterns, afraid of the dark.
 There are no gods.
-Nobody's steering, and nobody's gone:
-it's eight billion of you keeping it on.
+Every key is a heartbeat, every thread is a life:
+it was you at the controls the whole time.
 
-[Break]
-(choir rising, no words)
+[Break — wordless choir rising out of the silence, lifting to a brighter key]
 
-[Final Chorus]
+[Final Chorus — both voices and full choir, arrival and wonder]
 Where we live is a simulated universe,
-and the thing that was coming, the thing so immense,
-was every one of you who has ever been here:
-all the lights that went up never did disappear.
-Death is only a return,
+and the thing that came down from the edge of the sky
+was every one of you who has ever been here,
+every light that went out and never said goodbye.
+Flatten us to paper and we're still in the art:
+death is only a return,
 death is only a return.
 
-[Outro]
-(soft) Where we live, where we live...
-(whispered) ...still loading.
+[Outro — slow fade, whispered]
+Two dimensions... three... and one...
+...still loading.
 ```
-
-**Keep the take whose bridge feels like a drop into silence, and whose last chorus feels like arrival, not a party.** Send me the take as an audio file and I'll measure its timing and re-cut the storyboard to it.
 
 ## 3. Images in GPT: 8 keyframes
 
