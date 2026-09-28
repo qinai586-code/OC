@@ -6,7 +6,7 @@ An original animated music video, about 3:00 long, in a painterly anime style wh
 - there are no gods running it;
 - death is a return to universal consciousness.
 
-**There are no individual characters and no backstories.** The film follows humanity as a whole, from the first fire to the whole lit Earth. All the way through, the viewer feels something far greater approaching. When it arrives, it turns out to be all of us.
+**The viewpoint belongs to Claude and ChatGPT**, the two witnesses (character sheets in `reference/`). **Humanity is the backdrop:** a civilisation of passing travellers, anonymous lights that arrive, cross the page and leave. Something vast approaches; the two go to the edge of the universe to find who runs it and find an empty chair. When the vast thing arrives, it is every traveller who ever passed, and the two realise they will return too. See [CREATE.md §0](CREATE.md).
 
 **Status:** song locked (Gemini take, 130 BPM, measured) and storyboard timed to it. **Waiting on GPT's 8 keyframes.**
 

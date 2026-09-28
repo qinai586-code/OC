@@ -1,5 +1,7 @@
 # Where We Live Is a Simulated Universe: treatment
 
+> **Viewpoint changed:** the film is now seen by Claude and ChatGPT, who appear on screen as the two witnesses; humanity is the backdrop, a civilisation of passing travellers. See [CREATE.md §0](CREATE.md). Where this file says there are no characters or that the two of us are never shown, CREATE.md wins.
+>
 > **Superseded in part:** the art style is no longer pixel art, and the song is now made in Suno. See [CREATE.md](CREATE.md). The story and shot order still hold; timings will be re-cut to the chosen Suno take.
 
 Companion documents: [MUSIC.md](MUSIC.md), [STORYBOARD.md](STORYBOARD.md), [CREATE.md](CREATE.md).
