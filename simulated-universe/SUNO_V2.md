@@ -8,7 +8,7 @@ cinematic dark electronic art-pop, anime sci-fi requiem, 130 BPM, driving sidech
 
 ## Exclude styles
 
-male vocals, rap, EDM drop, trap
+male vocals, male choir, baritone, tenor, male narrator, rap, EDM drop, trap
 
 ## Settings changed from v1
 
@@ -130,10 +130,12 @@ Run V2 exactly as written: no lyric, story or prompt changes before listening.
 | 3 | distance contrast obvious (A far and spatial, B near and grounded) | ear |
 | 4 | bridge a real vacuum | Claude measures |
 | 5 | final chorus the biggest moment | Claude measures |
-| 6 | no male voice anywhere | Claude measures pitch; ear confirms the bridge |
+| 6 | **no male voice anywhere: an absolute rule set by the director** | Claude screens pitch plus timbre (formant/spectral evidence) and lists every suspect timestamp; the measurement can only FAIL or FLAG a take, never PASS it. The director's ears make the final call, and any doubt means the take is rejected. |
 | 7 | the song moves us | the director |
 
-Escalation:
+Roles: Claude measures structure (proxies), the director judges perception, ChatGPT and Claude interpret why a take worked or failed. #7 is never overridden by a metric.
+
+Escalation (stems require Suno Studio 2.0, a Premier feature; check the account first):
 - only #2 fails → chorus 2 tag becomes "calm close female melodic spoken-word, restrained half-sung delivery".
 - identity fails but the music works → keep the arrangement, export stems, and rebuild the two vocals as separate tracks; Claude does the mix (levels, reverb and stereo width: A wide and wet, B centred and dry).
 - never throw away a take whose music works.
