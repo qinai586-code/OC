@@ -1,12 +1,14 @@
 # STORYBOARD: Where We Live Is a Simulated Universe
 
+> **Superseded in part:** the art style is no longer pixel art, and the song is now made in Suno. See [CREATE.md](CREATE.md). The story and shot order still hold; timings will be re-cut to the chosen Suno take.
+
 - **Logline:** Humanity lights its first fire, and the world draws itself around the people looking into it. As we look further, the universe renders further, and all the while something vast is approaching. We reach past the edge of the sky to meet whoever runs it and find an empty chair. What was approaching was us.
 - **No individuals.** Every figure is anonymous and nobody is followed from shot to shot (TREATMENT §2).
 - **Timing:** 72 BPM, 4/4. A bar is 3.333 s (200 frames at 60 fps) and a beat 0.833 s (50 frames). **b.x** means bar b, beat x. Times are on the working grid in [MUSIC.md §8](MUSIC.md#8-beat-map-the-sync-contract-between-score-and-picture) and are re-timed to the locked audio.
 - **Resolution** is the effective grid of the drawn world (TREATMENT §6.1). Unlooked-at space is wireframe at every age.
 - **Screen direction:** the sky and the Sea are always up, and threads always rise straight up.
 - **Signature shots** get 1/60 s strip audits: S02, S06, S09, S15, S17, S21, S22.
-- **Style frames:** ★K1–K8 mark the shots GPT paints first (COLLAB.md).
+- **Style frames:** ★K1–K8 mark the shots GPT paints first (CREATE.md).
 
 ---
 

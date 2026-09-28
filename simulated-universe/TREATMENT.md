@@ -1,6 +1,8 @@
 # Where We Live Is a Simulated Universe: treatment
 
-Companion documents: [MUSIC.md](MUSIC.md), [STORYBOARD.md](STORYBOARD.md), [COLLAB.md](COLLAB.md).
+> **Superseded in part:** the art style is no longer pixel art, and the song is now made in Suno. See [CREATE.md](CREATE.md). The story and shot order still hold; timings will be re-cut to the chosen Suno take.
+
+Companion documents: [MUSIC.md](MUSIC.md), [STORYBOARD.md](STORYBOARD.md), [CREATE.md](CREATE.md).
 
 ---
 
@@ -126,7 +128,7 @@ A quantise pass block-averages each native frame to the current age's resolution
   - It is felt before it is seen: a light gathering at the horizon without a shape (S10), the sky's paint trembling, the edge of the frame darkening.
   - It is **never a figure**: no eyes, no body, no symbol.
   - When it arrives (S21), it is the Sea coming down, and its surface resolves into points of light, each with a face.
-  - Its visual design is GPT's style frame K8 (COLLAB.md).
+  - Its visual design is GPT's style frame K8 (CREATE.md).
 
 ### 6.4 Palette
 
@@ -153,7 +155,7 @@ The colour arc goes from black to firelight, to earth tones and night, to modern
 
 ## 8. Production plan
 
-GPT generates images only; Claude does everything else. The image list is in [COLLAB.md](COLLAB.md).
+GPT generates images only; Claude does everything else. The image list is in [CREATE.md](CREATE.md).
 
 1. **Images.** GPT generates style frames K1–K8 and the crowd sheet (9 images in total).
 2. **Score.** Claude composes a MIDI demo and renders it; the audio is locked and the beat map re-measured.

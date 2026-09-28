@@ -1,5 +1,7 @@
 # Where We Live Is a Simulated Universe: score
 
+> **Superseded in part:** the art style is no longer pixel art, and the song is now made in Suno. See [CREATE.md](CREATE.md). The story and shot order still hold; timings will be re-cut to the chosen Suno take.
+
 An original score, about 3:00, mostly instrumental with a choir. The only words are the three statements, sung by the choir, one per movement.
 
 ## 1. The feeling

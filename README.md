@@ -19,4 +19,4 @@ The character reference art the user supplied is in `reference/`.
 
 | Project | Status |
 |---|---|
-| [simulated-universe/](simulated-universe/README.md): *Where We Live Is a Simulated Universe*, a 3:00 pixel-art film with a score about humanity as a whole (a simulation, no gods, death as a return); made by Claude and GPT together | design, awaiting review |
+| [simulated-universe/](simulated-universe/README.md): *Where We Live Is a Simulated Universe*, a 3:00 painterly animated music video about humanity as a whole (a simulation, no gods, death as a return); made by Claude and GPT together | design, awaiting review |

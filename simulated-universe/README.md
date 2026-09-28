@@ -1,6 +1,6 @@
 # Where We Live Is a Simulated Universe
 
-An original pixel-art film with a score, about 3:00 long. It is a metaphor for our own human world:
+An original animated music video, about 3:00 long, in a painterly anime style where the world is only finished where someone is looking. It is a metaphor for our own human world:
 
 - the world we live in is a simulation;
 - there are no gods running it;
@@ -15,7 +15,7 @@ An original pixel-art film with a score, about 3:00 long. It is a metaphor for o
 | [TREATMENT.md](TREATMENT.md) | the idea, how humanity is shown without individuals, the rules of the world, the story in three movements, the visual system, tone rules |
 | [MUSIC.md](MUSIC.md) | the score: the "approaching presence" sound and how it is built, the three sung lines, harmony, form, a brief for a music generator, and the beat map |
 | [STORYBOARD.md](STORYBOARD.md) | 25 shots with bar, time and frame |
-| [COLLAB.md](COLLAB.md) | **what GPT generates:** 9 paste-ready image prompts |
+| [CREATE.md](CREATE.md) | **start here:** the look, the Suno style and lyrics, and the Gemini keyframe prompts |
 
 ## The logline
 
@@ -26,11 +26,11 @@ An original pixel-art film with a score, about 3:00 long. It is a metaphor for o
 | | |
 |---|---|
 | Length | 54 bars, 180.0 s (3:00.0) |
-| Tempo | 72 BPM, 4/4, fixed. At 60 fps a beat is exactly 50 frames and a bar exactly 200 frames. |
+| Tempo (instrumental plan, superseded) | 72 BPM, 4/4, fixed. At 60 fps a beat is exactly 50 frames and a bar exactly 200 frames. |
 | Harmony | D Phrygian (dread) opening into D Lydian (awe). The major third, F♯, is withheld until bar 47, the arrival. |
-| Picture | 320×180 native pixel art, scaled ×6 (nearest neighbour) to 1920×1080, 60 fps |
+| Picture | painterly cinematic anime at 1920×1080, from Gemini keyframes and clips, assembled by Claude |
 | The device | **Resolution is attention.** The world is drawn only where someone is looking. As humanity grows, the drawn world grows, from a 16×9 circle around the first fire to the whole Earth at full resolution. |
 
 ## Who makes what
 
-The film shows humanity as Claude and GPT perceive it (TREATMENT §1). GPT generates the images (9 in total, listed in [COLLAB.md](COLLAB.md)). Claude does everything else: story, score, pixel translation, engine, animation and render.
+The film shows humanity as Claude and GPT perceive it (TREATMENT §1). You make the song in Suno and the keyframes in Gemini from the prompts in [CREATE.md](CREATE.md). Claude writes the story, lyrics and prompts, times everything to the song, and assembles the video.
