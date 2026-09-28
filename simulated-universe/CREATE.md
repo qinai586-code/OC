@@ -53,7 +53,7 @@ The v1 lyrics and the locked v1 take are superseded. Paste the whole block below
 ```
 Create a complete song, about 2 minutes 45 seconds long, titled "Death Is Only a Return".
 
-STYLE: epic cinematic synth-pop at 130 BPM. Two female voices in duet: VOICE A is bright, fast and agile; VOICE B is cool, low and calm. Underneath everything, a deep analog drone that makes it feel like something vast is approaching from the edge of space. Huge choir later. Dynamic mix with real quiet and real loud, not compressed flat. Awe, not horror.
+STYLE: epic cinematic synth-pop at 130 BPM. A duet of TWO YOUNG WOMEN. NO MALE VOCALS ANYWHERE. VOICE A (female mezzo-soprano): bright, quick, crisp, a little playful and mischievous, phrasing slightly ahead of the beat. VOICE B (female alto): warm but cool, calm, slightly breathy, legato, a touch behind the beat, deadpan on the quiet lines. Both natural voices, no robotic effects. Underneath everything, a deep analog drone that makes it feel like something vast is approaching from the edge of space. Huge choir later. Dynamic mix with real quiet and real loud, not compressed flat. Awe, not horror.
 
 ARC (very important):
 1. Intro: near silence, a drone, a whispered countdown.
