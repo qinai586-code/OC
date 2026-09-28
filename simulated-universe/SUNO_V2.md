@@ -156,3 +156,5 @@ Claude measured, ChatGPT listened; all three of Claude's flags were confirmed by
 | P3 | A and B share one centred image | production | stems → Claude mixes A wide/wet/far, B centred/dry/near |
 
 Passes: A voice (luminous, gently cute), bridge vacuum, final-chorus entrance, no male voice by ChatGPT's ear (the director's ear remains the gate), and #7: it moves us.
+
+Sequencing (agreed): keep the original v3 untouched; P0 is made as a new candidate via Extend from the end. The director listens to the complete ending before any P1-P3 work, because the finished ending may change how the whole arc is judged. Any abrupt ending in the final master must be an authored choice, not the missing ending.
