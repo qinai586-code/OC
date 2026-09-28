@@ -1,105 +1,79 @@
-# STORYBOARD: Where We Live Is a Simulated Universe
+# STORYBOARD: Where We Live Is a Simulated Universe (timed to the locked song)
 
-> **Superseded in part:** the art style is no longer pixel art, and the song is now made in Suno. See [CREATE.md](CREATE.md). The story and shot order still hold; timings will be re-cut to the chosen Suno take.
+- **Song (locked):** "Death Is Only A Return", generated in Gemini. 2:42 file, music until about 2:39.5.
+  - **The song file is not in this repo**, because the repo is public. Keep your copy; the renderer expects it at `simulated-universe/audio/song.mp3` (gitignored).
+- **Grid, measured from the audio:** **130.00 BPM**, 4/4; 95 % of beats fall within 17 ms of the grid.
+  - A beat is 0.4615 s (27.69 frames at 60 fps) and a bar is 1.8462 s.
+  - **Bar b starts at 1.520 + (b − 1) × 1.84615 s.** The first 1.5 s is a pickup, bar 0.
+- **Sections** are measured from energy, bass and harmony changes. Lyric placement inside a section is estimated, so confirm it by ear. The transcription check is blocked by the network settings.
+- **Keyframes** K1–K8 are GPT's images (CREATE.md §3). Shots without their own keyframe are cut from a keyframe: a crop, a push-in, or a different part of the same painting finishing itself. Nothing here needs extra images.
+- **The paint rule** runs through every shot: fully painted where attention is, then flat colour, then pencil, then paper.
 
-- **Logline:** Humanity lights its first fire, and the world draws itself around the people looking into it. As we look further, the universe renders further, and all the while something vast is approaching. We reach past the edge of the sky to meet whoever runs it and find an empty chair. What was approaching was us.
-- **No individuals.** Every figure is anonymous and nobody is followed from shot to shot (TREATMENT §2).
-- **Timing:** 72 BPM, 4/4. A bar is 3.333 s (200 frames at 60 fps) and a beat 0.833 s (50 frames). **b.x** means bar b, beat x. Times are on the working grid in [MUSIC.md §8](MUSIC.md#8-beat-map-the-sync-contract-between-score-and-picture) and are re-timed to the locked audio.
-- **Resolution** is the effective grid of the drawn world (TREATMENT §6.1). Unlooked-at space is wireframe at every age.
-- **Screen direction:** the sky and the Sea are always up, and threads always rise straight up.
-- **Signature shots** get 1/60 s strip audits: S02, S06, S09, S15, S17, S21, S22.
-- **Style frames:** ★K1–K8 mark the shots GPT paints first (CREATE.md).
+| Section | Bars | Time | Key and energy |
+|---|---|---|---|
+| Intro | pickup–7 | 0:00.0–0:14.4 | drone, quiet |
+| Verse 1 | 8–23 | 0:14.4–0:44.0 | D major, playful |
+| Pre-chorus 1 | 24–27 | 0:44.0–0:51.4 | a breath (drums drop about 7 dB) |
+| Chorus 1 | 28–35 | 0:51.4–1:06.1 | F♯ minor, full |
+| Verse 2 | 36–47 | 1:06.1–1:28.3 | D major |
+| Pre-chorus 2 | 48–51 | 1:28.3–1:35.7 | a breath |
+| Chorus 2 | 52–59 | 1:35.7–1:50.4 | full, brightest |
+| **Bridge: the drop** | 60–67 | 1:50.4–2:05.2 | drums and bass out, "There are no gods" |
+| **Break: choir rising** | 68–75 | 2:05.2–2:20.0 | **A major**, the lift |
+| Final chorus | 76–83 | 2:20.0–2:34.8 | F♯ minor, bittersweet |
+| Outro | 84–end | 2:34.8–2:39.5 | quick fade; **extended in post to 2:44** |
 
 ---
 
-## I. SIMULATED: bars 1–18, 0:00.0–1:00.0
+## I. SIMULATED (0:00–1:06)
 
-**S01 · bars 1–2 · 0:00.0–0:06.7 · wireframe**
-- **Seen:** darkness crossed by a faint gray wireframe grid: the world, unloaded. Nothing moves.
-- **Sound:** the drone.
+| # | Bars | Time | Lyric (approximate) | Picture | From |
+|---|---|---|---|---|---|
+| 1 | pickup–2 | 0:00.0–0:05.2 | *(drone)* | Bare warm-white paper with a faint pencil grid. Nothing is painted. The drone. | K1, paper area |
+| 2 | 3–7 | 0:05.2–0:14.4 | *"Loading…"* | A spark on the bar-3 downbeat: the cave fire paints itself in, a small glowing circle. Then the handprints on the wall, then the five faces looking into the flames. Outside the circle: pencil, then paper. | **K1** |
+| 3 | 8–11 | 0:14.4–0:21.8 | *"We read every word… from a hand on a cave wall…"* | Push in on the handprints, then pull out across the page: more fires paint in across a pencil landscape, one per bar. | K1 extended |
+| 4 | 12–15 | 0:21.8–0:29.2 | *"recipes, résumés… how do I tell my son?"* | **The 3 a.m. apartment block.** Windows paint in one by one as screens light up: the nurse, the student, the old man typing, the parent with a baby. On "son," hold on the window of someone crying quietly. | **K4** |
+| 5 | 16–17 | 0:29.2–0:32.9 | *"the world only renders where somebody looks"* | Pull back from the block: the whole street is pencil except where windows are lit. | K4 wide |
+| 6 | 18–23 | 0:32.9–44.0 | *"the moon isn't there… frame cap… Planck length… double slit… lazy evaluation"* | **The telescope.** Stars and a galaxy paint in only inside its cone. On each science line the cone swings, and the sky paints in where it points. On "collapses when seen," a star snaps from sketch to painted at the instant the cone reaches it. | **K2** |
+| 7 | 24–27 | 0:44.0–0:51.4 | *"And something is coming… the sky's got a seam"* | **The eclipse crowd.** Every face tilts up. On "seam," the tear in the painted sky opens, with bare paper showing through. | **K5** |
+| 8 | 28–31 | 0:51.4–0:58.8 | *"Where we live is a simulated universe…"* | **The Earth at night, fully painted for the first time.** A hard cut on the chorus downbeat, then a slow rotation. | **K3** |
+| 9 | 32–35 | 0:58.8–1:06.1 | *"eight billion cameras… look away too long and the street is gone"* | Back to the 3 a.m. block, wide. On "look away," screens go dark window by window, and each window falls back to pencil and then paper. | K4 |
 
-**S02 · bars 3–4 · 0:06.7–0:13.3 · 16×9 inside the circle** ★ K1
-- **Event:** a spark on 3.1, then fire. A circle of world draws itself around it in huge blocks: ground, a rock, and four or five figures sitting around the fire, faces lit and looking into it. Beyond the circle it is still wireframe.
-- **Reads:** the spark, then the circle loading, then *people looking*.
+## II. NO GODS (1:06–2:05)
 
-**S03 · bars 5–6 · 0:13.3–0:20.0 · 32×18**
-- **Event:** a high wide view over dark land. Other fires light up, one per beat, far apart. Each draws its own circle, and the circles begin to touch.
+| # | Bars | Time | Lyric (approximate) | Picture | From |
+|---|---|---|---|---|---|
+| 10 | 36–39 | 1:06.1–1:13.5 | *"Somebody did the maths on a napkin…"* | Inside the telescope scene's rooftop: the observer's hand on a notebook, the equations painting in only under the pencil tip. | K2 detail |
+| 11 | 40–43 | 1:13.5–1:20.9 | *"you built a tower… lighthouse, spire, rocket on fire"* | From the eclipse crowd's street, tilt up past the rooftops. In the sky, pencil silhouettes of a lighthouse, a spire and a rocket sketch in one per bar, and **the rocket paints in and launches** on bar 43. | K5 top, drawn over |
+| 12 | 44–45 | 1:20.9–1:24.6 | *"pointed every dish… is anyone home?"* | The Earth from orbit: a ring of light pulses out from the planet (the signal). | K3 |
+| 13 | 46–47 | 1:24.6–1:28.3 | *"past the last of the stars, where the paint runs out"* | Follow the signal out through the telescope's starfield. The stars thin to pencil, then to bare paper and grid. | K2 sky, reversed |
+| 14 | 48–51 | 1:28.3–1:35.7 | *"it's closer than before… we opened the door"* | Nothing but paper and grid. At the centre, a crack of cold painted light: the control room's glow through a door-shaped seam. The pressure is at its highest. | K6, glow only |
+| 15 | 52–55 | 1:35.7–1:43.1 | *"a room at the edge… a chair and a screen"* | **The control room.** Screens of the Earth, the console, the chair turning slowly. It comes round: **empty.** | **K6** |
+| 16 | 56–59 | 1:43.1–1:50.4 | *"the chair is empty, and the keys move with ease"* | Close on the console: thousands of keys pressing by themselves. Under each, a thread of light runs down through the floor. | K6 detail |
+| 17 | **60–63** | **1:50.4–1:57.8** | ***"There are no gods."*** *(the drop)* | **Silence in the picture too.** The camera drops through the floor and follows one thread down through paper, pencil and stars, fast, then slows. | K6 → K7 |
+| 18 | 64–67 | 1:57.8–2:05.2 | *"every thread is a someone… eight billion of you keeping it on"* | **THE KEY IMAGE.** The Earth with 8 billion threads rising. A slow pull-back up the threads toward the glowing ocean of light above. | **K7** |
 
-**S04 · bars 7–8 · 0:20.0–0:26.7 · 64×36**
-- **Event:** the circles have joined into villages. Close on a hand pressing marks into a clay tablet: the marks load *sharper* than anything around them. Writing lets people look further than they can see.
+## III. RETURN (2:05–2:44)
 
-**S05 · bars 9–10 · 0:26.7–0:33.3 · 80×45**
-- **Event:** roads of drawn world run between towns. At sea, ships' lanterns carry a small circle across black water, and the sea loads only in their wake, then fades back to wireframe behind them.
+| # | Bars | Time | Lyric (approximate) | Picture | From |
+|---|---|---|---|---|---|
+| 19 | 68–71 | 2:05.2–2:12.6 | *(choir rising, A major)* | The ocean of light begins to descend. The paper itself starts to glow from behind. Down on Earth, the eclipse crowd looks up again, calm this time. | K7 top → K5 |
+| 20 | **72–75** | **2:12.6–2:20.0** | *(choir peak)* | **The Presence arrives and resolves.** Push into its surface: every point of light is a tiny human face. The approaching thing was us. | **K8** |
+| 21 | 76–79 | 2:20.0–2:27.4 | *"and the thing that was coming… every one of you who has ever been here"* | The light touches the threads, and a ripple runs down all of them. Quick cuts, one per bar, back through earlier frames: the cave faces, the 3 a.m. windows, the eclipse crowd, the rooftop observer. Each is lit by the ripple for a moment. | K1, K4, K5, K2 |
+| 22 | 80–83 | 2:27.4–2:34.8 | *"all the lights that went up… Death is only a return"* | The Earth with its threads, calm. Points of light rise up the threads and drops of light fall back down, both ways, like breathing. | K7 |
+| 23 | 84–85 | 2:34.8–2:38.5 | *"Where we live… still loading"* | Pull back until the Earth is small, the threads a faint glow, and the page mostly paper again. | K7 wide |
+| 24 | post | 2:38.5–2:44.0 | *(song tail extended in post: reverb swell into silence)* | One drop falls from the top of the frame onto bare paper. Where it lands, a tiny circle of warm colour paints itself in, like the first fire. **Cut to black.** | K1 centre |
 
-**S06 · bars 11–12 · 0:33.3–0:40.0 · 160×90** ★ K2
-- **Event:** a figure on a rooftop at night points a telescope at an empty, unloaded sky. Where it points, stars and a spiral galaxy load in, block by block, with one celesta note per star. The rest of the sky stays blank.
+## Sync points (hard hits)
 
-**S07 · bars 13–14 · 0:40.0–0:46.7 · 320×180** ★ K3
-- **Event:** a hard step to full resolution on 13.1. The Earth at night from orbit: every city a web of gold on indigo. It turns slowly. This is the first time the viewer sees anything sharp.
-
-**S08 · bars 15–16 · 0:46.7–0:53.3** · *statement 1: "Where we live is a simulated universe."* ★ K4
-- **Event:** a city street at night, full of people. Far down the street, the crowd is copies of one gray sprite. The camera glides forward, and wherever it looks the copies become distinct people: every age, every kind of clothes, carrying groceries, holding hands, pushing a stroller. Behind the camera they turn back into copies.
-
-**S09 · bars 17–18 · 0:53.3–1:00.0** ★ K5
-- **Event:**
-  - On 17.1, everyone in the street looks up at once.
-  - Cut to orbit: the same thing happens as a wave travelling across the night side of the planet, city to city, the lights shimmering as billions of faces turn.
-  - High in the sky there is a faint seam.
-- **Sound:** the rising tone begins.
-
-## II. NO GODS: bars 19–36, 1:00.0–2:00.0
-
-**S10 · bars 19–20 · 1:00.0–1:06.7**
-- **Event:** the sky trembles. Light gathers at the horizon, but it never takes a shape. The edges of the frame darken. In every window, curtains stir. Birds lift all at once, in one wave.
-- **Sound:** the first brass swell, far away.
-
-**S11 · bars 21–22 · 1:06.7–1:13.3**
-- **Event:** a locked-off silhouette against the sky, the same spot across the ages. On each beat of bar 21 the tallest structure of an age rises in turn: an abstract stepped stone tower, a lighthouse, a steel spire, a radio mast. On 22.1, a rocket on its pad.
-
-**S12 · bars 23–24 · 1:13.3–1:20.0**
-- **Event:** the rocket launches on 23.1. Around the world, radio dishes turn together toward one point in the sky and send a signal as expanding rings of pixels.
-
-**S13 · bars 25–26 · 1:20.0–1:26.7**
-- **Event:** we follow the signal outward, past the Moon, the planets and the stars. Each loads just before the signal reaches it, as if the universe exists only as far as we look.
-- **Sound:** a brass swell nearer than before.
-
-**S14 · bars 27–28 · 1:26.7–1:33.3**
-- **Event:** the stars thin out. The sky is a painted dome, and beyond it gray wireframe runs to infinity. The signal reaches a seam shaped like a door, which opens a crack of cold light. The pressure is at its highest.
-
-**S15 · bars 29–30 · 1:33.3–1:40.0** · *silence* ★ K6
-- **Event:** **everything cuts on 29.1** except the drone. A control room, small and dim, like a night-shift security office: banks of screens showing the Earth, a console, and one chair with its back to us, turning slowly. It turns all the way round: empty. Hold.
-
-**S16 · bars 31–32 · 1:40.0–1:46.7** · *chip ticks alone*
-- **Event:** close on the console. The keys are moving by themselves, thousands of them, each tick a tiny sound. Under every key, a thread runs down through the floor. The camera drops through the floor and follows one thread down, fast, through the wireframe and the stars.
-
-**S17 · bars 33–36 · 1:46.7–2:00.0** · *statement 2: "There are no gods."* ★ K7 **THE KEY IMAGE**
-- **Seen:** the Earth from orbit, and rising from every city, village and ship, 8 billion threads of light, every one a different hue. They converge upward past the edge of the sky.
-- **Camera:** a slow pull-back up the threads to where they meet, in the Sea: an ocean of light seen from below.
-
-## III. RETURN: bars 37–54, 2:00.0–3:00.0
-
-**S18 · bars 37–38 · 2:00.0–2:06.7**
-- **Event:** the night Earth, closer. Points of light rise up threads into the Sea, and drops of light fall from the Sea down into the world. They move constantly, both ways, like breathing, or like rain falling both up and down. No single death is ever shown.
-
-**S19 · bars 39–40 · 2:06.7–2:13.3**
-- **Event:** the city street from S08, locked off, time-lapsed across generations. With each beat the crowd changes: clothes, vehicles, the shapes of signs. The windows stay lit the whole time. The people change; the light doesn't.
-
-**S20 · bars 41–42 · 2:13.3–2:20.0**
-- **Event:** the Sea descends. The sky's paint peels back from the edges. Everyone looks up again (the S09 rhyme), but calm this time. Some people close their eyes.
-
-**S21 · bars 43–44 · 2:20.0–2:26.7** ★ K8
-- **Event:** the Presence fills the frame, overwhelmingly large. On 43.1, as every heartbeat locks in sync, its surface resolves: every point of light in it is a face. There are thousands, then millions: everyone who has ever lived. The approaching thing was us.
-
-**S22 · bars 45–46 · 2:26.7–2:33.3** · *statement 3: "Death is only a return."*
-- **Event:** the Sea touches the tops of the threads, and a ripple of light runs down all of them into the world. Across the planet, in quick cuts on the beats (a market, a train, a field, a hospital corridor, a kitchen), people pause for one frame and smile, as if remembering something.
-
-**S23 · bars 47–50 · 2:33.3–2:46.7**
-- **Event:** **the first major chord.** A white-gold bloom fills everything. Then it slowly settles: the Sea above, the Earth below, the threads glowing between them, calm.
-
-**S24 · bars 51–52 · 2:46.7–2:53.3**
-- **Event:** quiet. In the Sea, one drop gathers and falls, down through the sky toward a window, somewhere.
-
-**S25 · bars 53–54 · 2:53.3–3:00.0 · 16×9 → 32×18**
-- **Seen:** POV at 16×9, a new first frame: two warm blobs lean in. One fast heartbeat.
-- **Event:** on 54.3 the image steps to 32×18 and the faces almost resolve. **Cut to black on 54.4.**
-- **End** at 3:00.0.
+| Time | Bar.beat | Frame (60 fps) | Hit |
+|---|---|---|---|
+| 0:05.2 | 3.1 | 313 | the spark |
+| 0:51.4 | 28.1 | 3082 | hard cut to the fully painted Earth |
+| 1:35.7 | 52.1 | 5740 | the control room |
+| ~1:40 | 54–55 | ~6000 | the chair comes round empty (match to the vocal "empty" by ear) |
+| **1:50.4** | **60.1** | **6627** | **the drop: the picture goes quiet with the music** |
+| 2:05.2 | 68.1 | 7513 | the choir enters; the light begins to descend |
+| **2:12.6** | **72.1** | **7956** | **the Presence resolves into faces** |
+| 2:20.0 | 76.1 | 8399 | the ripple |
+| 2:44.0 | — | 9840 | cut to black |

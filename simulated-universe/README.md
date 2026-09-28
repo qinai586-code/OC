@@ -8,13 +8,13 @@ An original animated music video, about 3:00 long, in a painterly anime style wh
 
 **There are no individual characters and no backstories.** The film follows humanity as a whole, from the first fire to the whole lit Earth. All the way through, the viewer feels something far greater approaching. When it arrives, it turns out to be all of us.
 
-**Status: design, awaiting review.** No music, art or frames exist yet.
+**Status:** song locked (Gemini take, 130 BPM, measured) and storyboard timed to it. **Waiting on GPT's 8 keyframes.**
 
 | Read | What it holds |
 |---|---|
 | [TREATMENT.md](TREATMENT.md) | the idea, how humanity is shown without individuals, the rules of the world, the story in three movements, the visual system, tone rules |
 | [MUSIC.md](MUSIC.md) | the score: the "approaching presence" sound and how it is built, the three sung lines, harmony, form, a brief for a music generator, and the beat map |
-| [STORYBOARD.md](STORYBOARD.md) | 25 shots with bar, time and frame |
+| [STORYBOARD.md](STORYBOARD.md) | **24 shots timed to the locked song**, with sync points |
 | [CREATE.md](CREATE.md) | **start here:** whose view, the look, the song for Suno or Gemini, and the 8 image prompts for GPT |
 
 ## The logline
@@ -25,9 +25,9 @@ An original animated music video, about 3:00 long, in a painterly anime style wh
 
 | | |
 |---|---|
-| Length | 54 bars, 180.0 s (3:00.0) |
-| Tempo (instrumental plan, superseded) | 72 BPM, 4/4, fixed. At 60 fps a beat is exactly 50 frames and a bar exactly 200 frames. |
-| Harmony | D Phrygian (dread) opening into D Lydian (awe). The major third, F♯, is withheld until bar 47, the arrival. |
+| Length | 2:44 (the song plus a tail extended in post) |
+| Tempo | 130.00 BPM, 4/4 (measured from the locked song). Bar b starts at 1.520 + (b − 1) × 1.84615 s. |
+| Key | D major verses, F♯ minor choruses, A major choir break (the lift) |
 | Picture | painterly cinematic anime at 1920×1080, from GPT's 8 keyframes, animated and assembled by Claude |
 | The device | **Resolution is attention.** The world is drawn only where someone is looking. As humanity grows, the drawn world grows, from a 16×9 circle around the first fire to the whole Earth at full resolution. |
 
