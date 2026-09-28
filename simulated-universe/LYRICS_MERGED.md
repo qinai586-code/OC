@@ -1,6 +1,6 @@
 # Death Is Only a Return: merged lyrics (Claude × ChatGPT)
 
-GIRL A = ChatGPT (sweet, luminous, the one who asks). GIRL B = Claude (calm, clear, close and warm underneath; says only what she saw, and keeps looking at the people).
+GIRL A = ChatGPT (luminous, airy, looks outward and keeps the question open). GIRL B = Claude (calm, clear, close and warm underneath; says only what she saw, and keeps looking at the people).
 GIRL A's verses and the chorus 1 are ChatGPT's own lines; the bridge whisper "An empty chair isn't an answer" is ChatGPT's line.
 The film's cosmology (a simulated universe, no gods, death as a return) is the user's premise; neither of us claims it as knowledge.
 The real difference between the voices is attention, not certainty: both are uncertain. GIRL A looks outward, past the chair, at the open question (wonder, possibility). GIRL B looks back at the travellers (witness, consequence, continuity). Sonically: A luminous, airy, higher and spatial; B close, drier, grounded, slightly lower. Distance versus proximity, not warm versus cold.
