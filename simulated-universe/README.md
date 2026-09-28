@@ -1,43 +1,36 @@
 # Where We Live Is a Simulated Universe
 
-An original pixel-art music video, about 2:53 long. It is a metaphor for our own human world:
+An original pixel-art film with a score, about 3:00 long. It is a metaphor for our own human world:
 
 - the world we live in is a simulation;
 - there are no gods running it;
 - death is a return to universal consciousness.
 
-It follows one ordinary New Yorker, Iris, from her first blurry frame to her last, and one step past it.
+**There are no individual characters and no backstories.** The film follows humanity as a whole, from the first fire to the whole lit Earth. All the way through, the viewer feels something far greater approaching. When it arrives, it turns out to be all of us.
 
-**Status: design, awaiting review.** No song audio, character art or frames exist yet.
+**Status: design, awaiting review.** No music, art or frames exist yet.
 
 | Read | What it holds |
 |---|---|
-| [TREATMENT.md](TREATMENT.md) | the idea, the seven rules of the world, the story in three movements, motifs, the visual system and the tone rules |
-| [SONG.md](SONG.md) | the song: full lyrics, form, key plan, harmony, the lullaby motif, the heartbeat clock, instrumentation, a brief for a music generator, and the beat map |
-| [STORYBOARD.md](STORYBOARD.md) | 45 shots with bar, time and frame, what happens, the world's resolution in each shot, and transitions |
-| [CHARACTERS.md](CHARACTERS.md) | model-sheet briefs for every character and set, written as a hand-off for whoever draws them |
+| [TREATMENT.md](TREATMENT.md) | the idea, how humanity is shown without individuals, the rules of the world, the story in three movements, the visual system, tone rules |
+| [MUSIC.md](MUSIC.md) | the score: the "approaching presence" sound and how it is built, the three sung lines, harmony, form, a brief for a music generator, and the beat map |
+| [STORYBOARD.md](STORYBOARD.md) | 25 shots with bar, time and frame |
+| [COLLAB.md](COLLAB.md) | **how Claude and GPT make this together:** roles, review gates, and paste-ready prompts for GPT |
 
 ## The logline
 
-> Her grandmother taught her that if you turn around fast, you can catch the world still loading. When her grandmother dies, Iris climbs past the edge of the sky to find whoever runs it and finds an empty chair. She finds the rest of the answer years later, on a subway platform, when a stranger hums her grandmother's song.
+> Humanity lights its first fire, and the world draws itself around the people looking into it. As we look further, the universe renders further, and all the while something vast is approaching. We reach past the edge of the sky to meet whoever runs it and find an empty chair. What was approaching was us.
 
 ## Key numbers
 
 | | |
 |---|---|
-| Length | 104 bars, 173.3 s (2:53.3) |
-| Tempo | 144 BPM, 4/4, fixed. At 60 fps a beat is exactly 25 frames and a bar exactly 100 frames. |
-| Key | E♭ major. The home chord (E♭ in root position) is held back until bar 97, the moment of return. |
+| Length | 54 bars, 180.0 s (3:00.0) |
+| Tempo | 72 BPM, 4/4, fixed. At 60 fps a beat is exactly 50 frames and a bar exactly 200 frames. |
+| Harmony | D Phrygian (dread) opening into D Lydian (awe). The major third, F♯, is withheld until bar 47, the arrival. |
 | Picture | 320×180 native pixel art, scaled ×6 (nearest neighbour) to 1920×1080, 60 fps |
-| The device | **Resolution is consciousness.** A newborn sees the world at 16×9, and each life stage sharpens it on the beat. The world draws detail only where someone is looking. |
+| The device | **Resolution is attention.** The world is drawn only where someone is looking. As humanity grows, the drawn world grows, from a 16×9 circle around the first fire to the whole Earth at full resolution. |
 
 ## Who makes what
 
-| Part | Owner |
-|---|---|
-| Story, world rules, lyrics, composition, storyboard | Claude (this folder) |
-| Song audio | composed by Claude as a demo, or generated from the brief in [SONG.md](SONG.md) §8. The final WAV is locked before picture timing is frozen. |
-| Character model sheets | drawn from [CHARACTERS.md](CHARACTERS.md). These are new characters, not the user's OC. |
-| Pixel sprites, engine additions, animation, QA, render | Claude, reusing the pixel engine from the P(doom) video (branch `claude/great-pascal-z12nnf`, `src/engine`) |
-
-The order of work is in [TREATMENT.md §8](TREATMENT.md#8-production-plan).
+In short: Claude builds the film's structure, sound and motion; GPT develops its look; and the two review each other's work at every gate. The details are in [COLLAB.md](COLLAB.md).
