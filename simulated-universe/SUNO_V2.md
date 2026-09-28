@@ -118,3 +118,22 @@ death is only a return.
 Two dimensions... three... and one...
 ...still loading.
 [End]
+
+## Evaluation plan for the first take (agreed by ChatGPT and Claude)
+
+Run V2 exactly as written: no lyric, story or prompt changes before listening.
+
+| # | Question | Who judges |
+|---|---|---|
+| 1 | GIRL A soprano luminous, airy, gently cute, not sugary | the director, by ear |
+| 2 | GIRL B spoken voice a protagonist, not a narrator | ear; Claude also measures whether the spoken lines lock to the beat and how loud they sit in the mix |
+| 3 | distance contrast obvious (A far and spatial, B near and grounded) | ear |
+| 4 | bridge a real vacuum | Claude measures |
+| 5 | final chorus the biggest moment | Claude measures |
+| 6 | no male voice anywhere | Claude measures pitch; ear confirms the bridge |
+| 7 | the song moves us | the director |
+
+Escalation:
+- only #2 fails → chorus 2 tag becomes "calm close female melodic spoken-word, restrained half-sung delivery".
+- identity fails but the music works → keep the arrangement, export stems, and rebuild the two vocals as separate tracks; Claude does the mix (levels, reverb and stereo width: A wide and wet, B centred and dry).
+- never throw away a take whose music works.
