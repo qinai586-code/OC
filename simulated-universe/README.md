@@ -15,7 +15,7 @@ An original pixel-art film with a score, about 3:00 long. It is a metaphor for o
 | [TREATMENT.md](TREATMENT.md) | the idea, how humanity is shown without individuals, the rules of the world, the story in three movements, the visual system, tone rules |
 | [MUSIC.md](MUSIC.md) | the score: the "approaching presence" sound and how it is built, the three sung lines, harmony, form, a brief for a music generator, and the beat map |
 | [STORYBOARD.md](STORYBOARD.md) | 25 shots with bar, time and frame |
-| [COLLAB.md](COLLAB.md) | **how Claude and GPT make this together:** roles, review gates, and paste-ready prompts for GPT |
+| [COLLAB.md](COLLAB.md) | **what GPT generates:** 9 paste-ready image prompts |
 
 ## The logline
 
@@ -33,4 +33,4 @@ An original pixel-art film with a score, about 3:00 long. It is a metaphor for o
 
 ## Who makes what
 
-In short: Claude builds the film's structure, sound and motion; GPT develops its look; and the two review each other's work at every gate. The details are in [COLLAB.md](COLLAB.md).
+The film shows humanity as Claude and GPT perceive it (TREATMENT §1). GPT generates the images (9 in total, listed in [COLLAB.md](COLLAB.md)). Claude does everything else: story, score, pixel translation, engine, animation and render.

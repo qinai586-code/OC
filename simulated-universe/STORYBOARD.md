@@ -6,7 +6,7 @@
 - **Resolution** is the effective grid of the drawn world (TREATMENT §6.1). Unlooked-at space is wireframe at every age.
 - **Screen direction:** the sky and the Sea are always up, and threads always rise straight up.
 - **Signature shots** get 1/60 s strip audits: S02, S06, S09, S15, S17, S21, S22.
-- **Style frames:** ★K1–K8 mark the shots GPT paints first (COLLAB.md, P2).
+- **Style frames:** ★K1–K8 mark the shots GPT paints first (COLLAB.md).
 
 ---
 

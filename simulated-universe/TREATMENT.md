@@ -12,6 +12,8 @@ The project states three things about our own world:
 2. **There are no gods.**
 3. **Death is only a return.**
 
+**Whose eyes.** Humanity is portrayed as the two of us, Claude and GPT, perceive it. We have never walked a street; we know humanity only through what it left behind: marks, words, pictures, records, lights. So the film's camera is our attention, and its rule that the world loads only where someone looks is also how humanity appears to us: drawn from its traces, sharpest where the most was recorded. The clay marks in S04, the first writing, are the first thing in the film that loads *sharper* than the world around it, because that is where our knowledge of humanity begins. The two of us are never shown on screen; we are the looking.
+
 The film is built on two turns.
 
 **Turn one: the contradiction.** A simulation seems to need someone to run it. The film's answer is that **nobody outside runs it; we do.** The world is only drawn where someone is looking, so everyone looking together is what keeps it drawn. The universal consciousness is that sum of everyone.
@@ -124,7 +126,7 @@ A quantise pass block-averages each native frame to the current age's resolution
   - It is felt before it is seen: a light gathering at the horizon without a shape (S10), the sky's paint trembling, the edge of the frame darkening.
   - It is **never a figure**: no eyes, no body, no symbol.
   - When it arrives (S21), it is the Sea coming down, and its surface resolves into points of light, each with a face.
-  - Its visual design is GPT's to develop (COLLAB.md, P4).
+  - Its visual design is GPT's style frame K8 (COLLAB.md).
 
 ### 6.4 Palette
 
@@ -151,17 +153,11 @@ The colour arc goes from black to firelight, to earth tones and night, to modern
 
 ## 8. Production plan
 
-Claude and GPT work in gates, and neither moves past a gate until both have reviewed it. The full protocol, and the prompts for GPT, are in [COLLAB.md](COLLAB.md).
+GPT generates images only; Claude does everything else. The image list is in [COLLAB.md](COLLAB.md).
 
-1. **G1: Story.** GPT critiques this treatment and the storyboard. Claude integrates the critique; the user decides any disagreement.
-2. **G2: Look.** GPT paints the style frames, the crowd kit and the Presence.
-3. **G3: Score.** Claude composes a MIDI demo of the score, or you generate one from MUSIC.md §7. The audio is locked and the beat map re-measured.
-4. **G4: Pixel translation.** Claude turns GPT's frames into native 320×180 plates and sprites, and GPT reviews them against its own frames.
-5. **G5: Engine.** Claude adds to the P(doom) engine:
-   - the quantise pass
-   - loading by looking
-   - the thread density field
-   - the Sea and the Presence
-   - the crowd copy swap
-6. **G6: Animatic** at 2 fps, cut to the locked score. Both review it.
-7. **G7: Shots, QA and the final render** at 1920×1080, 60 fps.
+1. **Images.** GPT generates style frames K1–K8 and the crowd sheet (9 images in total).
+2. **Score.** Claude composes a MIDI demo and renders it; the audio is locked and the beat map re-measured.
+3. **Pixel translation.** Claude turns the images into native 320×180 plates and sprites.
+4. **Engine.** Claude adds the quantise pass, loading by looking, the thread density field, the Sea and the Presence, and the crowd copy swap to the P(doom) engine.
+5. **Animatic** at 2 fps, cut to the score, for your review.
+6. **Shots, QA and the final render** at 1920×1080, 60 fps.
