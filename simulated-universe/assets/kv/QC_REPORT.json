@@ -1,0 +1,48 @@
+{
+  "canvas": [
+    1536,
+    1024
+  ],
+  "bases": [
+    "BG0a",
+    "BG0b",
+    "KV1",
+    "KV2",
+    "KV3",
+    "KV4",
+    "KV5"
+  ],
+  "plates": {
+    "KV1": {
+      "outside_mask_max_delta": 0,
+      "changed_pixel_fraction": 0.3496417999267578
+    },
+    "KV2": {
+      "outside_mask_max_delta": 0,
+      "changed_pixel_fraction": 0.6354732513427734
+    },
+    "KV3": {
+      "outside_mask_max_delta": 0,
+      "changed_pixel_fraction": 0.4559160868326823
+    },
+    "KV4": {
+      "outside_mask_max_delta": 0,
+      "changed_pixel_fraction": 0.4944661458333333
+    },
+    "KV5": {
+      "outside_mask_max_delta": 0,
+      "changed_pixel_fraction": 0.6050643920898438
+    }
+  },
+  "locked_variants": {
+    "KV3b": "Only A head region locally rotated upward ~10 degrees.",
+    "KV4b": "Only B eye/gaze region locally altered downward/heavier.",
+    "KV5a": "Only flame/palm region changed to pre-contact falling-light state."
+  },
+  "notes": [
+    "All deliverables are 1536x1024 PNGs.",
+    "Plate pixels outside the character-removal masks are copied exactly from the corresponding KV.",
+    "Plates are depth/parallax utility assets, not standalone hero illustrations.",
+    "Character identity is based on the restored locked reference set from the conversation."
+  ]
+}
