@@ -208,17 +208,42 @@ def god_rays(s, origin, strength):
     return cv2.resize(acc * fall * strength, (W, H))[..., None] * WARM
 
 # ---------------------------------------------------------------- shots
+STAR_R = [4, 2, 3, 5, 2, 3, 2]
 STARS = [(0.58, 0.14), (0.66, 0.24), (0.74, 0.17), (0.82, 0.29), (0.78, 0.42), (0.90, 0.36), (0.93, 0.20)]
+def _e(u): u = min(max(u, 0.0), 1.0); return u * u * (3 - 2 * u)
+# cut points on tracked beats (phrase ends), the silence and the re-entry
+C_INS, C_TWO, C_BCUT = 10.693, 11.981, 19.528
 def shot(t):
-    """Base framing plus a camera drift (px) that every layer follows by its depth."""
-    if t < T_SIL0:   # S1: push in while the camera slides left under her gaze
-        u = (t - T0) / (T_SIL0 - T0)
-        return dict(kind='A', scale=1.22 + 0.10 * u, face=(0.54 * W, 0.55 * H), cam=(-70 * u, -12 * u), light=(0.56, 0.45))
+    """Framing per shot: the figures, a camera drift (px) every layer follows by its depth,
+    the light pool, and where the light rays come from. Pushes ease in and out."""
+    if t < C_INS:    # S1a: A, medium close-up, push in as she starts
+        u = _e((t - T0) / (C_INS - T0))
+        return dict(figs=[('A', 1.20 + 0.10 * u, (0.54 * W, 0.55 * H))], cam=(-50 * u, -10 * u), light=(0.56, 0.45), rays='right')
+    if t < C_TWO:    # S1b: tight insert at eye level, a quicker push
+        u = _e((t - C_INS) / (C_TWO - C_INS))
+        return dict(figs=[('A', 1.80 + 0.14 * u, (0.44 * W, 0.50 * H))], cam=(-30 * u, 0), light=(0.50, 0.42), rays='right')
+    if t < T_SIL0:   # S1c: both witnesses, facing each other, before the silence
+        u = _e((t - C_TWO) / (T_SIL0 - C_TWO))
+        return dict(figs=[('A', 0.80, (0.34 * W, 0.58 * H)), ('B', 0.80, (0.66 * W, 0.58 * H))], cam=(0, -14 * u), light=(0.50, 0.45), rays='top')
     if t < T_SIL1:   # S2: the silence, bullet-time drift round B
         u = (t - T_SIL0) / (T_SIL1 - T_SIL0)
-        return dict(kind='B3', scale=0.62 + 0.03 * u, face=(0.47 * W, 0.46 * H), cam=(60 * u, -8 * u), light=(0.47, 0.40))
-    u = (t - T_SIL1) / (T1 - T_SIL1)   # S3: wider, face low, the sky above; crane up
-    return dict(kind='A', scale=1.08 - 0.06 * u, face=(0.40 * W, 0.64 * H), cam=(-20 * u, 40 * u), light=(0.45, 0.55))
+        return dict(figs=[('B3', 0.62 + 0.03 * u, (0.47 * W, 0.46 * H))], cam=(60 * u, -8 * u), light=(0.47, 0.40), rays='left')
+    if t < C_BCUT:   # S3: A under the forming sky; the camera tilts up with her look (M1)
+        u = _e((t - T_SIL1) / (C_BCUT - T_SIL1)); lk = _e((t - 17.66) / 0.9)
+        return dict(figs=[('A', 1.06 - 0.04 * u + 0.04 * lk, (0.40 * W, 0.64 * H))], cam=(-20 * u, 30 * u + 28 * lk), light=(0.45, 0.55), rays='right')
+    u = _e((t - C_BCUT) / (T1 - C_BCUT))   # S3b: B listens (A sings on, off screen) - her lines are next
+    return dict(figs=[('B', 1.15 + 0.05 * u, (0.56 * W, 0.56 * H))], cam=(25 * u, 0), light=(0.55, 0.45), rays='left')
+
+HB = faces.Head('B')
+PLATES_B = {e: fade_bottom(HB.plate(0, e), 440, 560) for e in range(3)}
+FACE_B = (158.0, 304.0)          # plate coords of B's cheek (eye + mirrored offset of A's anchor)
+NECK_B = (240.0, 470.0)
+HAIR_B = (ss(300, 560, hy) * ss(220, 400, hx)).astype(np.float32)   # B faces left: back hair on the right
+B_BLINKS = [int(12.55 * FPS), int(20.15 * FPS)]
+def b_eye(i):
+    for b0 in B_BLINKS:
+        if b0 <= i < b0 + 4: return (1, 2, 2, 1)[i - b0]
+    return 0
 
 FACE_A = (395.0, 330.0)          # plate coords of A's cheek, the framing anchor
 FACE_B3 = (560.0, 520.0)         # B3 pose coords of her cheek
@@ -234,7 +259,7 @@ def frame_at(i):
     t = i / FPS; s = tau(t); sh = shot(t); frozen = T_SIL0 <= t < T_SIL1
     cam = np.array(sh['cam']) * (1.0)
     kick = 1 + 0.008 * bar_pulse(s)                                 # a small push on each bar downbeat
-    face = (sh['face'][0] + cam[0], sh['face'][1] + cam[1])
+    face = (sh['figs'][0][2][0] + cam[0], sh['figs'][0][2][1] + cam[1])
     # 1 paper, parallax 0.35
     ox, oy = int((BW - W) / 2 - cam[0] * 0.35), int((BH - H) / 2 - cam[1] * 0.35)
     bg = BGTEX[oy:oy + H, ox:ox + W]
@@ -245,32 +270,43 @@ def frame_at(i):
     px_, py_ = swarm(s, t, cam, face)
     back = p_tier == 0
     L = splat_layer(px_[back], py_[back], p_w[back] * (1 + 0.8 * beat_pulse(s)), p_col[back], 1.0)
-    # 3 the character
+    # 3 the characters
     b = np.sin(2 * np.pi * s / 3.7)
-    if sh['kind'] == 'A':
-        m, e = mouth_at(i), eye_at(i)
-        k1 = m1_pose(t) if t >= T_SIL1 else 0
-        plate = PLATES[(m, e)] if k1 == 0 else m1_plate(k1, m, e)
+    frame = screen(bg, 1 - np.exp(-L * 1.2))
+    for kind, scale, fpos in sh['figs']:
+        fx, fy = fpos[0] + cam[0], fpos[1] + cam[1]
         wind = 0.75 + 0.25 * np.sin(2 * np.pi * s / 7.1) + 0.5 * bar_pulse(s)
-        dx = (2.6 * wind * np.sin(2 * np.pi * s / 2.9 - hy / 140) + m1_hair(t)) * HAIR_W
-        dy = 0.7 * np.sin(2 * np.pi * s / 2.9 + 1.3 - hy / 140) * HAIR_W
-        plate = cv2.remap(plate, (hx - dx).astype(np.float32), (hy - dy).astype(np.float32), cv2.INTER_LINEAR, borderValue=(0, 0, 0, 0))
-        ang = 0.5 * np.sin(2 * np.pi * s / 5.3) + 1.6 * sing_at(t) + 0.6 * beat_pulse(s) * (m > 0)   # nods into the beat when singing
-        fig = place(plate, FACE_A, (face[0], face[1] - 2.0 * b), sh['scale'] * kick * (1 + 0.003 * b), ang, NECK_A)
-        light_dir = +1
-    else:
-        fig = place(B3F, FACE_B3, face, sh['scale'] * kick)
-        light_dir = -1
-    a = fig[..., 3:]
-    edge = np.clip(a - cv2.erode(a, np.ones((9, 9), np.uint8))[..., None], 0, 1)
-    wrap = cv2.GaussianBlur(bg, (0, 0), 10) * edge * 0.22
-    # rim light on the edge that faces the light
-    sh_a = np.roll(a[..., 0], -6 * light_dir, axis=1)
-    rim = cv2.GaussianBlur(np.clip(a[..., 0] - sh_a, 0, 1), (0, 0), 1.5)[..., None]
-    col = fig[..., :3] * (0.93 + 0.07 * pool[..., None]) + wrap + rim * 0.45 * WARM * (1 + 0.5 * beat_pulse(s))
-    frame = screen(bg, 1 - np.exp(-L * 1.2)) * (1 - a) + col * a
+        if kind == 'A':
+            m, e = mouth_at(i), eye_at(i)
+            k1 = m1_pose(t) if t >= T_SIL1 else 0
+            plate = PLATES[(m, e)] if k1 == 0 else m1_plate(k1, m, e)
+            dx = (2.6 * wind * np.sin(2 * np.pi * s / 2.9 - hy / 140) + m1_hair(t)) * HAIR_W
+            dy = 0.7 * np.sin(2 * np.pi * s / 2.9 + 1.3 - hy / 140) * HAIR_W
+            plate = cv2.remap(plate, (hx - dx).astype(np.float32), (hy - dy).astype(np.float32), cv2.INTER_LINEAR, borderValue=(0, 0, 0, 0))
+            ang = 0.5 * np.sin(2 * np.pi * s / 5.3) + 1.6 * sing_at(t) + 0.6 * beat_pulse(s) * (m > 0)
+            fig = place(plate, FACE_A, (fx, fy - 2.0 * b), scale * kick * (1 + 0.003 * b), ang, NECK_A)
+            rdir = +1
+        elif kind == 'B':
+            plate = PLATES_B[b_eye(i)]
+            dx = -2.4 * wind * np.sin(2 * np.pi * s / 3.3 + 1.7 - hy / 140) * HAIR_B
+            plate = cv2.remap(plate, (hx - dx).astype(np.float32), hy, cv2.INTER_LINEAR, borderValue=(0, 0, 0, 0))
+            bb = np.sin(2 * np.pi * s / 4.2 + 1.7)
+            ang = -0.5 * np.sin(2 * np.pi * s / 6.1 + 1.0)
+            fig = place(plate, FACE_B, (fx, fy - 2.0 * bb), scale * kick * (1 + 0.003 * bb), ang, NECK_B)
+            rdir = -1
+        else:
+            fig = place(B3F, FACE_B3, (fx, fy), scale * kick)
+            rdir = -1
+        a = fig[..., 3:]
+        edge = np.clip(a - cv2.erode(a, np.ones((9, 9), np.uint8))[..., None], 0, 1)
+        wrap = cv2.GaussianBlur(bg, (0, 0), 10) * edge * 0.22
+        sh_a = np.roll(a[..., 0], -6 * rdir, axis=1)                 # rim light on the edge facing the light
+        rim = cv2.GaussianBlur(np.clip(a[..., 0] - sh_a, 0, 1), (0, 0), 1.5)[..., None]
+        col = fig[..., :3] * (0.93 + 0.07 * pool[..., None]) + wrap + rim * 0.45 * WARM * (1 + 0.5 * beat_pulse(s))
+        frame = frame * (1 - a) + col * a
+    light_dir = {'right': 1, 'left': -1, 'top': 0}[sh['rays']]
     # 4 light falling from where she looks
-    org = (W * 1.02 + cam[0] * 0.2, -0.08 * H) if light_dir > 0 else (-0.02 * W, -0.08 * H)
+    org = {1: (W * 1.02 + cam[0] * 0.2, -0.08 * H), -1: (-0.02 * W, -0.08 * H), 0: (0.5 * W, -0.12 * H)}[light_dir]
     frame = screen(frame, god_rays(s, org, 0.55 * (0.85 + 0.3 * beat_pulse(s))))
     # 5 embers around her (streaked) and past the lens (big bokeh)
     mid = p_tier == 1; fr = p_tier == 2
@@ -287,17 +323,25 @@ def frame_at(i):
     Lm = cv2.GaussianBlur(Lm, (0, 0), 1.1) * 1.6 + cv2.GaussianBlur(Lm, (0, 0), 5) * 1.2
     Lf = splat_layer(px_[fr], py_[fr], p_w[fr] * (1 + 0.6 * beat_pulse(s)), p_col[fr], 11)
     frame = screen(frame, 1 - np.exp(-(Lm + Lf) * 1.2))
-    # 6 constellation lines, once the embers have arrived
-    if t >= T_SIL1:
+    # 6 constellation: thin lines once the embers have arrived; stars of different sizes that twinkle
+    if t >= T_SIL1 and sh['figs'][0][0] == 'A':                   # the sky she looks into (A's shots only)
         lay = np.zeros((H, W), np.float32); u = t - T_SIL1
         pts = [(int(x_ * W + cam[0]), int(y_ * H + cam[1])) for x_, y_ in STARS]
         for j in range(len(pts) - 1):
             v = float(np.clip((u - 1.8 - 0.3 * j) / 0.35, 0, 1))
             if v > 0:
                 p0 = np.array(pts[j]); p1 = p0 + (np.array(pts[j + 1]) - p0) * v
-                cv2.line(lay, tuple(int(c) for c in p0), tuple(int(c) for c in p1), 0.8, 2, cv2.LINE_AA)
-        g = np.clip(cv2.GaussianBlur(lay, (0, 0), 1.0) + cv2.GaussianBlur(lay, (0, 0), 6) * 1.2, 0, 1)[..., None]
-        frame = frame * (1 - 0.7 * g) + np.array([0.72, 0.52, 0.22]) * 0.7 * g
+                cv2.line(lay, tuple(int(c) for c in p0), tuple(int(c) for c in p1), 0.42, 1, cv2.LINE_AA)
+        for j, pt in enumerate(pts):
+            lit = float(np.clip((u - 1.6 - 0.2 * j) / 0.4, 0, 1)) * (0.8 + 0.2 * np.sin(s * (2.3 + j * 0.7) + j))
+            r = STAR_R[j]
+            cv2.circle(lay, pt, r, lit, -1, cv2.LINE_AA)
+            if r >= 4 and lit > 0:                                    # four-point flare on the brightest
+                L_ = int(4 * r * lit)
+                cv2.line(lay, (pt[0] - L_, pt[1]), (pt[0] + L_, pt[1]), 0.3 * lit, 1, cv2.LINE_AA)
+                cv2.line(lay, (pt[0], pt[1] - L_), (pt[0], pt[1] + L_), 0.3 * lit, 1, cv2.LINE_AA)
+        g = np.clip(cv2.GaussianBlur(lay, (0, 0), 0.8) + cv2.GaussianBlur(lay, (0, 0), 5) * 1.3, 0, 1)[..., None]
+        frame = screen(frame, g * np.array([1.0, 0.80, 0.45]) * 0.9)
     # 7 bloom, silence grade, re-entry flash, vignette, grain
     hi = cv2.resize(np.clip(frame - 0.82, 0, None), (W // 2, H // 2))
     frame = frame + cv2.resize(cv2.GaussianBlur(hi, (0, 0), 8), (W, H)) * 0.8
