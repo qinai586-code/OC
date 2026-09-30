@@ -41,7 +41,8 @@ def _sit(name):
     empty = (rgba[int(EDGE_Y) - 9, :, 3] < 0.5) & (rgba[int(EDGE_Y) + 9, :, 3] < 0.5)
     rgba[band, empty, 3] = 0
     return rgba
-SB = _sit('SIT_BACK.png')
+SB = _sit('SIT_BACK_TAIL.png')                                     # authoritative pair, with A's dragon tail
+SBL = _sit('SIT_BACK_LOOKUP_TAIL.png')
 def _stages(rgba):
     rgb, a = rgba[..., :3], rgba[..., 3:]
     px = (rgb.reshape(-1, 3) * 255).astype(np.float32); sel = a.reshape(-1) > 0.5
@@ -55,6 +56,8 @@ def _stages(rgba):
     pencil = np.dstack([np.full(rgb.shape, 0.85, np.float32), cv2.GaussianBlur(line.astype(np.float32), (3, 3), 0.6) * 0.9])
     return {'painted': rgba, 'flat': np.dstack([flat * 0.85 + 0.15 * 0.9, a]).astype(np.float32), 'pencil': pencil}
 ST = _stages(SB)
+TY, TX = np.mgrid[0:SB.shape[0], 0:SB.shape[1]].astype(np.float32)
+TAIL_W = (ss(615, 940, TY) * (TX < 520) * ss(560, 470, TX)).astype(np.float32)   # A's tail hangs below the edge
 NOISE = cv2.GaussianBlur(np.random.default_rng(5).random(SB.shape[:2]).astype(np.float32), (0, 0), 7)
 NOISE = (NOISE - NOISE.min()) / (NOISE.max() - NOISE.min())
 
@@ -131,8 +134,11 @@ def shot(t):
     if t < T_SIL0:
         u = _e((t - 11.981) / (T_SIL0 - 11.981))
         return dict(name='WIDE2', sc=0.36 + 0.03 * u, cx=0.5 * W, cy=0.70 * H)
-    u = _e((t - T_SIL1) / (17.705 - T_SIL1))    # the sky: camera tilts up as the constellation forms
-    return dict(name='SKY', sc=0.29, cx=0.5 * W, cy=(0.80 + 0.08 * u) * H)
+    if t < 17.705:
+        u = _e((t - T_SIL1) / (17.705 - T_SIL1))    # the sky: camera tilts up as the constellation forms
+        return dict(name='SKY', sc=0.29, cx=0.5 * W, cy=(0.80 + 0.08 * u) * H)
+    u = _e((t - 19.528) / (21.0 - 19.528))          # back wide after her close-up: A already looking up (wide = meaning)
+    return dict(name='SKY', sc=0.31 + 0.02 * u, cx=0.5 * W, cy=0.88 * H, lookup=True)
 
 def to_screen(x, y, sh):
     return sh['cx'] + (x - MID_X) * sh['sc'], sh['cy'] + (y - EDGE_Y) * sh['sc']
@@ -196,7 +202,9 @@ def render(i, t, s, tau_frozen=False):
             fig[..., :3] = fig[..., :3] * (1 - a) + ST[key][..., :3] * a
             fig[..., 3:] = np.maximum(fig[..., 3:], a)
     else:
-        fig = SB
+        fig = SBL if sh.get('lookup') else SB
+    fig = cv2.remap(fig, TX - (TAIL_W * 7 * np.sin(2 * np.pi * s / 3.1 + TY / 160)).astype(np.float32), TY,
+                    cv2.INTER_LINEAR, borderValue=(0, 0, 0, 0))                # the tail sways, slow as breath
     f = cv2.warpAffine(fig, M, (W, H), flags=cv2.INTER_AREA if sc < 1 else cv2.INTER_LINEAR, borderValue=(0, 0, 0, 0))
     fgm = None
     if sh.get('fg_blur'):                                              # only A (src x < blur_x) is the soft foreground
@@ -218,7 +226,7 @@ def render(i, t, s, tau_frozen=False):
         lay = np.zeros((H, W), np.float32); u = t - T_SIL1
         pts = [tuple(int(v) for v in to_screen(px, py, sh)) for px, py in STARS]
         for j in range(len(pts) - 1):
-            v = float(np.clip((u - 1.9 - 0.25 * j) / 0.35, 0, 1))
+            v = float(np.clip((u - 1.6 - 0.15 * j) / 0.35, 0, 1))
             if v > 0:
                 p0 = np.array(pts[j]); p1 = p0 + (np.array(pts[j + 1]) - p0) * v
                 cv2.line(lay, tuple(int(c) for c in p0), tuple(int(c) for c in p1), 0.42, 1, cv2.LINE_AA)

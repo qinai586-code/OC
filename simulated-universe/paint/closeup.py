@@ -214,7 +214,7 @@ def _e(u): u = min(max(u, 0.0), 1.0); return u * u * (3 - 2 * u)
 # cut points on tracked beats (phrase ends), the silence and the re-entry
 C_INS, C_TWO, C_BCUT = 10.693, 11.981, 19.528
 import edge as edgeshots
-EDGE_WIN = [(5.62, 10.24), (11.981, T_SIL0), (T_SIL1, 17.705)]   # edge-of-the-world shots (edge.py)
+EDGE_WIN = [(5.62, 10.24), (11.981, T_SIL0), (T_SIL1, 17.705), (19.528, 21.0)]   # edge-of-the-world shots (edge.py)
 def shot(t):
     """Framing per shot: the figures, a camera drift (px) every layer follows by its depth,
     the light pool, and where the light rays come from. Pushes ease in and out.

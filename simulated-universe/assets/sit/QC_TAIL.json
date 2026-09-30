@@ -1,0 +1,19 @@
+{
+  "canvas": [
+    1536,
+    1024
+  ],
+  "B_region_max_delta_SIT_BACK": 0,
+  "B_region_max_delta_LOOKUP": 0,
+  "page_edge_band_max_delta_SIT_BACK": 0,
+  "page_edge_band_max_delta_LOOKUP": 0,
+  "tail_only_on_A_side": true,
+  "lookup_uses_identical_tail_asset": true,
+  "SIT_BACK_to_LOOKUP_diff_bbox": [
+    274,
+    0,
+    776,
+    379
+  ],
+  "PASS": true
+}

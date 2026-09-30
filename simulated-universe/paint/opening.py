@@ -121,11 +121,15 @@ def earth_pos(s, eye=None):
     cl = np.cos(e_lat)
     sph = np.stack([R_E * e_rad * cl * np.sin(lon), 5 + R_E * e_rad * np.sin(e_lat), R_E * e_rad * cl * np.cos(lon)], 1)
     mp = np.stack([lon / np.pi * 8, 5 + e_lat / (np.pi / 2) * 4.2, np.zeros(N)], 1)
-    f2 = float(eio(T_TWO, T_TWO + 0.9, s)); f1 = float(eio(T_ONE, T_ONE + 0.75, s))
+    # "two": the living world unrolls from the meridian facing us outward, rippling like a sheet as it goes flat
+    st = T_TWO + 0.45 * np.abs(lon) / np.pi
+    f2 = eio(st, st + 0.7, s)[:, None]; f1 = float(eio(T_ONE, T_ONE + 0.75, s))
     P = sph * (1 - f2) + mp * f2
+    P[:, 2] += 0.9 * np.sin(lon * 2.3 + e_lat * 1.7 + s * 2.5) * f2[:, 0] * (1 - f2[:, 0])
     P[:, 1] = 5 + (P[:, 1] - 5) * (1 - f1) - 5 * f1 + 0.03 * np.sin(P[:, 0] * 2.5 + s * 18) * f1 * (1 - sm(T_HIT - 0.2, T_HIT, s))
     vis = np.ones(N)
-    if eye is not None and f2 < 1:
+    f2 = f2[:, 0]
+    if eye is not None and f2.min() < 1:
         nrm = (sph - [0, 5, 0]) / (R_E * e_rad)[:, None]
         v = eye - sph; v /= np.linalg.norm(v, axis=1, keepdims=True)
         facing = (nrm * v).sum(1)
@@ -133,6 +137,8 @@ def earth_pos(s, eye=None):
         limb = np.clip(1 - np.abs(facing), 0, 1) ** 4 * (facing > -0.15)
         vis = np.where(e_type == 2, limb * 4.5, v_surf)
         vis = vis * (1 - f2) + np.where(e_type == 2, 0.0, 1.0) * f2
+    vis = vis * np.where(e_type == 1, 1 - 0.65 * f2, 1.0)                  # flat, it is lights, not a map of coastlines
+    vis = vis * np.where(e_type == 0, 0.85 + 0.15 * np.sin(s * 5 + e_lon * 40 + e_lat * 17), 1.0)   # living cities flicker
     return P, vis
 
 L_HIT = earth_pos(T_HIT)[0]
