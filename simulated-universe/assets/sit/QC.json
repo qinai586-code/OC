@@ -1,0 +1,18 @@
+{
+  "canvas": [
+    1536,
+    1024
+  ],
+  "background": "#FFFFFF",
+  "A_head_pitch_deg": 10.0,
+  "pivot_xy": [
+    565.0,
+    315.0
+  ],
+  "B_region_max_channel_delta": 0,
+  "A_lower_body_legs_max_channel_delta": 0,
+  "page_edge_band_max_channel_delta": 0,
+  "left_outside_edit_max_channel_delta": 0,
+  "changed_pixel_fraction": 0.09063275655110677,
+  "pass": true
+}

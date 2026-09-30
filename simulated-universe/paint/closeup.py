@@ -19,7 +19,7 @@ from multiprocessing import Pool
 import faces
 
 W, H, FPS = 1280, 720, 30
-T0, T_SIL0, T_SIL1, T1 = 8.452, 13.40, 14.45, 21.0
+T0, T_SIL0, T_SIL1, T1 = 5.62, 13.40, 14.45, 21.0      # from the bass hit (0-5.62 is opening.py's countdown)
 HERE = os.path.dirname(os.path.abspath(__file__))
 LS = json.load(open(f'{HERE}/../timing/lipsync_opening.json'))
 BEATS = np.array([b for b in json.load(open(f'{HERE}/../timing/p0_beatmap.json'))['beats_s'] if b < 22])
@@ -111,7 +111,7 @@ def _m1_plate(k, m, e):
             msk = cv2.warpAffine(_mask(src, base), cv2.getRotationMatrix2D(PIV, SGN * 9.0, 1.0), (512, 1024))[..., None]
             rgb = rgb * (1 - msk) + _rot(src, SGN * 9.0) * msk
     return fade_bottom(faces.cutout(rgb), 440, 560)
-M1_T = [17.66, 17.83, 17.93]                       # F1 (eyes lead) / F2 / F3 lands, inside the 17.63-18.17 breath
+M1_T = [17.75, 17.92, 18.02]                       # F1 (eyes lead) / F2 / F3 lands, inside the 17.63-18.17 breath
 M1_DEG = [0.0, 1.5, 5.0, 9.0]
 _M1C = {}
 def m1_pose(t):
@@ -213,10 +213,17 @@ STARS = [(0.58, 0.14), (0.66, 0.24), (0.74, 0.17), (0.82, 0.29), (0.78, 0.42), (
 def _e(u): u = min(max(u, 0.0), 1.0); return u * u * (3 - 2 * u)
 # cut points on tracked beats (phrase ends), the silence and the re-entry
 C_INS, C_TWO, C_BCUT = 10.693, 11.981, 19.528
+import edge as edgeshots
+EDGE_WIN = [(5.62, 10.24), (11.981, T_SIL0), (T_SIL1, 17.705)]   # edge-of-the-world shots (edge.py)
 def shot(t):
     """Framing per shot: the figures, a camera drift (px) every layer follows by its depth,
-    the light pool, and where the light rays come from. Pushes ease in and out."""
-    if t < C_INS:    # S1a: A, medium close-up, push in as she starts
+    the light pool, and where the light rays come from. Pushes ease in and out.
+    Edge, over-the-shoulder, wide and sky shots come from edge.py; the close-ups are reactions."""
+    if any(a <= t < b for a, b in EDGE_WIN): return dict(scene='edge')
+    if t < C_TWO:    # A reacts: medium close-up, the traces caught in her eye
+        u = _e((t - 10.24) / (C_TWO - 10.24))
+        return dict(figs=[('A', 1.22 + 0.10 * u, (0.54 * W, 0.55 * H))], cam=(-40 * u, -8 * u), light=(0.56, 0.45), rays='right', glint=True)
+    if t < 0:        # (retired: S1a medium close-up and S1b eye insert are replaced by the reaction shot)
         u = _e((t - T0) / (C_INS - T0))
         return dict(figs=[('A', 1.20 + 0.10 * u, (0.54 * W, 0.55 * H))], cam=(-50 * u, -10 * u), light=(0.56, 0.45), rays='right')
     if t < C_TWO:    # S1b: tight insert at eye level, a quicker push
@@ -230,8 +237,8 @@ def shot(t):
     if t < T_SIL1:   # S2: the silence, bullet-time drift round B
         u = (t - T_SIL0) / (T_SIL1 - T_SIL0)
         return dict(figs=[('B3', 0.62 + 0.03 * u, (0.47 * W, 0.46 * H))], cam=(60 * u, -8 * u), light=(0.47, 0.40), rays='left')
-    if t < C_BCUT:   # S3: A under the forming sky; the camera tilts up with her look (M1)
-        u = _e((t - T_SIL1) / (C_BCUT - T_SIL1)); lk = _e((t - 17.66) / 0.9)
+    if t < C_BCUT:   # S3: A under the formed sky; the camera tilts up with her look (M1)
+        u = _e((t - 17.705) / (C_BCUT - 17.705)); lk = _e((t - 17.66) / 0.9)
         return dict(figs=[('A', 1.06 - 0.04 * u + 0.04 * lk, (0.40 * W, 0.64 * H))], cam=(-20 * u, 30 * u + 28 * lk), light=(0.45, 0.55), rays='right')
     u = _e((t - C_BCUT) / (T1 - C_BCUT))   # S3b: B listens (A sings on, off screen) - her lines are next
     return dict(figs=[('B', 1.15 + 0.05 * u, (0.56 * W, 0.56 * H))], cam=(25 * u, 0), light=(0.55, 0.45), rays='left')
@@ -262,6 +269,7 @@ IRIS_A = (364.0, 295.0)          # plate coords: where a reflection would sit in
 
 def frame_at(i):
     t = i / FPS; s = tau(t); sh = shot(t); frozen = T_SIL0 <= t < T_SIL1
+    if sh.get("scene") == "edge": return edgeshots.render(i, t, s)
     cam = np.array(sh['cam']) * (1.0)
     kick = 1 + 0.008 * bar_pulse(s)                                 # a small push on each bar downbeat
     face = (sh['figs'][0][2][0] + cam[0], sh['figs'][0][2][1] + cam[1])
@@ -270,7 +278,9 @@ def frame_at(i):
     bg = BGTEX[oy:oy + H, ox:ox + W]
     lx, ly = sh['light']
     pool = np.exp(-(((xx - lx * W - cam[0]) / (0.55 * W)) ** 2 + ((yy - ly * H - cam[1]) / (0.60 * H)) ** 2))
-    bg = bg * np.array([1.03, 0.95, 0.84]) * (0.20 + 0.52 * pool[..., None]) + (pool * 0.06 * (1 + 0.8 * beat_pulse(s)))[..., None] * WARM   # a night page
+    # the same night as the edge shots: dark paper under the sky, lit warmly from the human world below
+    up = np.exp(-(H - yy) / (0.38 * H))[..., None]
+    bg = bg * np.array([0.30, 0.31, 0.42]) * (0.30 + 0.45 * pool[..., None]) + up * 0.16 * EMBER * (1 + 0.5 * beat_pulse(s))
     # 2 embers behind her
     px_, py_ = swarm(s, t, cam, face)
     back = p_tier == 0
@@ -324,7 +334,7 @@ def frame_at(i):
     light_dir = {'right': 1, 'left': -1, 'top': 0}[sh['rays']]
     # 4 light falling from where she looks
     org = {1: (W * 1.02 + cam[0] * 0.2, -0.08 * H), -1: (-0.02 * W, -0.08 * H), 0: (0.5 * W, -0.12 * H)}[light_dir]
-    frame = screen(frame, god_rays(s, org, 0.55 * (0.85 + 0.3 * beat_pulse(s))))
+    frame = screen(frame, god_rays(s, org, 0.28 * (0.85 + 0.3 * beat_pulse(s))))
     # 5 embers around her (streaked) and past the lens (big bokeh)
     mid = p_tier == 1; fr = p_tier == 2
     wm = p_w[mid] * (1 + 0.8 * beat_pulse(s)) * (0.75 + 0.25 * np.sin(s * 6 + p_ph[mid] * 3))
