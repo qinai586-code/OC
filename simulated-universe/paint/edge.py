@@ -137,8 +137,14 @@ def shot(t):
     if t < 17.705:
         u = _e((t - T_SIL1) / (17.705 - T_SIL1))    # the sky: camera tilts up as the constellation forms
         return dict(name='SKY', sc=0.29, cx=0.5 * W, cy=(0.80 + 0.08 * u) * H)
-    u = _e((t - 19.528) / (21.0 - 19.528))          # back wide after her close-up: A already looking up (wide = meaning)
-    return dict(name='SKY', sc=0.31 + 0.02 * u, cx=0.5 * W, cy=0.88 * H, lookup=True)
+    if t < 21.0:
+        u = _e((t - 19.528) / (21.0 - 19.528))      # back wide after her close-up: A already looking up (wide = meaning)
+        return dict(name='SKY', sc=0.31 + 0.02 * u, cx=0.5 * W, cy=0.88 * H, lookup=True)
+    if t < 30.9:
+        u = _e((t - 25.913) / (27.748 - 25.913))    # B's breath: both small on the edge under the sky of traces
+        return dict(name='SKY', sc=0.34 + 0.02 * u, cx=0.5 * W, cy=0.80 * H)
+    u = _e((t - 30.929) / (33.205 - 30.929))        # the first fire lights in the world below them
+    return dict(name='SKY', sc=0.37 + 0.05 * u, cx=0.5 * W, cy=(0.56 - 0.04 * u) * H, fire=True)
 
 def to_screen(x, y, sh):
     return sh['cx'] + (x - MID_X) * sh['sc'], sh['cy'] + (y - EDGE_Y) * sh['sc']
@@ -166,6 +172,13 @@ def render(i, t, s, tau_frozen=False):
         mrgb = cv2.warpAffine(MAPRGB, Mm, (W, H), flags=cv2.INTER_LINEAR)
         mm = cv2.warpAffine(np.ones((mh, mw), np.float32), Mm, (W, H))[..., None]
         frame = frame * (1 - mm) + mrgb * mm
+    if sh.get('fire'):                                                # the first fire, down in the painted world
+        fxs, fys = to_screen(620, 900, sh)
+        gl = np.zeros((H, W), np.float32)
+        if 0 <= fxs < W and 0 <= fys < H: gl[int(fys), int(fxs)] = 1
+        k = float(ss(30.95, 32.2, t)); fl = (0.85 + 0.15 * np.sin(s * 19) * np.sin(s * 6.1)) * (1 + 0.4 * beat_pulse(s))
+        g = cv2.GaussianBlur(gl, (0, 0), 4) * 900 * k + cv2.GaussianBlur(gl, (0, 0), 38 * sc / 0.37) * 0.55e5 * k * sc
+        frame = screen(frame, np.clip(g * fl, 0, 1)[..., None] * np.array([1.0, 0.58, 0.25]))
     # traces: behind the witnesses
     def draw_traces(front):
         L = np.zeros((H, W), np.float32)

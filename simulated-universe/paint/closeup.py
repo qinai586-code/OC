@@ -19,7 +19,7 @@ from multiprocessing import Pool
 import faces
 
 W, H, FPS = 1280, 720, 30
-T0, T_SIL0, T_SIL1, T1 = 5.62, 13.40, 14.45, 21.0      # from the bass hit (0-5.62 is opening.py's countdown)
+T0, T_SIL0, T_SIL1, T1 = 5.62, 13.40, 14.45, 33.205      # from the bass hit (0-5.62 is opening.py's countdown)
 HERE = os.path.dirname(os.path.abspath(__file__))
 LS = json.load(open(f'{HERE}/../timing/lipsync_opening.json'))
 BEATS = np.array([b for b in json.load(open(f'{HERE}/../timing/p0_beatmap.json'))['beats_s'] if b < 22])
@@ -140,6 +140,57 @@ e_tier = rng.integers(0, 3, NE); e_ph = rng.uniform(0, 2 * np.pi, NE)
 e_col = np.where(rng.random(NE)[:, None] < 0.22, JADE, EMBER)
 e_w = rng.uniform(0.5, 1.0, NE) * np.array([4.0, 11.0, 26.0])[e_tier]
 
+# ---------------------------------------------------------------- M2 (B considers) and M3 (A notices the ember)
+class Motion:
+    """A locked pose sequence (ChatGPT's frames, F0 = the head's mouth panel 1). The final pose can
+    speak and blink: its mouth/eye patches are the neutral ones turned by the same head angle."""
+    def __init__(self, head, files, final_deg, pivot=None):
+        self.h = head
+        pad = lambda f: np.concatenate([np.array(faces.Image.open(f).convert('RGB')).astype(np.float32) / 255, head.mouth[0][768:]], 0)
+        self.F = [pad(f) for f in files]
+        rot = lambda im, pv, d: cv2.warpAffine(im, cv2.getRotationMatrix2D(pv, d, 1.0), (512, 1024), flags=cv2.INTER_LINEAR, borderValue=(1, 1, 1))
+        if pivot is None:                          # not given: fit the pivot and direction that best explain the last pose
+            best = None
+            for sg in (1, -1):
+                for px_ in range(160, 441, 20):
+                    for py_ in range(260, 481, 20):
+                        e = np.abs(rot(self.F[0], (px_, py_), sg * final_deg)[60:520] - self.F[-1][60:520]).mean()
+                        if best is None or e < best[0]: best = (e, (float(px_), float(py_)), sg)
+            _, pivot, sg = best
+        else:
+            sg = min((1, -1), key=lambda g: np.abs(rot(self.F[0], pivot, g * final_deg)[:540] - self.F[-1][:540]).mean())
+        self.pv, self.deg = pivot, sg * final_deg
+        self.rot = lambda im: rot(im, self.pv, self.deg)
+        self.cache = {}
+    def plate(self, k, m=0, e=0):
+        key = (k, m if k == len(self.F) - 1 else 0, e if k == len(self.F) - 1 else 0)
+        if key in self.cache: return self.cache[key]
+        rgb = self.F[k].copy()
+        if k == len(self.F) - 1:
+            def raw(mm, ee):
+                r = self.h.mouth[mm].copy()
+                if ee: r = r * (1 - self.h.eye_mask[ee]) + self.h.eye[ee] * self.h.eye_mask[ee]
+                return r
+            base = raw(0, 0)
+            for mm, ee in ((key[1], 0), (0, key[2])):
+                if (mm, ee) == (0, 0): continue
+                src = raw(mm, ee)
+                msk = cv2.warpAffine(_mask(src, base), cv2.getRotationMatrix2D(self.pv, self.deg, 1.0), (512, 1024))[..., None]
+                rgb = rgb * (1 - msk) + self.rot(src) * msk
+        self.cache[key] = fade_bottom(faces.cutout(rgb), 440, 560)
+        return self.cache[key]
+
+MDIR = os.path.join(HERE, '..', 'assets', 'motion')
+M2 = Motion(faces.Head('B'), [f'{MDIR}/M2/M2_F{k}.png' for k in range(4)], 8.0)
+M3 = Motion(HA, [f'{MDIR}/M3/M3_G{k}.png' for k in range(3)], 3.5)
+M2_T = [20.95, 21.15, 21.29]        # considered: eyes lower (6 frames), skull follows (4), settles and holds
+M3_T = [28.20, 28.45]               # the eyes find the falling ember, then a small head response
+def pose_at(tlist, t): return sum(t >= x for x in tlist)
+FLAP_B = flap_track('B')
+def mouth_b(i): return FLAP_B.get(i, 0)
+A3F = fade_bottom(faces.pose('A3'), 1120, 1275)
+FACE_A3, PALM_A3 = (510.0, 695.0), (820.0, 868.0)
+
 # ---------------------------------------------------------------- layers: paper, light, particles
 BARS = BEATS[BEATS >= 7.5][::4]                                 # bar downbeats from the 7.55 downbeat
 def bar_pulse(s):
@@ -214,12 +265,21 @@ def _e(u): u = min(max(u, 0.0), 1.0); return u * u * (3 - 2 * u)
 # cut points on tracked beats (phrase ends), the silence and the re-entry
 C_INS, C_TWO, C_BCUT = 10.693, 11.981, 19.528
 import edge as edgeshots
-EDGE_WIN = [(5.62, 10.24), (11.981, T_SIL0), (T_SIL1, 17.705), (19.528, 21.0)]   # edge-of-the-world shots (edge.py)
+EDGE_WIN = [(5.62, 10.24), (11.981, T_SIL0), (T_SIL1, 17.705), (19.528, 20.863), (25.913, 27.748), (30.929, 33.205)]   # edge-of-the-world shots (edge.py)
 def shot(t):
     """Framing per shot: the figures, a camera drift (px) every layer follows by its depth,
     the light pool, and where the light rays come from. Pushes ease in and out.
     Edge, over-the-shoulder, wide and sky shots come from edge.py; the close-ups are reactions."""
     if any(a <= t < b for a, b in EDGE_WIN): return dict(scene='edge')
+    if t >= 29.118:  # the held palm-up pose: the ember lands, the first fire
+        u = _e((t - 29.118) / (30.929 - 29.118))
+        return dict(figs=[('A3', 0.66 + 0.04 * u, (0.38 * W, 0.40 * H))], cam=(0, 0), light=(0.55, 0.60), rays='right', palm=True)
+    if t >= 27.748:  # A notices a falling ember (M3), eyes then a small head response
+        u = _e((t - 27.748) / (29.118 - 27.748))
+        return dict(figs=[('AM3', 1.22 + 0.06 * u, (0.44 * W, 0.52 * H))], cam=(0, 0), light=(0.55, 0.45), rays='right', ember_fall=True)
+    if t >= 20.863:  # B considers (M2), then speaks, close and near
+        u = _e((t - 20.863) / (25.913 - 20.863))
+        return dict(figs=[('B2', 1.20 + 0.10 * u, (0.58 * W, 0.53 * H))], cam=(20 * u, 0), light=(0.52, 0.45), rays='left')
     if t < C_TWO:    # A reacts: medium close-up, the traces caught in her eye
         u = _e((t - 10.24) / (C_TWO - 10.24))
         return dict(figs=[('A', 1.22 + 0.10 * u, (0.54 * W, 0.55 * H))], cam=(-40 * u, -8 * u), light=(0.56, 0.45), rays='right', glint=True)
@@ -248,7 +308,7 @@ PLATES_B = {e: fade_bottom(HB.plate(0, e), 440, 560) for e in range(3)}
 FACE_B = (158.0, 304.0)          # plate coords of B's cheek (eye + mirrored offset of A's anchor)
 NECK_B = (240.0, 470.0)
 HAIR_B = (ss(300, 560, hy) * ss(220, 400, hx)).astype(np.float32)   # B faces left: back hair on the right
-B_BLINKS = [int(12.55 * FPS), int(20.15 * FPS)]
+B_BLINKS = [int(12.55 * FPS), int(20.15 * FPS), int(22.95 * FPS), int(25.62 * FPS)]
 def b_eye(i):
     for b0 in B_BLINKS:
         if b0 <= i < b0 + 4: return (1, 2, 2, 1)[i - b0]
@@ -294,7 +354,7 @@ def frame_at(i):
         wind = 0.75 + 0.25 * np.sin(2 * np.pi * s / 7.1) + 0.5 * bar_pulse(s)
         if kind == 'A':
             m, e = mouth_at(i), eye_at(i)
-            k1 = m1_pose(t) if t >= T_SIL1 else 0
+            k1 = m1_pose(t) if T_SIL1 <= t < 19.6 else 0
             plate = PLATES[(m, e)] if k1 == 0 else m1_plate(k1, m, e)
             dx = (2.6 * wind * np.sin(2 * np.pi * s / 2.9 - hy / 140) + m1_hair(t)) * HAIR_W
             dy = 0.7 * np.sin(2 * np.pi * s / 2.9 + 1.3 - hy / 140) * HAIR_W
@@ -310,6 +370,22 @@ def frame_at(i):
             ang = -0.5 * np.sin(2 * np.pi * s / 6.1 + 1.0)
             fig = place(plate, FACE_B, (fx, fy - 2.0 * bb), scale * kick * (1 + 0.003 * bb), ang, NECK_B)
             rdir = -1
+        elif kind == 'B2':
+            plate = M2.plate(pose_at(M2_T, t), mouth_b(i), b_eye(i))
+            dx = -2.4 * wind * np.sin(2 * np.pi * s / 3.3 + 1.7 - hy / 140) * HAIR_B
+            plate = cv2.remap(plate, (hx - dx).astype(np.float32), hy, cv2.INTER_LINEAR, borderValue=(0, 0, 0, 0))
+            bb = np.sin(2 * np.pi * s / 4.2 + 1.7)
+            fig = place(plate, FACE_B, (fx, fy - 2.0 * bb), scale * kick * (1 + 0.003 * bb), -0.4 * np.sin(2 * np.pi * s / 6.1 + 1.0), NECK_B)
+            rdir = -1
+        elif kind == 'AM3':
+            plate = M3.plate(pose_at(M3_T, t))
+            dx = 2.6 * wind * np.sin(2 * np.pi * s / 2.9 - hy / 140) * HAIR_W
+            plate = cv2.remap(plate, (hx - dx).astype(np.float32), hy, cv2.INTER_LINEAR, borderValue=(0, 0, 0, 0))
+            fig = place(plate, FACE_A, (fx, fy - 2.0 * b), scale * kick * (1 + 0.003 * b), 0.4 * np.sin(2 * np.pi * s / 5.3), NECK_A)
+            rdir = +1
+        elif kind == 'A3':
+            fig = place(A3F, FACE_A3, (fx, fy - 1.5 * b), scale * kick * (1 + 0.002 * b))
+            rdir = +1
         else:
             fig = place(B3F, FACE_B3, (fx, fy), scale * kick)
             rdir = -1
@@ -331,6 +407,22 @@ def frame_at(i):
             cv2.circle(gl, (int(gx), int(gy)), max(2, int(1.5 * scale)), 1.0, -1, cv2.LINE_AA)
             g = cv2.GaussianBlur(gl, (0, 0), 0.5 * scale) * 1.8 + cv2.GaussianBlur(gl, (0, 0), 3 * scale) * 1.2
             frame = screen(frame, np.clip(g, 0, 1)[..., None] * EMBER * (0.65 + 0.35 * beat_pulse(s)))
+        if sh.get('ember_fall'):                                      # one ember falls past her line of sight
+            ue = (t - 27.95) / 1.05
+            if 0 <= ue <= 1:
+                ex_, ey_ = fx + 170 * scale + 30 * np.sin(ue * 5), -40 + (H + 80) * ue ** 1.2
+                gl = np.zeros((H, W), np.float32); cv2.circle(gl, (int(ex_), int(ey_)), 4, 1.0, -1, cv2.LINE_AA)
+                g = cv2.GaussianBlur(gl, (0, 0), 1.5) * 2 + cv2.GaussianBlur(gl, (0, 0), 9) * 2.5
+                frame = screen(frame, np.clip(g, 0, 1)[..., None] * EMBER)
+        if sh.get('palm'):                                            # it lands in her palm and becomes the first fire
+            pa_x, pa_y = LAST_M[0] @ np.array([PALM_A3[0], PALM_A3[1] - 18, 1.0])
+            ul = np.clip((t - 29.118) / 0.45, 0, 1)
+            ey_ = pa_y - (1 - ul) ** 2 * 260
+            grow = 1 + 1.6 * float(ss(29.6, 30.9, t))
+            gl = np.zeros((H, W), np.float32); cv2.circle(gl, (int(pa_x), int(ey_)), int(4 * grow), 1.0, -1, cv2.LINE_AA)
+            flk = (0.85 + 0.15 * np.sin(s * 23) * np.sin(s * 7.3)) * (1 + 0.4 * beat_pulse(s))
+            g = cv2.GaussianBlur(gl, (0, 0), 2 * grow) * 2.2 + cv2.GaussianBlur(gl, (0, 0), 30 * grow) * 3.0 * float(ss(29.5, 30.6, t))
+            frame = screen(frame, np.clip(g * flk, 0, 1)[..., None] * np.array([1.0, 0.62, 0.28]))
     light_dir = {'right': 1, 'left': -1, 'top': 0}[sh['rays']]
     # 4 light falling from where she looks
     org = {1: (W * 1.02 + cam[0] * 0.2, -0.08 * H), -1: (-0.02 * W, -0.08 * H), 0: (0.5 * W, -0.12 * H)}[light_dir]

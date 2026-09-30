@@ -11,7 +11,7 @@ import sys, json, subprocess, numpy as np, librosa, scipy.signal as ss, imageio_
 
 SR, FPS = 22050, 100
 # (singer, t0, t1, f0 range): verse 1, A. The song stops for 13.4-14.45, so the mouth rests there.
-WINDOWS = [('A', 7.40, 13.40, (220, 1100)), ('A', 14.45, 21.5, (220, 1100))]
+WINDOWS = [('A', 7.40, 13.40, (220, 1100)), ('A', 14.45, 21.5, (220, 1100)), ('B', 20.6, 33.4, (140, 600))]   # B: spoken, close
 
 def load(path):
     raw = subprocess.run([imageio_ffmpeg.get_ffmpeg_exe(), '-v', 'error', '-i', path, '-t', '40', '-ac', '2',
@@ -77,7 +77,7 @@ def flaps(t, o, fps=30, lead=0.07, hold=3):
 if __name__ == '__main__':
     y = load(sys.argv[1]); out = {'fps': FPS, 'note': 'measured from the master, not listened; see lipsync.py', 'tracks': []}
     for who, t0, t1, fr in WINDOWS:
-        t, o = curve(y, t0, t1, fr)
+        t, o = curve(y, t0, t1, fr, span=(20.0, 34.0) if who == 'B' else (6.0, 22.0))
         tf, fl = flaps(t, o)
         out['tracks'].append({'who': who, 't0': t0, 'open': [round(float(v), 3) for v in o],
                               'flaps30': ''.join(map(str, fl))})

@@ -1,0 +1,46 @@
+{
+  "M2": {
+    "F0_exact_B_mouth_panel1": true,
+    "angles_deg": [
+      0.0,
+      0.0,
+      3.5,
+      8.0
+    ],
+    "lower_anchor_y_start": 540,
+    "lower_anchor_locked": [
+      true,
+      true,
+      true
+    ],
+    "master_canvas": [
+      1024,
+      1536
+    ],
+    "cells": [
+      512,
+      768
+    ],
+    "delivery_note": "eyes lower first; brief hold; skull follows; settle"
+  },
+  "M3": {
+    "G0_exact_A_mouth_panel1": true,
+    "angles_deg": [
+      0.0,
+      0.0,
+      -3.5
+    ],
+    "lower_anchor_y_start": 540,
+    "lower_anchor_locked": [
+      true,
+      true
+    ],
+    "strip_canvas": [
+      1536,
+      768
+    ],
+    "endpoint": "M3_ENDPOINT_A3.png (unchanged held palm-up pose)",
+    "delivery_note": "eyes track ember down; tiny head response; CUT to held A3"
+  },
+  "background": "#FFFFFF"
+}
