@@ -25,10 +25,11 @@ Usage: python3 opening.py OUTDIR [t0 t1] [--sheet]
 import sys, os, json, numpy as np, cv2
 from multiprocessing import Pool
 from scipy.interpolate import PchipInterpolator
-from characters import stages
+from characters import Rig
 
 W, H, FPS = 1280, 720, 30
-PW, PH, PPU = 1600, 1000, 100          # page texture size and pixels per world unit (page is 16 x 10)
+PW, PH, PPU = 2400, 1500, 150          # page texture size and pixels per world unit (page is 16 x 10)
+SC = PPU / 100                         # page-pixel constants below were designed at 100 px/unit
 F = 900.0                              # focal length in px
 PAPER = np.array([0.95, 0.925, 0.875], np.float32)
 JADE = np.array([0.30, 0.95, 0.72], np.float32)
@@ -43,6 +44,19 @@ T_FREEZE0, T_FREEZE1 = 13.40, 14.45
 HERE = os.path.dirname(os.path.abspath(__file__))
 BEATS = np.array([b for b in json.load(open(f'{HERE}/../timing/p0_beatmap.json'))['beats_s']
                   if b < 22 and not (T_FREEZE0 - 0.1 < b < T_FREEZE1)])
+
+LS = json.load(open(f'{HERE}/../timing/lipsync_opening.json'))
+# Parked: a mouth painted into sheet-resolution art reads as uncanny. Drawn mouth frames (ChatGPT) will
+# replace it; the flap timing below stays and will drive those drawings.
+PROCEDURAL_MOUTH = False
+def mouth_of(who, t, avg=0.0):
+    """Mouth for a singer at real time t: the held three-shape flaps from lipsync.py (0, 0.5, 1).
+    avg > 0 gives a running mean, used to lift the chin through a phrase."""
+    for tr in LS['tracks']:
+        if tr['who'] != who: continue
+        f = tr['flaps30']; i1 = int(round((t - tr['t0']) * 30)); i0 = max(0, i1 - int(avg * 30))
+        if 0 <= i1 < len(f): return float(np.mean([int(c) for c in f[i0:i1 + 1]])) / 2
+    return 0.0
 
 def sm(a, b, t):
     x = np.clip((t - a) / (b - a), 0, 1); return x * x * (3 - 2 * x)
@@ -113,10 +127,11 @@ DUST = np.column_stack([rng.uniform(-12, 12, ND), rng.uniform(-4, 14, ND), rng.u
 dust_ph = rng.uniform(0, 2 * np.pi, ND)
 
 # ---------------------------------------------------------------- page and witnesses
-CH_H = 600
-ST = {'A': stages('A', CH_H), 'B': stages('B', CH_H)}
-POS = {'A': 620, 'B': 985}                                             # page x of each figure centre
-FEET = PH - 28
+CH_H = 900                                                             # about the sheets' native height
+RIG = {w: Rig(w, CH_H) for w in 'AB'}
+ST = {w: RIG[w].st for w in 'AB'}
+POS = {'A': int(620 * SC), 'B': int(985 * SC)}                         # page x of each figure centre
+FEET = PH - int(28 * SC)
 def char_box(w):
     im = ST[w]['painted']; return POS[w] - im.shape[1] // 2, FEET - im.shape[0], im
 tg = []
@@ -128,27 +143,27 @@ TGT_UV = np.concatenate(tg).astype(np.float32)
 form_delay = rng.uniform(0, 0.4, NF)
 
 yy, xx = np.mgrid[0:PH, 0:PW].astype(np.float32)
-grain = cv2.GaussianBlur(rng.random((PH, PW)).astype(np.float32), (0, 0), 1.1)
-fibre = cv2.GaussianBlur(rng.random((PH, PW)).astype(np.float32), (0, 0), 16)
+grain = cv2.GaussianBlur(rng.random((PH, PW)).astype(np.float32), (0, 0), 1.1 * SC)
+fibre = cv2.GaussianBlur(rng.random((PH, PW)).astype(np.float32), (0, 0), 16 * SC)
 PAPER_TEX = PAPER[None, None] * (0.965 + 0.05 * grain[..., None] + 0.06 * (fibre[..., None] - 0.5))
 GRID = np.zeros((PH, PW), np.float32)
-GRID[:, ::100] = 1; GRID[::100, :] = 1
+GRID[:, ::PPU] = 1; GRID[::PPU, :] = 1
 GRID = cv2.GaussianBlur(GRID, (3, 3), 0.6)
 def norm01(a): return (a - a.min()) / (a.max() - a.min())
-NOISE = norm01(cv2.GaussianBlur(rng.random((PH, PW)).astype(np.float32), (0, 0), 6))
-NOISE_E = norm01(cv2.GaussianBlur(rng.random((PH, PW)).astype(np.float32), (0, 0), 4))
+NOISE = norm01(cv2.GaussianBlur(rng.random((PH, PW)).astype(np.float32), (0, 0), 6 * SC))
+NOISE_E = norm01(cv2.GaussianBlur(rng.random((PH, PW)).astype(np.float32), (0, 0), 4 * SC))
 d_edge = np.minimum(np.minimum(xx, PW - 1 - xx), yy)                   # bottom edge (the hinge) stays crisp
-ALPHA = np.clip((d_edge - 22 * NOISE_E) / 12, 0, 1)
+ALPHA = np.clip((d_edge - 22 * SC * NOISE_E) / (12 * SC), 0, 1)
 cxp = (POS['A'] + POS['B']) / 2
-LIGHT = np.clip(0.07 + 0.30 * np.exp(-(((xx - cxp) / 650) ** 2 + ((yy - 600) / 480) ** 2))
-                + 0.50 * sum(np.exp(-(((xx - POS[w]) / 210) ** 2 + ((yy - 640) / 400) ** 2)) for w in 'AB'), 0, 1)
-PERIPH = 1 - np.exp(-(((xx - cxp) / 520) ** 2 + ((yy - 620) / 420) ** 2))
-GLOW_A = np.exp(-(((xx - POS['A']) / 300) ** 2 + ((yy - 420) / 280) ** 2))
+LIGHT = np.clip(0.07 + 0.30 * np.exp(-(((xx - cxp) / (650 * SC)) ** 2 + ((yy - 600 * SC) / (480 * SC)) ** 2))
+                + 0.50 * sum(np.exp(-(((xx - POS[w]) / (210 * SC)) ** 2 + ((yy - 640 * SC) / (400 * SC)) ** 2)) for w in 'AB'), 0, 1)
+PERIPH = 1 - np.exp(-(((xx - cxp) / (520 * SC)) ** 2 + ((yy - 620 * SC) / (420 * SC)) ** 2))
+GLOW_A = np.exp(-(((xx - POS['A']) / (300 * SC)) ** 2 + ((yy - 420 * SC) / (280 * SC)) ** 2))
 SHADOW = np.zeros((PH, PW), np.float32)
 for w in 'AB':
-    cv2.ellipse(SHADOW, (POS[w] + (8 if w == 'A' else -8), FEET - 4), (95, 13), 0, 0, 360, 1.0, -1)
-SHADOW = cv2.GaussianBlur(SHADOW, (0, 0), 9)
-EDGE_GLOW = np.exp(-(PH - 1 - yy) / 5.0)
+    cv2.ellipse(SHADOW, (POS[w] + int((8 if w == 'A' else -8) * SC), FEET - int(4 * SC)), (int(95 * SC), int(13 * SC)), 0, 0, 360, 1.0, -1)
+SHADOW = cv2.GaussianBlur(SHADOW, (0, 0), 9 * SC)
+EDGE_GLOW = np.exp(-(PH - 1 - yy) / (5.0 * SC))
 
 def page_angle(s):          # degrees; 0 = lying flat away from camera, 90 = upright; back-ease overshoot
     x = np.clip((s - T_HIT) / 0.85, 0, 1); c1 = 1.4
@@ -160,7 +175,7 @@ def page_side(P, s):        # signed distance to the page plane, + toward the vi
     a = np.radians(page_angle(s))
     return P[:, 1] * np.cos(a) + P[:, 2] * np.sin(a)
 
-def page_texture(s):
+def page_texture(s, t):
     tex = PAPER_TEX.copy()
     tex -= (GRID * (0.03 + 0.05 * PERIPH))[..., None] * sm(T_HIT + 0.2, T_DOWN, s)
     tex *= 1 - (SHADOW * 0.30 * sm(T_DOWN - 0.3, T_DOWN + 0.6, s))[..., None]
@@ -171,7 +186,9 @@ def page_texture(s):
     tex += (GLOW_A * 0.06 * sm(T_DOWN, 9.5, s) * (1 + 0.8 * beat_pulse(s)))[..., None] * WARM
     lit_ch = unlit * (1 - pool) + 0.97 * pool
     for w in 'AB':          # pencil -> flat -> painted, through a ragged noise mask, top to bottom
-        x0, y0, _ = char_box(w); st = ST[w]; h_, w_ = st['painted'].shape[:2]
+        x0, y0, _ = char_box(w); h_, w_ = ST[w]['painted'].shape[:2]
+        mo = mouth_of(w, t) if PROCEDURAL_MOUTH else 0.0
+        st = RIG[w].pose(s, mouth=mo, sing=mouth_of(w, t, avg=0.6))
         nz = NOISE[y0:y0 + h_, x0:x0 + w_][..., None] * 0.6 + np.linspace(0, 0.4, h_)[:, None, None]
         d = 0.18 if w == 'B' else 0.0
         p_pen = np.clip((s - (T_DOWN - 0.75 + d)) / 0.5 - nz, 0, 1)
@@ -241,11 +258,12 @@ KEYS = np.array([
     [5.50,    0,   3,   13.0,  0.0,  2.2, 0.0],
     [6.35,    0,   4,   14.5,  0.0,  3.0, 0.0],
     [7.55,   16,   8,   22.0,  0.0,  4.6, 0.0],
-    [9.50,    8,   6,   14.0,  0.0,  3.4, 0.0],
-    [13.40,  -9,   4,   10.5,  0.0,  3.3, 0.0],
-    [14.45, -32,   9,    9.5,  0.0,  3.5, 0.0],
-    [17.00, -26,  -4,   13.0, -0.8,  5.4, 0.8],
-    [21.00, -18, -10,   17.0, -1.4,  6.6, 1.0]])
+    [9.00,   14,   0,    9.0, -1.0,  4.6, 0.0],     # A starts singing: push in on her
+    [11.50,  22,  -5,    5.2, -1.45, 4.95, 0.0],    # medium close-up, a low angle looking up
+    [13.40,  26,  -6,    4.7, -1.5,  5.0, 0.0],
+    [14.45,   6,  -3,    5.0, -1.5,  5.0, 0.0],     # bullet-time orbit round her in the silence
+    [17.00,   2,  -9,    7.5, -1.2,  5.9, 0.4],     # crane up: her face low in frame, the new sky above
+    [21.00,  -6, -13,   10.5, -0.9,  6.6, 0.6]])
 CAM = PchipInterpolator(KEYS[:, 0], KEYS[:, 1:], axis=0, extrapolate=True)
 
 def camera(t):
@@ -418,7 +436,7 @@ def frame_at(t):
         if pz.min() > 0.3 and area > 40:
             src = np.array([[0, PH], [PW, PH], [PW, 0], [0, 0]], np.float32)
             M = cv2.getPerspectiveTransform(src, dst)
-            rgba = np.dstack([page_texture(s), ALPHA])
+            rgba = np.dstack([page_texture(s, t), ALPHA])
             wp = cv2.warpPerspective(rgba, M, (W, H), flags=cv2.INTER_LINEAR)
             mask = wp[..., 3:]
             glow_amt = 0.10 + 0.35 * np.exp(-(s - T_HIT) * 1.5)
