@@ -3,12 +3,12 @@
 The countdown is a dimension count. The world loses one dimension per word, is rebuilt as a
 sheet of paper on the hit, and gets its depth back when the ink leaves the page.
 
-  0.0-1.0    dust drifting past the lens, a galaxy barely there
-  1.0        "Three": the galaxy ignites from the core outward; the camera pulls out of it
-  3.3        "two": its thickness collapses into a plane (the dual-vector foil); a sheen sweeps it
+  0.0-1.0    the night side of Earth, barely there: a thin blue limb and the first fire
+  1.0        "Three": city lights spread across the globe from that first fire; the camera pulls out
+  3.3        "two": the globe unrolls into a flat lit map (the dual-vector foil); a sheen sweeps it
   4.5        "one": the plane collapses into a single line; the camera turns face-on
   5.62       bass hit: the line is the hinge of a sheet of paper that swings up into a wall;
-             most of the galaxy scatters into the starfield behind it, some flies past the lens
+             most of the lights scatter into the starfield behind it, some flies past the lens
   6.3        "Loading.": the camera pulls back to show the page floating in space; the rest of
              the line streams into the two silhouettes; the page frays into motes at its edges
   7.55       downbeat: A and B paint themselves in (pencil -> flat -> painted) under a pool of light
@@ -75,39 +75,67 @@ def beat_pulse(s):          # 1 on each tracked beat, decaying
     b = BEATS[BEATS <= s]
     return float(np.exp(-(s - b[-1]) * 7)) if len(b) else 0.0
 
-# ---------------------------------------------------------------- galaxy (story time < T_HIT)
+# ---------------------------------------------------------------- night-side Earth (story time < T_HIT)
+# The countdown collapses OUR world: city lights on a night globe (3D) -> a flat lit map (2D) -> a line (1D).
 rng = np.random.default_rng(7)
 N = 160000
-g_r = rng.gamma(2.0, 1.75, N).clip(0.05, 10.5)
-arm = rng.integers(0, 3, N)
-g_th = arm * 2 * np.pi / 3 + g_r * 0.62 + rng.normal(0, 0.17, N)
-inter = rng.random(N) < 0.22
-g_th[inter] = rng.uniform(0, 2 * np.pi, inter.sum())
-g_z = rng.normal(0, 1, N) * (0.22 + 1.1 * np.exp(-g_r / 1.8))
-g_om = 0.55 / (1 + 0.28 * g_r)                                          # differential rotation
-halo = rng.random(N) < 0.16
-hv = rng.normal(0, 1, (halo.sum(), 3)); hv /= np.linalg.norm(hv, axis=1, keepdims=True)
-H0 = hv * rng.uniform(1.5, 10, halo.sum())[:, None]
-g_col = CORE[None] * np.exp(-g_r / 1.9)[:, None] + BLUE[None] * (1 - np.exp(-g_r / 1.9))[:, None]
-knot = (rng.random(N) < 0.07) & (g_r > 2.2) & ~inter
-g_col[knot] = JADE
-g_col[halo] = BLUE * 0.8
-g_w = (rng.uniform(0.35, 1.0, N) * 0.20).astype(np.float32)
-g_w[halo] *= 0.55; g_w[knot] *= 1.8
+R_E = 4.4
+def _unit(lat, lon):
+    return np.stack([np.cos(lat) * np.sin(lon), np.sin(lat), np.cos(lat) * np.cos(lon)], 1)
+# real data, bundled on PyPI: 34k cities with population (geonamescache) and a land mask (global-land-mask)
+import geonamescache
+from global_land_mask import globe as _globe
+_cities = list(geonamescache.GeonamesCache().get_cities().values())
+c_lat = np.radians([c['latitude'] for c in _cities]); c_lon = np.radians([c['longitude'] for c in _cities])
+c_pop = np.array([max(c['population'], 15000) for c in _cities], float)
+NC = int(N * 0.64); NL = int(N * 0.22); NA = N - NC - NL
+wgt = c_pop ** 0.6; cpick = rng.choice(len(_cities), NC, p=wgt / wgt.sum())
+spread = np.radians(0.04 + 0.05 * (c_pop[cpick] / 1e5) ** 0.3)          # big cities sprawl
+lat_c = c_lat[cpick] + rng.normal(0, 1, NC) * spread
+lon_c = c_lon[cpick] + rng.normal(0, 1, NC) * spread / np.maximum(np.cos(c_lat[cpick]), 0.2)
+cand_lat = np.degrees(np.arcsin(rng.uniform(-1, 1, NL * 4))); cand_lon = rng.uniform(-180, 180, NL * 4)
+keep = _globe.is_land(cand_lat, cand_lon) & (cand_lat > -60)
+lat_l, lon_l = np.radians(cand_lat[keep][:NL]), np.radians(cand_lon[keep][:NL])
+NL = len(lat_l); NA = N - NC - NL
+Ua = rng.normal(0, 1, (NA, 3)); Ua /= np.linalg.norm(Ua, axis=1, keepdims=True)
+U = np.concatenate([_unit(lat_c, lon_c), _unit(lat_l, lon_l), Ua]).astype(np.float32)
+first = _unit(np.radians([-3.0]), np.radians([35.0]))[0]              # the first fire: East Africa
+e_type = np.concatenate([np.zeros(NC), np.ones(NL), np.full(NA, 2)]).astype(int)   # 0 city, 1 land, 2 air
+e_rad = np.where(e_type == 2, 1.025, 1.0)
+e_lat = np.arcsin(np.clip(U[:, 1], -1, 1)); e_lon = np.arctan2(U[:, 0], U[:, 2])
+e_d = np.arccos(np.clip(U @ first, -1, 1))                              # how far each light is from it
+g_col = np.tile(np.array([1.0, 0.74, 0.42], np.float32), (N, 1))
+g_col[(e_type == 0) & (rng.random(N) < 0.3)] = [1.0, 0.92, 0.80]
+g_col[e_type == 1] = [0.20, 0.26, 0.38]; g_col[e_type == 2] = [0.35, 0.55, 1.0]
+g_w = (rng.uniform(0.4, 1.0, N) * np.array([0.20, 0.035, 0.11])[e_type]).astype(np.float32)
 
-def galaxy_pos(s):
-    ang = g_th + g_om * s
-    x = g_r * np.cos(ang); y = g_r * np.sin(ang) * 0.92; z = g_z.copy()
-    ha = 0.05 * s; ca, sa = np.cos(ha), np.sin(ha)
-    x[halo] = H0[:, 0] * ca - H0[:, 1] * sa; y[halo] = H0[:, 0] * sa + H0[:, 1] * ca; z[halo] = H0[:, 2]
-    y = y + 5.0
-    f2 = eio(T_TWO, T_TWO + 0.9, s); z = z * (1 - f2)                    # "two": thickness -> 0
-    f1 = eio(T_ONE, T_ONE + 0.75, s)                                     # "one": height -> 0
-    y = y * (1 - f1) + 0.03 * np.sin(x * 2.5 + s * 18) * f1 * (1 - sm(T_HIT - 0.2, T_HIT, s))
-    x = x * (1 - 0.12 * f1)
-    return np.stack([x, y, z], 1)
+def earth_light(s):
+    """Per-point brightness: cities ignite outward from the first fire on "Three"."""
+    city = 0.25 * sm(0, 0.8, s) * (e_d < 0.12) + sm(T_THREE + e_d * 0.55 - 0.1, T_THREE + e_d * 0.55 + 0.35, s)
+    return np.where(e_type == 0, np.clip(city, 0, 1), np.where(e_type == 1, 0.5 + 0.5 * sm(0, 1.2, s), 1.0))
 
-L_HIT = galaxy_pos(T_HIT)
+def earth_pos(s, eye=None):
+    """Globe -> flat map ("two") -> line ("one"). Returns positions and a visibility factor
+    (far hemisphere hidden and the air shown as a limb glow while it is still a globe)."""
+    lon = (e_lon - 0.55 + 0.12 * min(s, T_TWO) + np.pi) % (2 * np.pi) - np.pi    # spins until it flattens
+    cl = np.cos(e_lat)
+    sph = np.stack([R_E * e_rad * cl * np.sin(lon), 5 + R_E * e_rad * np.sin(e_lat), R_E * e_rad * cl * np.cos(lon)], 1)
+    mp = np.stack([lon / np.pi * 8, 5 + e_lat / (np.pi / 2) * 4.2, np.zeros(N)], 1)
+    f2 = float(eio(T_TWO, T_TWO + 0.9, s)); f1 = float(eio(T_ONE, T_ONE + 0.75, s))
+    P = sph * (1 - f2) + mp * f2
+    P[:, 1] = 5 + (P[:, 1] - 5) * (1 - f1) - 5 * f1 + 0.03 * np.sin(P[:, 0] * 2.5 + s * 18) * f1 * (1 - sm(T_HIT - 0.2, T_HIT, s))
+    vis = np.ones(N)
+    if eye is not None and f2 < 1:
+        nrm = (sph - [0, 5, 0]) / (R_E * e_rad)[:, None]
+        v = eye - sph; v /= np.linalg.norm(v, axis=1, keepdims=True)
+        facing = (nrm * v).sum(1)
+        v_surf = sm(-0.06, 0.10, facing)
+        limb = np.clip(1 - np.abs(facing), 0, 1) ** 4 * (facing > -0.15)
+        vis = np.where(e_type == 2, limb * 4.5, v_surf)
+        vis = vis * (1 - f2) + np.where(e_type == 2, 0.0, 1.0) * f2
+    return P, vis
+
+L_HIT = earth_pos(T_HIT)[0]
 NF = 14000                                                              # these become the witnesses
 FORM = rng.choice(N, NF, replace=False)
 rest = np.setdiff1d(np.arange(N), FORM)
@@ -294,11 +322,11 @@ def all_particles(s, t):
     if s < T_DOWN + 0.8:                                                    # dust near the lens
         Dp = DUST + np.column_stack([0.3 * np.sin(s * 0.4 + dust_ph), -0.12 * s + 0 * dust_ph, 0.2 * np.cos(s * 0.3 + dust_ph)])
         Ps.append(Dp); Cs.append(np.broadcast_to(WARM, (ND, 3))); Ws.append(np.full(ND, 0.9) * (1 - sm(T_HIT, T_DOWN + 0.8, s)))
-    ign = sm(T_THREE - 0.15 + g_r * 0.07, T_THREE + 0.35 + g_r * 0.07, s)   # ignition ripples outward
-    w = g_w * (1.4 * np.exp(-g_r / 1.1) * (0.6 + 0.4 * sm(0, 0.8, s)) + (1 - np.exp(-g_r / 1.1)) * ign)
+    w = g_w * earth_light(min(s, T_HIT))
     col = g_col.copy()
     if s < T_HIT:
-        P = galaxy_pos(s)
+        P, vis = earth_pos(s, camera(t)[0])
+        w = w * vis
         if T_TWO <= s < T_ONE + 0.4:                                        # foil sheen sweeps the plane
             c = -12 + 24 * sm(T_TWO, T_TWO + 1.2, s)
             band = np.exp(-(((P[:, 0] * 0.8 + (P[:, 1] - 5) * 0.6) - c) / 0.8) ** 2)
