@@ -78,7 +78,53 @@ def fade_bottom(rgba, y0, y1):                                  # the figure dis
     out[..., 3] *= 1 - ss(y0, y1, ys); return out
 PLATES = {(m, e): fade_bottom(HA.plate(m, e), 440, 560) for m in range(3) for e in range(3)}
 B3F = fade_bottom(B3, 1100, 1350)
-NECK_A = (300.0, 470.0)                                         # plate coords: rotation pivot
+NECK_A = (300.0, 470.0)
+
+# ---------------------------------------------------------------- M1: A looks up (ChatGPT's pilot, 4 poses)
+M1DIR = os.path.join(HERE, '..', 'assets', 'motion', 'M1')
+M1Q = json.load(open(f'{M1DIR}/QC.json')); PIV = tuple(M1Q['pivot_xy'])
+def _pad(f):                                       # 512x768 cell -> 512x1024 panel (rows below are F0's)
+    im = np.array(faces.Image.open(f).convert('RGB')).astype(np.float32) / 255
+    return np.concatenate([im, HA.mouth[0][768:]], 0)
+M1F = [_pad(f'{M1DIR}/F{k}.png') for k in range(4)]
+def _rot(im, deg):
+    return cv2.warpAffine(im, cv2.getRotationMatrix2D(PIV, deg, 1.0), (512, 1024), flags=cv2.INTER_LINEAR, borderValue=(1, 1, 1))
+_err = {sg: np.abs(_rot(M1F[0], sg * 9.0)[:540] - M1F[3][:540]).mean() for sg in (1, -1)}
+SGN = min(_err, key=_err.get)                      # which way F3 was rotated
+def _mask(a, b):
+    d = (np.abs(a - b).max(-1) > 0.03).astype(np.uint8)
+    d = cv2.dilate(cv2.morphologyEx(d, cv2.MORPH_CLOSE, np.ones((7, 7), np.uint8)), np.ones((7, 7), np.uint8)).astype(np.float32)
+    return cv2.GaussianBlur(d, (0, 0), 3)[..., None]
+def _m1_plate(k, m, e):
+    """Pose k (0-3) with mouth m and eyes e. On F3 the mouth/eye patches are the neutral ones turned 9 deg,
+    the same way F3 itself was built; the in-between poses are only shown in a breath (mouth closed)."""
+    rgb = M1F[k].copy()
+    if k == 3:
+        def raw(mm, ee):                           # the drawings themselves, not the matte-processed plate
+            r = HA.mouth[mm].copy()
+            if ee: r = r * (1 - HA.eye_mask[ee]) + HA.eye[ee] * HA.eye_mask[ee]
+            return r
+        base = raw(0, 0)
+        for (mm, ee) in ((m, 0), (0, e)):
+            if (mm, ee) == (0, 0): continue
+            src = raw(mm, ee)
+            msk = cv2.warpAffine(_mask(src, base), cv2.getRotationMatrix2D(PIV, SGN * 9.0, 1.0), (512, 1024))[..., None]
+            rgb = rgb * (1 - msk) + _rot(src, SGN * 9.0) * msk
+    return fade_bottom(faces.cutout(rgb), 440, 560)
+M1_T = [17.66, 17.79, 17.89]                       # F1 (eyes lead) / F2 / F3 lands, inside the 17.63-18.17 breath
+M1_DEG = [0.0, 1.5, 5.0, 9.0]
+_M1C = {}
+def m1_pose(t):
+    return 0 if t < M1_T[0] else (1 if t < M1_T[1] else (2 if t < M1_T[2] else 3))
+def m1_plate(k, m, e):
+    key = (k, m if k == 3 else 0, e if k == 3 else 0)
+    if key not in _M1C: _M1C[key] = _m1_plate(*key)
+    return _M1C[key]
+def m1_hair(s):                                    # the hair lags each head change and settles
+    out = 0.0
+    for j, tk in enumerate(M1_T):
+        if s >= tk: out += (M1_DEG[j + 1] - M1_DEG[j]) * 0.9 * np.exp(-(s - tk) / 0.28) * np.sin(2 * np.pi * (s - tk) / 0.5)
+    return out                                         # plate coords: rotation pivot
 hy, hx = np.mgrid[0:1024, 0:512].astype(np.float32)
 HAIR_W = (ss(300, 560, hy) * ss(300, 110, hx)).astype(np.float32)   # A's back hair, ears down
 
@@ -203,9 +249,10 @@ def frame_at(i):
     b = np.sin(2 * np.pi * s / 3.7)
     if sh['kind'] == 'A':
         m, e = mouth_at(i), eye_at(i)
-        plate = PLATES[(m, e)]
+        k1 = m1_pose(t) if t >= T_SIL1 else 0
+        plate = PLATES[(m, e)] if k1 == 0 else m1_plate(k1, m, e)
         wind = 0.75 + 0.25 * np.sin(2 * np.pi * s / 7.1) + 0.5 * bar_pulse(s)
-        dx = 2.6 * wind * np.sin(2 * np.pi * s / 2.9 - hy / 140) * HAIR_W
+        dx = (2.6 * wind * np.sin(2 * np.pi * s / 2.9 - hy / 140) + m1_hair(t)) * HAIR_W
         dy = 0.7 * np.sin(2 * np.pi * s / 2.9 + 1.3 - hy / 140) * HAIR_W
         plate = cv2.remap(plate, (hx - dx).astype(np.float32), (hy - dy).astype(np.float32), cv2.INTER_LINEAR, borderValue=(0, 0, 0, 0))
         ang = 0.5 * np.sin(2 * np.pi * s / 5.3) + 1.6 * sing_at(t) + 0.6 * beat_pulse(s) * (m > 0)   # nods into the beat when singing

@@ -1,0 +1,28 @@
+{
+  "F0_exact_locked_panel1": true,
+  "angles_deg": [
+    0.0,
+    1.5,
+    5.0,
+    9.0
+  ],
+  "pivot_xy": [
+    296.0,
+    352.0
+  ],
+  "lower_anchor_y_start": 540,
+  "lower_anchor_exact_for_F1_F3": [
+    true,
+    true,
+    true
+  ],
+  "canvas": [
+    1024,
+    1536
+  ],
+  "cell": [
+    512,
+    768
+  ],
+  "background": "#FFFFFF"
+}
