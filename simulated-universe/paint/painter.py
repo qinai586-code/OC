@@ -91,7 +91,47 @@ class Scene:
         ImageDraw.Draw(self.sketch).rectangle(box, fill=255)
 
     # --- composite -----------------------------------------------------------
-    def render(self, t_paint=0.62, t_flat=0.40, t_pencil=0.16):
+    def render(self, t_paint=0.62, t_flat=0.40, t_pencil=0.16, attn=None):
+        """Composite against the scene's own attention map, or against `attn` (an H x W array) when
+        given, so a moving gaze can paint the world frame by frame. The costly layers are cached."""
+        if not hasattr(self, '_cache'): self._cache = self._layers()
+        c = self._cache
+        return self._compose(c, self.attn if attn is None else attn, t_paint, t_flat, t_pencil)
+
+    def _layers(self):
+        r = self.rng
+        lab = np.asarray(self.labels, np.int64)
+        pal = np.array(self.palette, float) / 255.0
+        flat = pal[lab]; flat[lab == 0] = PAPER
+        wash = 1 + (noise(r, 60) - 0.5) * 0.22 + (noise(r, 9) - 0.5) * 0.08
+        gran = 1 + (r.random((H, W)) - 0.5) * 0.06
+        edges = ndi.gaussian_filter((ndi.sobel(lab.astype(float), 0) ** 2 + ndi.sobel(lab.astype(float), 1) ** 2 > 0).astype(float), 2.5)
+        painted = flat * (wash * gran)[..., None] * (1 - 0.18 * edges)[..., None]
+        light = ndi.gaussian_filter(self.emit, (60, 60, 0)) * 1.6 + ndi.gaussian_filter(self.emit, (10, 10, 0)) * 0.9
+        painted = np.clip(painted + light * (0.6 + 0.4 * flat) + self.emit * 0.55, 0, 1)
+        m = flat.mean(-1, keepdims=True)
+        flat_tier = PAPER * (1 - 0.42 * (1 - np.clip(m + (flat - m) * 2.2, 0, 1)))
+        sk = ndi.gaussian_filter(np.asarray(self.sketch, float) / 255.0, 40) + (noise(r, 25) - 0.5) * 0.3
+        return dict(painted=painted.astype(np.float32), flat=flat_tier.astype(np.float32), sk=sk,
+                    edge=((noise(r, 18) - 0.5) * 0.16 + (noise(r, 4) - 0.5) * 0.05).astype(np.float32),
+                    pen=np.asarray(self.pencil, float) / 255.0,
+                    paper=(1 + (noise(r, 1.2) - 0.5) * 0.05 + (noise(r, 40) - 0.5) * 0.04).astype(np.float32))
+
+    def _compose(self, c, attn, t_paint, t_flat, t_pencil):
+        a = np.clip(attn, 0, 1.2) + c['edge']
+        w_paint = smooth(t_paint - 0.03, t_paint + 0.03, a); w_flat = smooth(t_flat - 0.03, t_flat + 0.03, a)
+        w_pencil = np.maximum(smooth(t_pencil - 0.06, t_pencil + 0.06, a), smooth(0.45, 0.6, c['sk']))
+        out = np.broadcast_to(PAPER, (H, W, 3)).copy()
+        out = out * (1 - w_flat[..., None]) + c['flat'] * w_flat[..., None]
+        out = out * (1 - w_paint[..., None]) + c['painted'] * w_paint[..., None]
+        rim = np.clip(np.abs(ndi.gaussian_filter(w_paint, 1.5) - ndi.gaussian_filter(w_paint, 5)) * 3, 0, 1)
+        out *= (1 - 0.10 * rim)[..., None]
+        pen_vis = c['pen'] * np.maximum(w_pencil * (1 - 0.8 * w_paint), 0.35 * (c['pen'] < 0.3))
+        out = out * (1 - pen_vis[..., None]) + GRAPHITE * pen_vis[..., None]
+        out *= c['paper'][..., None]
+        return Image.fromarray((np.clip(out, 0, 1) * 255).astype(np.uint8))
+
+    def render_legacy(self, t_paint=0.62, t_flat=0.40, t_pencil=0.16):
         r = self.rng
         lab = np.asarray(self.labels, np.int64)
         pal = np.array(self.palette, float) / 255.0

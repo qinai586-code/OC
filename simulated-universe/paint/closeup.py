@@ -268,12 +268,14 @@ def _e(u): u = min(max(u, 0.0), 1.0); return u * u * (3 - 2 * u)
 # cut points on tracked beats (phrase ends), the silence and the re-entry
 C_INS, C_TWO, C_BCUT = 10.693, 11.981, 19.528
 import edge as edgeshots
+import pov
 EDGE_WIN = [(5.62, 10.24), (11.981, T_SIL0), (T_SIL1, 17.705), (19.528, 20.863), (25.913, 27.748), (30.929, 33.205)]   # edge-of-the-world shots (edge.py)
 def shot(t):
     """Framing per shot: the figures, a camera drift (px) every layer follows by its depth,
     the light pool, and where the light rays come from. Pushes ease in and out.
     Edge, over-the-shoulder, wide and sky shots come from edge.py; the close-ups are reactions."""
     if any(a <= t < b for a, b in EDGE_WIN): return dict(scene='edge')
+    if 10.24 <= t < C_TWO: return dict(scene='pov')                 # what A sees: the world renders under her gaze
     if t >= 29.118:  # the held palm-up pose: the ember lands, the first fire
         u = _e((t - 29.118) / (30.929 - 29.118))
         return dict(figs=[('A3', 0.66 + 0.04 * u, (0.38 * W, 0.40 * H))], cam=(0, 0), light=(0.55, 0.60), rays='right', palm=True)
@@ -333,6 +335,9 @@ IRIS_A = (364.0, 295.0)          # plate coords: where a reflection would sit in
 def frame_at(i):
     t = i / FPS; s = tau(t); sh = shot(t); frozen = T_SIL0 <= t < T_SIL1
     if sh.get("scene") == "edge": return edgeshots.render(i, t, s)
+    if sh.get("scene") == "pov":
+        nf = edgeshots.render(int(10.23 * FPS), 10.23, 10.23).astype(np.float32) / 255 if t < 10.5 else None
+        return pov.render(i, t, s, nf)
     cam = np.array(sh['cam']) * (1.0)
     kick = 1 + 0.008 * bar_pulse(s)                                 # a small push on each bar downbeat
     face = (sh['figs'][0][2][0] + cam[0], sh['figs'][0][2][1] + cam[1])

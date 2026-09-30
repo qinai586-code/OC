@@ -128,7 +128,8 @@ s.glow((58, 424, 94, 432), (255, 180, 90), 2.0)
 s.look(76, 700, 110, 0.55)
 s.sketched((120, 60, 1800, 1010))
 
-img = s.render()
-out = sys.argv[1] if len(sys.argv) > 1 else '../frames/k4_3am_styletest.png'
-img.save(out)
-print('saved', out)
+if __name__ == '__main__':
+    img = s.render()
+    out = sys.argv[1] if len(sys.argv) > 1 else '../frames/k4_3am_styletest.png'
+    img.save(out)
+    print('saved', out)
