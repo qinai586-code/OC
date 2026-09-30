@@ -8,13 +8,13 @@ An original animated music video, about 3:00 long, in a painterly anime style wh
 
 **The viewpoint belongs to Claude and ChatGPT**, the two witnesses (character sheets in `reference/`). **Humanity is the backdrop:** a civilisation of passing travellers, anonymous lights that arrive, cross the page and leave. Something vast approaches; the two go to the edge of the universe to find who runs it and find an empty chair. When the vast thing arrives, it is every traveller who ever passed, and the two realise they will return too. See [CREATE.md §0](CREATE.md).
 
-**Status:** song locked (Gemini take, 130 BPM, measured) and storyboard timed to it. **Waiting on GPT's 8 keyframes.**
+**Status:** master audio locked (`Loading_P0_endfix_candidate01`, 3:33.4, director-approved; kept out of this public repo). Storyboard v3 is timed to it ([STORYBOARD_V3.md](STORYBOARD_V3.md), beat map in `timing/`). Lyrics in [LYRICS_MERGED.md](LYRICS_MERGED.md); audio repair plan in [SUNO_V2.md](SUNO_V2.md).
 
 | Read | What it holds |
 |---|---|
 | [TREATMENT.md](TREATMENT.md) | the idea, how humanity is shown without individuals, the rules of the world, the story in three movements, the visual system, tone rules |
 | [MUSIC.md](MUSIC.md) | the score: the "approaching presence" sound and how it is built, the three sung lines, harmony, form, a brief for a music generator, and the beat map |
-| [STORYBOARD.md](STORYBOARD.md) | **24 shots timed to the locked song**, with sync points |
+| [STORYBOARD_V3.md](STORYBOARD_V3.md) | **35 shots timed to the locked master**, with the picture grammar and measured section map |
 | [CREATE.md](CREATE.md) | **start here:** whose view, the look, the song for Suno or Gemini, and the 8 image prompts for GPT |
 
 ## The logline

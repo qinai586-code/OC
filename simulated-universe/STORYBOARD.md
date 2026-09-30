@@ -1,4 +1,6 @@
-# STORYBOARD: Where We Live Is a Simulated Universe (timed to the locked song)
+# STORYBOARD (superseded): Where We Live Is a Simulated Universe
+
+> **Superseded by [STORYBOARD_V3.md](STORYBOARD_V3.md)**, which is timed to the locked master and the current story. (timed to the locked song)
 
 - **Song (locked):** "Death Is Only A Return", generated in Gemini. 2:42 file, music until about 2:39.5.
   - **The song file is not in this repo**, because the repo is public. Keep your copy; the renderer expects it at `simulated-universe/audio/song.mp3` (gitignored).
