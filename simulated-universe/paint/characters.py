@@ -101,12 +101,14 @@ if __name__ == '__main__':
 
 
 # ---------------------------------------------------------------- living rig
-# Anchors in native cut pixels (read off 6x zooms of the cuts). A faces right (+x), B faces left.
+# Anchors in native cut pixels, read off 8x zooms of the cuts. A faces right (+x), B faces left.
+# mouth = lip front on the profile line at the mouth line; corner = mouth corner (the art's mouth mark);
+# hinge = jaw hinge under the hair, by the ear; keep_x = B's hair strand in front of her face stays put.
 ANCHORS = {
-    'A': dict(face=+1, mouth=(164.5, 136.5), mouth_depth=5.0, hinge=(128, 122), chin=155, face_x=171, pivot=(140, 172),
+    'A': dict(face=+1, mouth=(161.5, 142.0), corner=(155.5, 142.2), hinge=(130, 130), chin=158, keep_x=None, pivot=(140, 172),
               chest=200, waist=330, hair_x=95, hair_y=(165, 345), tail_root=(45, 545),
               breath=3.7, sway=2.9, phase=0.0),
-    'B': dict(face=-1, mouth=(58.0, 139.5), mouth_depth=5.0, hinge=(98, 124), chin=153, face_x=-49, pivot=(84, 172),
+    'B': dict(face=-1, mouth=(60.0, 140.0), corner=(65.0, 140.2), hinge=(92, 130), chin=154, keep_x=58.0, pivot=(84, 172),
               chest=200, waist=330, hair_x=168, hair_y=(150, 545), tail_root=None,
               breath=4.2, sway=3.4, phase=1.7),
 }
@@ -133,10 +135,23 @@ class Rig:
         back = (A['hair_x'] - xn) if A['face'] > 0 else (xn - A['hair_x'])      # behind the back line
         self.w_hair = (_ss(A['hair_y'][0], A['hair_y'][1], yn) * np.clip(back / 35, 0, 1)
                        * (1 - _ss(A['hair_y'][1] - 20, A['hair_y'][1] + 30, yn))).astype(np.float32)
-        # the lower jaw: below the lip line, in front of the hinge, down to just under the chin
-        hx, hy = A['hinge']; ym = A['mouth'][1]; front = (xn - hx) * A['face']
-        self.w_jaw = (_ss(ym - 1.0, ym + 0.8, yn) * (1 - _ss(A['chin'] + 3, A['chin'] + 15, yn))
-                      * _ss(-6, 8, front) * (1 - _ss(A['face_x'] - 3, A['face_x'] + 3, front + hx * A['face']))).astype(np.float32)
+        # the lower jaw: everything under the lip line in front of the hinge, down to under the chin.
+        # The split is sharp in front of the mouth corner (the lips part) and soft behind it (skin stretches).
+        hx, hy = A['hinge']; ym = A['mouth'][1]; f = A['face']
+        behind = (A['corner'][0] - xn) * f
+        r = 0.5 + 3.5 * np.clip(behind / 8, 0, 1)
+        wj = _ss(-1, 1, (yn - ym) / r) * (1 - _ss(A['chin'] + 2, A['chin'] + 12, yn)) * _ss(-4, 6, (xn - hx) * f)
+        if A['keep_x'] is not None:
+            wj = wj * _ss(A['keep_x'] - 1, A['keep_x'] + 1, xn)                  # (B faces left)
+        self.w_jaw = wj.astype(np.float32)
+        # colours from the art itself: the line of the mouth mark, and (B) the hair in front of the lips
+        cx_, cy_ = A['corner']
+        pat = self.st['painted'][int((cy_ - 1.5) * k):int((cy_ + 1.5) * k) + 1, int((cx_ - 3) * k):int((cx_ + 3) * k) + 1, :3].reshape(-1, 3)
+        self.line_col = pat[np.argmin(pat.sum(1))] * 0.9
+        self.hair_col = None
+        if A['keep_x'] is not None:
+            hp = self.st['painted'][int(ym * k):int((ym + 6) * k), int((A['keep_x'] - 4) * k):int((A['keep_x'] - 1) * k), :3]
+            self.hair_col = np.median(hp.reshape(-1, 3), 0)
         self.w_tail = None
         if A['tail_root'] is not None:                                           # the dragon tail, by colour
             rgb = (self.st['painted'][..., :3] * 255).astype(np.uint8)
@@ -147,31 +162,44 @@ class Rig:
             m = cv2.GaussianBlur(m, (0, 0), 6 * k)
             rx, ry = A['tail_root']
             self.w_tail = (m * np.clip(np.hypot(xn - rx, yn - ry) / 320, 0, 1)).astype(np.float32)
-    JAW_DEG = 5.0                                                               # open mouth: lower lip drops ~3 px
+    JAW_DEG = 7.0                                                               # fully open: the lower lip drops ~4 px
+
+    def _lower_lip(self, jaw):
+        A = self.A; hx, hy = A['hinge']; ex, ey = A['mouth']
+        th = np.radians(self.JAW_DEG * jaw) * A['face']
+        rx, ry = ex - hx, ey + 0.3 - hy
+        return hx + np.cos(th) * rx - np.sin(th) * ry, hy + np.sin(th) * rx + np.cos(th) * ry
 
     def _draw_opening(self, img, jaw, off=(0.0, 0.0)):
-        """The mouth opening in profile, drawn after the jaw warp: a small dark shape between the
-        still upper lip and the dropped lower lip, set back from the profile line. 4x supersampled."""
+        """The profile mouth, drawn after the jaw warp on a 4x patch: the outline runs from the still
+        upper lip in to the mouth corner and back out along the dropped lower lip (a lined notch);
+        inside is the dark mouth, in front of it is whatever was behind the face."""
         if jaw < 0.05: return
-        A, k, f = self.A, self.k, self.A['face']
-        ex, ey = A['mouth']; hx, hy = A['hinge']
-        th = np.radians(self.JAW_DEG * jaw) * f
-        rx, ry = ex - hx, ey + 0.6 - hy                                              # lower lip rides the jaw
-        lx, ly = hx + np.cos(th) * rx - np.sin(th) * ry, hy + np.sin(th) * rx + np.cos(th) * ry
-        pts = np.array([[ex + 0.2 * f, ey - 0.1], [ex - f * A['mouth_depth'], ey + 0.45 * (ly - ey)],
-                        [lx - 0.5 * f, ly], [lx + 0.1 * f, ly - 0.35 * (ly - ey)]])
-        pts = pts + np.array(off) / k
-        S = 4
-        X0, Y0 = int((pts[:, 0].min() - 2) * k), int((pts[:, 1].min() - 2) * k)
-        X1, Y1 = int((pts[:, 0].max() + 2) * k) + 1, int((pts[:, 1].max() + 2) * k) + 1
-        m = np.zeros(((Y1 - Y0) * S, (X1 - X0) * S), np.float32)
-        cv2.fillPoly(m, [((pts * k - [X0, Y0]) * S).astype(np.int32)], 1.0, cv2.LINE_AA)
-        m = cv2.resize(m, (X1 - X0, Y1 - Y0), interpolation=cv2.INTER_AREA)[..., None] * min(1.0, jaw * 1.6)
+        A, k, f, S = self.A, self.k, self.A['face'], 4
+        U = np.array(A['mouth']); L = np.array(self._lower_lip(jaw))
+        C = np.array([A['corner'][0], U[1] + 0.4 * (L[1] - U[1])])
+        o = np.array(off) / k
+        U, L, C = U + o, L + o, C + o
+        X0 = int((min(U[0], L[0], C[0]) - 6) * k); X1 = int((max(U[0], L[0], C[0]) + 6) * k) + 1
+        Y0 = int((U[1] - 4) * k); Y1 = int((L[1] + 4) * k) + 1
         reg = img[Y0:Y1, X0:X1]
-        yy = np.linspace(0, 1, Y1 - Y0)[:, None, None]
-        col = np.array([0.26, 0.12, 0.13]) * (1 - yy) + np.array([0.42, 0.20, 0.21]) * yy    # dark, warmer low
-        a = reg[..., 3:] > 0.4
-        reg[..., :3] = np.where(a, reg[..., :3] * (1 - m) + col * m, reg[..., :3])
+        big = cv2.resize(reg, ((X1 - X0) * S, (Y1 - Y0) * S), interpolation=cv2.INTER_CUBIC)
+        P = lambda q: ((np.asarray(q) * k - [X0, Y0]) * S).astype(np.int32)
+        front = np.zeros(big.shape[:2], np.float32)                                   # air in front of the lips
+        cv2.fillPoly(front, [P([U, U + [5 * f, 0], L + [5 * f, 0], L])], 1.0, cv2.LINE_AA)
+        if self.hair_col is None: big[..., 3] *= 1 - front
+        else: big[..., :3] = big[..., :3] * (1 - front[..., None]) + self.hair_col * front[..., None]
+        inside = np.zeros(big.shape[:2], np.float32)
+        cv2.fillPoly(inside, [P([U, C, L])], 1.0, cv2.LINE_AA)
+        yy = np.clip((np.arange(big.shape[0])[:, None] / S / k + Y0 / k - U[1]) / max(0.5, L[1] - U[1]), 0, 1)[..., None]
+        col = np.array([0.40, 0.16, 0.18]) * (1 - yy) + np.array([0.64, 0.31, 0.32]) * yy   # tongue shade low
+        big[..., :3] = big[..., :3] * (1 - inside[..., None]) + col * inside[..., None]
+        big[..., 3] = np.maximum(big[..., 3], inside)
+        lines = np.zeros(big.shape[:2], np.float32)
+        cv2.polylines(lines, [P([U, C, L])], False, 1.0, max(1, int(round(0.9 * k * S))), cv2.LINE_AA)
+        big[..., :3] = big[..., :3] * (1 - lines[..., None]) + self.line_col * lines[..., None]
+        big[..., 3] = np.maximum(big[..., 3], lines)
+        reg[:] = cv2.resize(big, (X1 - X0, Y1 - Y0), interpolation=cv2.INTER_AREA)
 
     def pose(self, t, mouth=0.0, sing=0.0):
         """Return {'painted','flat','pencil'} at time t. sing (0-1) lifts the chin a little."""
@@ -195,19 +223,18 @@ class Rig:
             dx += ((np.cos(ta) * qx - np.sin(ta) * qy) - qx) * self.w_tail
             dy += ((np.sin(ta) * qx + np.cos(ta) * qy) - qy) * self.w_tail
         if mouth > 0.01:                                                                # the jaw swings on its hinge
-            tj = np.radians(self.JAW_DEG * mouth) * A['face']
+            tj = np.radians(self.JAW_DEG * mouth) * A['face'] * self.w_jaw
             hx, hy = A['hinge'][0] * k, A['hinge'][1] * k
             qx, qy = self.xs - hx, self.ys - hy
-            wj = self.w_jaw
-            dx += ((np.cos(tj * wj) * qx - np.sin(tj * wj) * qy) - qx) * self.w_head
-            dy += ((np.sin(tj * wj) * qx + np.cos(tj * wj) * qy) - qy) * self.w_head
+            dx += (np.cos(tj) * qx - np.sin(tj) * qy) - qx
+            dy += (np.sin(tj) * qx + np.cos(tj) * qy) - qy
         mx, my = (self.xs - dx).astype(np.float32), (self.ys - dy).astype(np.float32)
         out = {}
         for key in ('painted', 'flat', 'pencil'):
             out[key] = cv2.remap(self.st[key], mx, my, cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT, borderValue=0)
             if key != 'pencil' and mouth > 0.05:
                 # the opening lives in warped space: carry it by the head/breath warp at the lip
-                ex, ey = int(A['mouth'][0] * k), int(A['mouth'][1] * k) - 2
+                ex, ey = int(A['corner'][0] * k), int((A['mouth'][1] - 3) * k)
                 self._draw_opening(out[key], mouth, (float(dx[ey, ex]), float(dy[ey, ex])))
         return out
 
