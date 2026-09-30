@@ -64,7 +64,14 @@ def flaps(t, o, fps=30, lead=0.07, hold=3):
     st = np.array(st)
     # a singer breathes in through a half-open mouth just before a phrase (after >= 0.6 s of rest)
     on = [i for i in range(1, len(st)) if st[i] > 0 and st[i - 1] == 0 and (st[max(0, i - 18):i] == 0).all() and i >= 18]
-    for i in on: st[i - 8:i - 1] = 1
+    for i in on: st[i - 8:i] = 1
+    # no shape is held for less than `hold` frames: a too-short run takes the previous shape
+    i = 1
+    while i < len(st):
+        j = i
+        while j < len(st) and st[j] == st[i]: j += 1
+        if st[i] != st[i - 1] and j - i < hold and j < len(st): st[i:j] = st[i - 1]
+        i = j
     return tf, st
 
 if __name__ == '__main__':
