@@ -111,7 +111,7 @@ def _m1_plate(k, m, e):
             msk = cv2.warpAffine(_mask(src, base), cv2.getRotationMatrix2D(PIV, SGN * 9.0, 1.0), (512, 1024))[..., None]
             rgb = rgb * (1 - msk) + _rot(src, SGN * 9.0) * msk
     return fade_bottom(faces.cutout(rgb), 440, 560)
-M1_T = [17.66, 17.79, 17.89]                       # F1 (eyes lead) / F2 / F3 lands, inside the 17.63-18.17 breath
+M1_T = [17.66, 17.83, 17.93]                       # F1 (eyes lead) / F2 / F3 lands, inside the 17.63-18.17 breath
 M1_DEG = [0.0, 1.5, 5.0, 9.0]
 _M1C = {}
 def m1_pose(t):
@@ -221,10 +221,12 @@ def shot(t):
         return dict(figs=[('A', 1.20 + 0.10 * u, (0.54 * W, 0.55 * H))], cam=(-50 * u, -10 * u), light=(0.56, 0.45), rays='right')
     if t < C_TWO:    # S1b: tight insert at eye level, a quicker push
         u = _e((t - C_INS) / (C_TWO - C_INS))
-        return dict(figs=[('A', 1.80 + 0.14 * u, (0.44 * W, 0.50 * H))], cam=(-30 * u, 0), light=(0.50, 0.42), rays='right')
+        sc = 3.3 + 0.2 * u                          # her eye, an ember reflected in it (new information, not a re-crop)
+        return dict(figs=[('A', sc, (0.48 * W + 31 * sc, 0.44 * H + 35 * sc))], cam=(-24 * u, 0), light=(0.50, 0.42), rays='right', glint=True)
     if t < T_SIL0:   # S1c: both witnesses, facing each other, before the silence
         u = _e((t - C_TWO) / (T_SIL0 - C_TWO))
-        return dict(figs=[('A', 0.80, (0.34 * W, 0.58 * H)), ('B', 0.80, (0.66 * W, 0.58 * H))], cam=(0, -14 * u), light=(0.50, 0.45), rays='top')
+        return dict(figs=[('A', 1.30, (0.17 * W, 0.66 * H), dict(blur=3.5, dim=0.70)), ('B', 0.86 + 0.03 * u, (0.63 * W, 0.56 * H))],
+                    cam=(-18 * u, -8 * u), light=(0.60, 0.45), rays='top')   # A soft in the foreground, B listening, in focus
     if t < T_SIL1:   # S2: the silence, bullet-time drift round B
         u = (t - T_SIL0) / (T_SIL1 - T_SIL0)
         return dict(figs=[('B3', 0.62 + 0.03 * u, (0.47 * W, 0.46 * H))], cam=(60 * u, -8 * u), light=(0.47, 0.40), rays='left')
@@ -253,7 +255,10 @@ def place(rgba, anchor, target, scale, angle=0.0, pivot=None):
     M = cv2.getRotationMatrix2D(pv, angle, scale)
     p = M @ np.array([anchor[0], anchor[1], 1.0])
     M[:, 2] += np.array(target) - p
+    LAST_M[0] = M
     return cv2.warpAffine(rgba, M, (W, H), flags=cv2.INTER_LANCZOS4, borderValue=(0, 0, 0, 0))
+LAST_M = [None]
+IRIS_A = (364.0, 295.0)          # plate coords: where a reflection would sit in A's iris
 
 def frame_at(i):
     t = i / FPS; s = tau(t); sh = shot(t); frozen = T_SIL0 <= t < T_SIL1
@@ -273,7 +278,8 @@ def frame_at(i):
     # 3 the characters
     b = np.sin(2 * np.pi * s / 3.7)
     frame = screen(bg, 1 - np.exp(-L * 1.2))
-    for kind, scale, fpos in sh['figs']:
+    for fdef in sh['figs']:
+        kind, scale, fpos = fdef[:3]; opt = fdef[3] if len(fdef) > 3 else {}
         fx, fy = fpos[0] + cam[0], fpos[1] + cam[1]
         wind = 0.75 + 0.25 * np.sin(2 * np.pi * s / 7.1) + 0.5 * bar_pulse(s)
         if kind == 'A':
@@ -297,13 +303,24 @@ def frame_at(i):
         else:
             fig = place(B3F, FACE_B3, (fx, fy), scale * kick)
             rdir = -1
+        if opt.get('blur'):                                            # depth of field: premultiplied blur
+            pm = np.dstack([fig[..., :3] * fig[..., 3:], fig[..., 3:]])
+            pm = cv2.GaussianBlur(pm, (0, 0), opt['blur'])
+            fig = np.dstack([pm[..., :3] / np.maximum(pm[..., 3:], 1e-3), pm[..., 3:]])
         a = fig[..., 3:]
         edge = np.clip(a - cv2.erode(a, np.ones((9, 9), np.uint8))[..., None], 0, 1)
         wrap = cv2.GaussianBlur(bg, (0, 0), 10) * edge * 0.22
         sh_a = np.roll(a[..., 0], -6 * rdir, axis=1)                 # rim light on the edge facing the light
         rim = cv2.GaussianBlur(np.clip(a[..., 0] - sh_a, 0, 1), (0, 0), 1.5)[..., None]
         col = fig[..., :3] * (0.93 + 0.07 * pool[..., None]) + wrap + rim * 0.45 * WARM * (1 + 0.5 * beat_pulse(s))
+        col = col * opt.get('dim', 1.0)
         frame = frame * (1 - a) + col * a
+        if sh.get('glint') and kind == 'A' and eye_at(i) < 2:        # an ember caught in her iris
+            gx, gy = LAST_M[0] @ np.array([IRIS_A[0], IRIS_A[1], 1.0])
+            gl = np.zeros((H, W), np.float32)
+            cv2.circle(gl, (int(gx), int(gy)), max(2, int(1.5 * scale)), 1.0, -1, cv2.LINE_AA)
+            g = cv2.GaussianBlur(gl, (0, 0), 0.5 * scale) * 1.8 + cv2.GaussianBlur(gl, (0, 0), 3 * scale) * 1.2
+            frame = screen(frame, np.clip(g, 0, 1)[..., None] * EMBER * (0.65 + 0.35 * beat_pulse(s)))
     light_dir = {'right': 1, 'left': -1, 'top': 0}[sh['rays']]
     # 4 light falling from where she looks
     org = {1: (W * 1.02 + cam[0] * 0.2, -0.08 * H), -1: (-0.02 * W, -0.08 * H), 0: (0.5 * W, -0.12 * H)}[light_dir]

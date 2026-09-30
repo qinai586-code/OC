@@ -49,6 +49,9 @@ LS = json.load(open(f'{HERE}/../timing/lipsync_opening.json'))
 # Parked: a mouth painted into sheet-resolution art reads as uncanny. Drawn mouth frames (ChatGPT) will
 # replace it; the flap timing below stays and will drive those drawings.
 PROCEDURAL_MOUTH = False
+# The wide figures stay unfinished (pencil and flat colour): the characters only become fully painted
+# where attention lands, on the close-up at 8.45 s. Replaced when new full-body art exists.
+UNFINISHED_WIDE = True
 def mouth_of(who, t, avg=0.0):
     """Mouth for a singer at real time t: the held three-shape flaps from lipsync.py (0, 0.5, 1).
     avg > 0 gives a running mean, used to lift the chin through a phrase."""
@@ -193,7 +196,7 @@ def page_texture(s, t):
         d = 0.18 if w == 'B' else 0.0
         p_pen = np.clip((s - (T_DOWN - 0.75 + d)) / 0.5 - nz, 0, 1)
         p_flat = np.clip((s - (T_DOWN - 0.05 + d)) / 0.45 - nz, 0, 1)
-        p_paint = np.clip((s - (T_DOWN + 0.35 + d)) / 0.6 - nz, 0, 1)
+        p_paint = np.clip((s - (T_DOWN + 0.35 + d)) / 0.6 - nz, 0, 1) * (0.0 if UNFINISHED_WIDE else 1.0)
         reg = tex[y0:y0 + h_, x0:x0 + w_]
         for key, p in (('pencil', p_pen), ('flat', p_flat), ('painted', p_paint)):
             a = st[key][..., 3:] * p
