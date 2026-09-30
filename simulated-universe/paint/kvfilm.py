@@ -37,6 +37,7 @@ were. The pre-contact state is KV5 with only the flame inpainted.
 Usage: python3 kvfilm.py OUTDIR [t0 t1]
 """
 import os, sys, json, bisect, numpy as np, cv2
+import space
 from multiprocessing import Pool
 from PIL import Image
 
@@ -317,7 +318,7 @@ def sh_countdown_kv1(t, s):                                         # something 
     return view(B1 + L1 * g[..., None])[0] * (1 - 0.12 * p)
 
 rW = np.random.default_rng(21)
-WALL_X = rW.uniform(200, 1340, 26); WALL_Y0 = rW.uniform(800, 860, 26); WALL_T0 = rW.uniform(50.9, 52.6, 26)
+WALL_X = rW.uniform(200, 1340, 26); WALL_Y0 = rW.uniform(800, 860, 26); WALL_T0 = rW.uniform(49.9, 51.2, 26)
 WALL_Y = 102.0                                                      # the top of the frame: the wall
 def sky_alive(s, present=None, city=None):
     g = 0.72 + 0.28 * np.sin(s * 0.8 + SLOW * 14)                    # stars are people: some fade, some come back
@@ -562,16 +563,35 @@ def sh_outro(t, s):                                                 # two... thr
     g = np.clip(cv2.GaussianBlur(lay, (0, 0), 1.5) * 1.2, 0, 1)[..., None] * blink    # on paper the last light is ink
     return fr * (1 - g) + OCHRE * g
 
+FLAME_SCR = (FLAME[0] * W / SW, (FLAME[1] - 80) * W / SW)            # where the flame was on screen
+def sp_network(t, s): return space.s_network(t, *FLAME_SCR)
+def sp_wall(t, s): return space.s_wall(t)
+def sh_planck_lattice(t, s):                                        # under the painting, the grid of the simulation
+    k = float(ss(57.2, 57.8, t))
+    if k <= 0: return sh_planck(t, s)
+    if k >= 1: return space.s_lattice(t)
+    return sh_planck(t, s) * (1 - k) + space.s_lattice(t) * k
+SIG_B = beats_in(73.1, 77.2)[:8]
+def sp_signals(t, s): return space.s_signals(t, SIG_B)
+def sp_sheet(t, s): return space.s_sheet(t)
+def sp_flat(t, s): return space.s_flat(t)
+def sp_fly(t, s): return space.s_fly(t)
+CON_B = beats_in(117.0, 121.6)
+def sp_console(t, s): return space.s_console(t, CON_B)
+def sp_no_gods(t, s): return space.s_no_gods(t)
+def sp_threads(t, s): return space.s_threads(t)
+def sp_outro(t, s): return space.s_outro(t)
+
 SHOTS = [(0.0, sh_countdown), (5.62, sh_loading), (8.452, sh_rise), (10.24, sh_city1), (11.981, sh_sky),
-         (20.863, sh_b_city), (25.913, sh_kv1_time), (27.748, sh_fall), (29.118, sh_fire), (30.929, sh_network),
-         (38.4, sh_countdown_kv1), (44.1, sh_wall), (54.9, sh_planck), (58.6, sh_lookaway), (61.8, sh_city_alone),
-         (65.0, sh_unanswered), (STOP0, sh_stop), (73.0, sh_signals), (78.4, sh_windows_out), (86.5, sh_sheet),
-         (93.7, sh_flat), (97.8, sh_b_looks), (99.9, sh_flat_near), (105.2, sh_follow_up), (110.6, sh_past_stars),
-         (117.0, sh_console), (121.6, sh_empty_hand), (124.9, sh_unfinished), (128.6, sh_no_gods),
+         (20.863, sh_b_city), (25.913, sh_kv1_time), (27.748, sh_fall), (29.118, sh_fire), (30.929, sp_network),
+         (38.4, sh_countdown_kv1), (44.1, sh_wall), (51.3, sp_wall), (54.9, sh_planck_lattice), (58.6, sh_lookaway), (61.8, sh_city_alone),
+         (65.0, sh_unanswered), (STOP0, sh_stop), (73.0, sp_signals), (78.4, sh_windows_out), (86.5, sp_sheet),
+         (93.7, sp_flat), (97.8, sh_b_looks), (99.9, sh_flat_near), (105.2, sh_follow_up), (110.6, sp_fly),
+         (117.0, sp_console), (121.6, sh_empty_hand), (124.9, sh_unfinished), (128.6, sp_no_gods),
          (131.6, sh_empty_sky), (134.6, sh_keys), (138.0, sh_travellers), (144.6, sh_not_i), (146.4, sh_h1),
-         (150.0, sh_h2), (153.6, sh_h3), (158.8, sh_h4), (160.1, sh_breath), (161.4, sh_descent),
+         (150.0, sh_h2), (153.6, sh_h3), (158.8, sp_threads), (161.4, sh_descent),
          (172.0, sh_every_traveller), (182.0, sh_out_crop), (187.0, sh_out_full), (192.5, sh_paper),
-         (198.9, sh_return), (203.4, sh_together), (207.2, sh_chain), (211.0, sh_outro)]
+         (198.9, sh_return), (203.4, sh_together), (207.2, sh_chain), (211.0, sp_outro)]
 STARTS = [a for a, _ in SHOTS]
 
 def frame_at(t):

@@ -63,3 +63,23 @@ Built: `paint/kvfilm.py`, the whole film, 0:00–3:33.4. Timings come from the m
 | 3:23.4–3:27.2 | "death is only a return" (A+B) | KV5 | The only frame the two share at the same distance, lit by the first fire. |
 | 3:27.2–3:31.0 | full band | chain | One light per beat, each centred on screen: fire, star, window, city, Earth, map, globe. The camera pulls back to the whole Earth. |
 | 3:31.0–3:32.7 | "Two dimensions… three… and one… still loading." | BG0a | The globe returns to paper from the edges in until one warm mark is left. It blinks. Cut to black. |
+
+## The space layer (`paint/space.py`, my own shots)
+
+These shots are my own 3D particle shots, not the KVs. The Earth is built from 34k real cities (geonamescache) and a real land mask. They use the same colour script as the KVs: warm is human, and stars, lattice and sheet are cold. Every space shot is rendered over the painted space of BG0a. Dimension here is literal geometry.
+
+| Time | Shot |
+|---|---|
+| 0:30.9–0:38.4 | The flame match-cuts to one light in East Africa. The lights spread across the real world, out of Africa, and the camera pulls back until the Earth is a small warm sphere in the dark forest, holding its breath. |
+| 0:51.3–0:54.9 | The speed of light: a warm light-shell leaves the Earth at constant speed and stops at a cold spherical wall, which is visible only where the light reaches it. |
+| 0:57.2–0:58.6 | The Planck scale: the painting's fog dissolves into the lattice of the simulation. |
+| 1:13.0–1:18.4 | Signals: light-cones expand from the largest real cities into the dark. Nothing comes back. |
+| 1:26.5–1:33.7 | The sheet: a plane seen exactly edge-on is a hairline. As the camera rises, it opens into a surface descending onto the Earth. |
+| 1:33.7–1:37.8 | Everything falls flat: the Earth collapses onto the sheet, top first, and spreads in the plane. The flattened world becomes a drawing on paper, with its cities left as ochre marks. |
+| 1:50.6–1:57.0 | Past the stars: the camera flies out through the warm constellation of human traces and the cold stars to the lattice at the end of the light. |
+| 1:57.0–2:01.6 | The console: on each beat a key of the lattice lights warm. No hand is on it. |
+| 2:08.6–2:11.6 | No gods: from the edge, looking back, the only light is the one people made. |
+| 2:38.8–2:41.4 | The whole Earth with its threads: each life's line goes out from its city. On the breath, everything dims and holds. |
+| 3:31.0–3:32.7 | "Two dimensions… three… and one… still loading": the world as a plane curls into a sphere, collapses into a line, then into one point, which blinks. |
+
+These replace the painted versions of those moments in the table above.
