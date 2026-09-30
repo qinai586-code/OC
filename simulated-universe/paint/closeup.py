@@ -42,7 +42,10 @@ def flap_track(who):
         for i, c in enumerate(tr['flaps30']): fr[i0 + i] = int(c)
     return fr
 FLAP = flap_track('A')
-def mouth_at(i): return FLAP.get(i, 0)                        # i = video frame index at real time
+# No lip-sync: without a clean vocal stem the timing is a guess, and a mouth moving to the wrong syllable
+# is worse than a closed one. The voices play as the witnesses' inner voices; the picture follows the music.
+LIPSYNC = False
+def mouth_at(i): return FLAP.get(i, 0) if LIPSYNC else 0      # i = video frame index at real time
 
 def blink_frames():
     """Blink starts: 0.25 s after each A cut, then roughly every 3-4.5 s at a phrase edge."""
@@ -187,7 +190,7 @@ M2_T = [20.95, 21.15, 21.29]        # considered: eyes lower (6 frames), skull f
 M3_T = [28.20, 28.45]               # the eyes find the falling ember, then a small head response
 def pose_at(tlist, t): return sum(t >= x for x in tlist)
 FLAP_B = flap_track('B')
-def mouth_b(i): return FLAP_B.get(i, 0)
+def mouth_b(i): return FLAP_B.get(i, 0) if LIPSYNC else 0
 A3F = fade_bottom(faces.pose('A3'), 1120, 1275)
 FACE_A3, PALM_A3 = (510.0, 695.0), (820.0, 868.0)
 
