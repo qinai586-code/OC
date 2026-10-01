@@ -1,0 +1,82 @@
+{
+ "test1": {
+  "A_max_disp_px": 196.3,
+  "B_max_disp_px": 134.1,
+  "A_head_deg_range": [
+   -1.99,
+   16.0
+  ],
+  "A_chest_deg_range": [
+   0.0,
+   6.0
+  ],
+  "A_waist_deg_range": [
+   0.0,
+   2.0
+  ],
+  "A_hair_lag_deg_range": [
+   -1.75,
+   16.47
+  ],
+  "B_head_deg_range": [
+   -11.5,
+   -0.0
+  ],
+  "B_chest_deg_range": [
+   -4.0,
+   -0.0
+  ],
+  "B_waist_deg_range": [
+   -1.2,
+   -0.0
+  ],
+  "B_hair_lag_deg_range": [
+   -11.92,
+   0.0
+  ],
+  "frames": 120,
+  "mean_abs_frame_diff": {
+   "max": 1.12,
+   "median": 0.224,
+   "held_frames_diff_below_0p01": 0
+  }
+ },
+ "test2": {
+  "frames": 93,
+  "t0": 52.417,
+  "t1": 56.291666666666664,
+  "openness_vs_vocal_rms_corr_by_lag_frames": {
+   "-3": 0.008,
+   "-2": 0.028,
+   "-1": 0.088,
+   "0": 0.262,
+   "1": 0.324,
+   "2": 0.177,
+   "3": 0.124
+  },
+  "loud_threshold_db_re_track_rms": -15.0,
+  "loud_frames": 85,
+  "closed_while_loud": 4,
+  "open_while_quiet_below_minus30": 0,
+  "viseme_counts": {
+   "closed": 5,
+   "A": 18,
+   "I": 38,
+   "U": 6,
+   "small": 16,
+   "E": 10
+  },
+  "drawing_changes": 22,
+  "holes_in_face_px": {
+   "min": 66,
+   "max": 315,
+   "mean": 134.5,
+   "note": "sampled frames 1258, 1300, 1340: all on the drawing's right crop edge (one pixel column, x 1179-1184 in the 1920x1080 frame), alpha 0.50-0.99; 0 px with alpha < 0.5 inside the face mask"
+  },
+  "mouthless_check": {
+   "mouthless_changed_pixels": 1349,
+   "region_pixels": 1725,
+   "max_change_outside_region": 0.0
+  }
+ }
+}
