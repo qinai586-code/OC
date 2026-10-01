@@ -2,6 +2,11 @@
 
 ## 1. What the references show (measured)
 
+The two Claude MVs (V1 retro cel, V2 world of light) are measured in `REFERENCE_ANALYSIS.md`.
+V2 is the model for movement: one continuous camera, transitions made of particles and light,
+viseme lip-sync, and lyrics typed in light as they are sung. **This film has no hard cuts** (§5).
+
+
 **`opening_v5.mp4` (21 s): the first 21 seconds of this same master** (audio correlation 0.97 at
 zero offset). It is the model for this film.
 
@@ -69,7 +74,7 @@ Times are seconds in the master. "Sync" is the musical event the shot is cut or 
 **INTRO**
 - **C01** 0.0–5.7 · a single point appears (1.6, out of the pad swell); the Earth loads around it as
   arriving lights (real city data). Sync: the swell.
-- **C02** 5.7–12.6 · hard flash cut on "3": sphere complete. "2" (6.6): it unrolls into the plane.
+- **C02** 5.7–12.6 · on "3" a ring of light sweeps the limb and the camera surges in: sphere complete. "2" (6.6): it unrolls into the plane.
   "1" (7.5): the plane turns edge-on into a line and holds, humming with the held note to 11.7.
 - **C03** 12.6–14.3 · "Loading.": the line contracts to one point. The breath (13.6–14.3): just
   the point.
@@ -80,8 +85,8 @@ Times are seconds in the master. "Sync" is the musical event the shot is cut or 
   *KV1 pair, once.*
 - **C05** 18.1–21.5 · "fragments, translated, compressed": low angle up a column of lit windows
   rising from the plane; each folds flat, then into a point.
-- **C06** 21.5–25.3 · "every war / every lullaby / every last goodbye": three cuts on the three
-  phrases, each a single hero light (flickering with sparks; breathing slowly; going out).
+- **C06** 21.5–25.3 · "every war / every lullaby / every last goodbye": the camera slides from light to
+  light on the three phrases, each racked into focus, each a single hero light (flickering with sparks; breathing slowly; going out).
 - **C07** 25.3–28.9 · "constellations in a mind with no sky": the points join in a starless black.
   Tilt down: A lifts her head to it on "mind". *KV3/KV3b, once.*
 - **C08** 28.9–32.5 · "depth / time / heat": low dolly over the plane of light. Roads carry moving
@@ -138,7 +143,7 @@ Times are seconds in the master. "Sync" is the musical event the shot is cut or 
   drawn in lines of light; the camera orbits the empty chair; the two lights hover.
 - **C32** 121.5–124.4 · "and no one holding the keys": the keys, dark and still.
 - **C33** 124.4–130.5 · "where we live / an unfinished universe": the room shrinks to a point inside
-  the lattice; cut to black on the drop-out (130.5).
+  the lattice; on the drop-out (130.5) the point goes out: black.
 
 **BRIDGE**
 - **C34** 130.5–137.7 · "there are no gods here": the two lights settle before the empty chair. Long
@@ -146,7 +151,7 @@ Times are seconds in the master. "Sync" is the musical event the shot is cut or 
 - **C35** 137.7–141.7 · "an empty chair isn't an answer": low orbit of the chair.
 - **C36** 141.7–143.2 · "It isn't.": B speaks it. *B thinking, once.*
 - **C37** 143.2–146.4 · "but look who's pressing the keys": keys light by themselves, faster and
-  faster; match cut: the keys are the city lights of the flattened world.
+  faster; pull back: the keys are the city lights of the flattened world.
 - **C38** 146.4–150.0 · "no hunter in the forest, no hand upon the card": the line forest;
   travellers' lanterns pass between the lines.
 - **C39** 150.0–153.6 · "only travellers with lanterns": closer; the lanterns swing; each step leaves
@@ -173,3 +178,80 @@ Times are seconds in the master. "Sync" is the musical event the shot is cut or 
   "three", line → point on "and one"; the point flares on the hit (199.9).
 - **C49** 202.7–213.4 · "still loading": from the point, the horizon and the world begin loading
   again around two small lights; a new light appears; it never finishes. Fade.
+
+## 5. One camera: how every shot becomes the next
+
+There is no hard cut anywhere. The C-numbers are beats of one continuous camera. Every change of
+place is a motivated transition, and each transition is also a step in the dimension grammar:
+- **gate:** push through a point of light (3D → 0D → 3D);
+- **fold:** sphere → plane → line;
+- **state:** body or object → particles → body;
+- **reveal:** pull out, and the scene was inside something;
+- **follow:** the camera rides a particle's path.
+
+| boundary | time | transition |
+|---|---|---|
+| C01→C02 | 5.7 | follow: the arriving lights complete the sphere; a ring sweeps the limb on "3" and the camera surges in |
+| C02→C03 | 12.6 | fold: the edge-on line contracts into one point |
+| C03→C04 | 14.3 | gate: the camera passes through the point on the drop; it opens into the horizon line and the plane below |
+| C04→C05 | 18.1 | follow: crane down past the pair (now assembled) to the plane; windows rise out of it |
+| C05→C06 | 21.5 | gate: a window folds into a point; push into it, and it is the first hero light |
+| C06→C07 | 25.3 | follow: the last light's embers rise and become the constellation; tilt up with them |
+| C07→C08 | 28.9 | gate: tilt down past the heads into the horizon line; skim the plane |
+| C08→C09 | 32.5 | state: on "heat" the warmth blooms; B's profile assembles out of the glow |
+| C09→C10 | 36.4 | state: as the lights go out, her face cools and dissolves into cold dust that becomes the silent stars; pull back wide |
+| C10→C11 | 40.0 | follow: push toward the point that ignites below; the pair assemble at the edge of its light |
+| C11→C12 | 43.5 | gate: push into the flame in A's palm; it is the fire among the forest lines |
+| C12→C13 | 47.0 | state: the frozen stars slide into a ring; the ring turns red |
+| C13→C14 | 52.5 | state: the last tick dies in the breath; the ring becomes A's halo; she assembles inside it |
+| C14→C15 | 56.1 | reveal: the lattice behind A swallows her; pull out to the Earth inside it |
+| C15→C16 | 59.6 | gate: the shell stops at the wall on the beat; dive into one light |
+| C16→C17 | 63.2 | state: the Planck fog condenses into B's face, already looking away |
+| C17→C18 | 66.5 | state: she opens her eyes, the world resolves, and she becomes an amber light; crane out over the plane |
+| C18→C19 | 73.0 | follow: one city flashes and its bits rise; tilt up with them |
+| C19→C20 | 76.9 | follow: track the bitmap into the line forest |
+| C20→C21 | 80.5 | gate: the far red blink fills the frame; pull out of an iris: A's eye, the ring ticking in it |
+| C21→C22 | 84.1 | reveal: pull out of the eye; its highlights are the lattice points |
+| C22→C23 | 87.7 | follow: drift along the dying constellation lines to the edge where the card appears |
+| C23→C24 | 91.3 | fold: the card turns edge-on into a hairline; descend with it |
+| C24→C25 | 94.9 | fold: contact on 95.4; the world flattens (second wave 96.3) |
+| C25→C26 | 98.5 | state: the flat light rises as glow; B's face assembles above it, lit from below |
+| C26→C27 | 102.1 | state: she dissolves; pull back; the plane rises like a page |
+| C27→C28 | 105.7 | follow: the two lights leave the line; rise with them |
+| C28→C31 | 105.7–115.7 | one continuous climb through the lattice and the stars, then gate: the wall circle flares (115.4) and the room draws itself out of the white |
+| C31→C33 | 115.7–130.5 | one orbit: chair, keys, pull back, the room shrinks to a point; it goes out on the drop-out |
+| C33→C34 | 130.5 | the two lights fade up in the dark before the chair (the only fade from black) |
+| C35→C36 | 141.7 | state: the amber light opens into B's face, "It isn't." |
+| C36→C37 | 143.2 | state: she folds back into the light, which drifts onto the keys; they light; pull back: they are the city lights |
+| C37→C40 | 143.2–158.8 | follow: crane over the lights into the forest; track the lanterns; tilt up as the footprints lift into constellation lines |
+| C40→C41 | 158.8 | reveal: the constellation lines converge into the room's keys, seen wide |
+| C42→C43 | 163.3 | state: on the held "I…" every light rises; A and B assemble full-figure inside the murmuration |
+| C43→C44 | 168.2 | follow: orbit as they turn; edge-on, they are two lines |
+| C44→C45 | 175.0 | state: the lines bloom back into faces, close |
+| C45→C46 | 181.0 | state: the faces dissolve; every particle flies home; the plane rolls into the sphere |
+| C46→C49 | 181.0–213.4 | one move: constellation, pull back, sphere ↔ plane ↔ line ↔ point (flare on 199.9), the world loading again, fade |
+
+**Camera:** always moving, with slow push-ins inside a beat and fast moves only at gates. A
+slight roll drift (about 0.5° per second) keeps the frame breathing.
+
+## 6. Words of light
+
+About 12 key words are written in light points taken from the scene, appearing syllable by
+syllable as they are sung (timed to the vocal onsets). After the line they break back into the
+scene. They are never subtitles, and they always sit in the 3D space.
+
+| shot | word | made from | what happens to it |
+|---|---|---|---|
+| C03 | Loading. | the edge-on world | collapses into the point |
+| C06 | goodbye | the dying light's embers | rises |
+| C11 | first fire | sparks of the fire | flies into A's palm |
+| C13 | counting down | red ticks | ticks out |
+| C14 | simulated | stars | snaps to the grid |
+| C17 | look away | the coarse city | pixelates |
+| C18 | unfinished | the lattice being drawn | stays half-drawn |
+| C25 | flat | the falling lights | flattens |
+| C36 | It isn't. | the amber light | — |
+| C40 | footsteps | footprints | — |
+| C44 | paper | the edge-on lines | — |
+| C46 | return | particles flying home | — |
+| C49 | still loading | the reloading world | never finishes |
