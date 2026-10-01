@@ -451,7 +451,7 @@ class C45(Shot):
     def pose(self, t):
         p = self.c43.pose(min(t, 175.0))
         close = pose(np.array([0.0, 0.08, FIG_Z - 1.15]), np.array([0.0, 0.08, FIG_Z + 5.0]), 1300)
-        p = lerp_pose(p, close, smoother(t, 174.8, 176.0))
+        p = lerp_pose(p, close, smoother(t, 175.0, 176.1))
         p = lerp_pose(p, pose(np.array([0.0, 0.1, FIG_Z - 1.0]), np.array([0.0, 0.1, FIG_Z + 5.0]), 1300), smooth(t, 176.0, 181.0))
         back = pose(np.array([0.0, 2.2, -3.5]), np.array([0.0, -0.4, 4.5]), 1300)
         p = lerp_pose(p, back, smoother(t, 181.2, 184.0))
@@ -465,10 +465,10 @@ class C45(Shot):
         P, r = murmur(t)
         S, u = roll_up(t)
         P = P + (S - P) * u[:, None]
-        I = GI * (1.9 * (1 + 0.3 * r)) * (1 + 0.7 * r * (1 - smooth(t, 181.5, 184.0)))
+        I = GI * 1.92 * (1 + 1.6 * r)
         if t > 184.5:
             I = I * mix(np.ones(EN), np.clip(-(S - E3)[:, 2] / R3 * 2.5 + 0.35, 0.08, 1.0), u)
-        fr.points(P, CITY_COL, I)
+        fr.points(P, CITY_COL, I, min_r=0.6 * r)
         draw_stars(fr, t, 0.5)
         # the two lines of light, blooming into faces
         lines = 1 - smooth(t, 175.0, 175.6)
