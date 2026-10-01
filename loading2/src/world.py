@@ -167,3 +167,19 @@ def tick_ring(fr, center, R, n, alive, t, col=RED, inten=1.0, rot=0.0, normal_ax
         B.append(np.asarray(center) + d * R * 0.93)
     if A:
         fr.segments(np.array(A), np.array(B), col, inten, width=2.0)
+
+
+def ground_roads(H=1.0, z0=0.6, scale=3.2, yaw=15.0, seg=10):
+    """Roads between cities on the same flat map as ground_points (polylines)."""
+    out = []
+    for lo1, la1, lo2, la2 in EARTH['roads']:
+        arc = great_arc(lo1, la1, lo2, la2, seg)
+        P = on_plane(arc[:, 0], arc[:, 1] - 62, scale, yaw, (0, 0, 0), PLANE_R) + np.array([0, -H, z0])
+        if np.abs(np.diff(P[:, 0])).max() < 1.5:
+            out.append(P)
+    return out
+
+
+def bright_cities(k=60):
+    """Indices of the k brightest lights (big cities)."""
+    return np.argsort(-EARTH['I'])[:k]

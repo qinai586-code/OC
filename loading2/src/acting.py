@@ -12,8 +12,10 @@ _img = {}
 
 
 def char(name):
+    """A character drawing (the 4x upscaled version when one exists)."""
     if name not in _img:
-        _img[name] = imread(os.path.join(CH, name + '.png')).astype(np.float32)
+        hd = os.path.join(CH, 'hd', name + '.png')
+        _img[name] = imread(hd if os.path.exists(hd) else os.path.join(CH, name + '.png')).astype(np.float32)
     return _img[name]
 
 
@@ -82,22 +84,49 @@ class Morph:
         return wa * (1 - k) + wb * k
 
 
-def secondary(rgba, t, breathe=0.004, sway=3.0, wind=0.0, seed=0, axis=0.5, hair_from=0.25):
-    """Breathing (slow vertical scale from the base) + hair/cloth sway that grows toward the
-    outline and the lower hair; returned image is the same size."""
+_edge = {}
+
+
+def _edge_of(a):
+    """Outline weight of a figure (1 near the silhouette), cached per alpha shape/content."""
+    key = (a.shape, float(a[::17, ::17].sum()))
+    if key not in _edge:
+        s = 4
+        small = cv2.resize((a > 0.5).astype(np.uint8), (a.shape[1] // s, a.shape[0] // s), interpolation=cv2.INTER_AREA)
+        e = 1 - gblur(cv2.erode(small, np.ones((9, 9), np.uint8)).astype(np.float32), 3)
+        _edge[key] = cv2.resize(e, (a.shape[1], a.shape[0]), interpolation=cv2.INTER_LINEAR)
+    return _edge[key]
+
+
+def secondary(rgba, t, breathe=0.004, sway=3.0, wind=0.0, seed=0, axis=0.5, hair_from=0.25,
+              yaw=0.0, pitch=0.0, roll=0.0, face=None):
+    """Living motion on every frame (no held drawings): breathing (scale from the base), hair and
+    cloth sway growing toward the outline and the lower hair, and a puppet head move: yaw/pitch
+    shift the face features more than the outline (parallax), roll turns about the neck."""
     h, w = rgba.shape[:2]
-    tt = on_twos(t)
+    tt = t
     ys, xs = np.mgrid[0:h, 0:w].astype(np.float32)
     br = 1 + breathe * np.sin(2 * np.pi * tt / 4.2 + seed)
-    sy = h - (h - ys) / br                         # scale about the bottom edge
+    sx, sy = xs.copy(), h - (h - ys) / br                    # scale about the bottom edge
+    if roll:
+        a_ = np.deg2rad(roll)
+        px, py = w * axis, h * 1.0
+        c, s_ = np.cos(a_), np.sin(a_)
+        X, Y = sx - px, sy - py
+        sx, sy = px + c * X + s_ * Y, py - s_ * X + c * Y
+    if (yaw or pitch) and face is not None:
+        fx, fy, fr = (float(v) for v in face)
+        wf = np.exp(-((xs - fx) ** 2 + (ys - fy) ** 2) / (2 * (0.85 * fr) ** 2))
+        sx = sx - yaw * fr * 0.06 * wf
+        sy = sy - pitch * fr * 0.05 * wf
     a = rgba[:, :, 3]
-    edge = 1 - gblur(cv2.erode((a > 0.5).astype(np.uint8), np.ones((31, 31), np.uint8)).astype(np.float32), 12)
+    edge = _edge_of(a)
     vy = np.clip((ys / h - hair_from) / (1 - hair_from), 0, 1)
     wgt = (0.35 + 0.65 * edge) * vy
     ph = 2 * np.pi * (0.23 * tt) - ys / h * 3.0 + seed
     dx = (sway * np.sin(ph) + wind * (0.6 + 0.4 * np.sin(ph * 1.7 + 1))) * wgt * (h / 1000.0)
     dy = 0.3 * sway * np.cos(ph * 0.8) * wgt * (h / 1000.0)
-    return cv2.remap(rgba, (xs - dx).astype(np.float32), (sy - dy).astype(np.float32), cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
+    return cv2.remap(rgba, (sx - dx).astype(np.float32), (sy - dy).astype(np.float32), cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT)
 
 
 class LightBody:
