@@ -195,14 +195,14 @@ class C04(Shot):
         p = lerp_pose(p, c, smoother(t, 17.8, 19.8))
         # the gate: push into the hero window's light
         d = pose(C04.HP - np.array([0.0, 0.0, 0.22]), C04.HP + np.array([0, 0, 5.0]), 1350)
-        return lerp_pose(p, d, ease_in(t, 20.55, 21.5, 2))
+        return lerp_pose(p, d, ease_in(t, 20.55, 21.46, 2))
 
     def render(self, t):
         p = self.pose(t)
         cam = cam_of(p, t, amp=0.6)
         fr = Frame(cam)
         u = ease_out(t, 14.3, 15.7, 3)
-        gate = ease_in(t, 20.7, 21.5, 2)
+        gate = ease_in(t, 20.7, 21.46, 2)
         dim = 1 - 0.7 * gate
         fr.points(G * u, CITY_COL, GI * 1.6 * (0.6 + 0.4 * u) * dim)
         ledge_line(fr, inten=0.4 * smooth(t, 14.3, 14.8) * dim, x=0.2 + 60 * ease_out(t, 14.3, 15.2, 3))
@@ -333,11 +333,11 @@ class C06(Shot):
         # the constellation in a mind with no sky
         if t > 25.9:
             for i, c in enumerate(C7):
-                hero(fr, c, WARM, 0.8 * smooth(t, 25.9 + 0.05 * i, 26.3 + 0.05 * i) * (1 - 0.6 * smooth(t, 28.2, 28.9)), 0.45)
+                hero(fr, c, WARM, 0.8 * smooth(t, 25.9 + 0.05 * i, 26.3 + 0.05 * i) * (1 - smooth(t, 28.2, 28.85)), 0.45)
             for i in range(len(C7) - 1):
                 k = smooth(t, 26.1 + 0.18 * i, 26.4 + 0.18 * i)
                 if k > 0:
-                    fr.segments([C7[i]], [C7[i] + (C7[i + 1] - C7[i]) * k], WARM * 0.8, 0.9 * (1 - 0.7 * smooth(t, 28.2, 28.9)), width=1.4)
+                    fr.segments([C7[i]], [C7[i] + (C7[i + 1] - C7[i]) * k], WARM * 0.8, 0.9 * (1 - smooth(t, 28.2, 28.85)), width=1.4)
         cards = []
         if 26.5 < t < 28.9:
             kin = smooth(t, 26.7, 27.5)
@@ -453,7 +453,7 @@ class C08(Shot):
         heat = smooth(t, 31.1, 31.6) * (1 - smooth(t, 31.8, 32.8))
         pl = pulse(t, self.bt, 0.22)
         alive = np.clip((self.off - t) / 0.15, 0, 1)
-        I = GI * (3.2 + 2.5 * heat) * (1 - 0.35 * smooth(t, 32.2, 32.8)) * (1 + 1.2 * pl * smooth(t, 32.5, 33.0)) * alive
+        I = GI * (1.6 + 1.6 * smooth(t, 28.9, 30.0) + 2.5 * heat) * (1 - 0.35 * smooth(t, 32.2, 32.8)) * (1 + 1.2 * pl * smooth(t, 32.5, 33.0)) * alive
         fr.points(G, CITY_COL, I)
         R, ph = roads()
         tm = smooth(t, 29.8, 30.4) * (1 - smooth(t, 32.0, 32.8))
@@ -521,7 +521,7 @@ class C10(Shot):
         p = lerp_pose(p, K5, smoother(t, 38.8, 40.6))
         p = lerp_pose(p, pose(K5[0] + np.array([0.02, 0.0, 0.18]), K5[1], 1500), smooth(t, 40.6, 42.7))
         gate = pose(self.palm + np.array([0, 0.06, -0.24]), self.palm + np.array([0, 0.06, 5.0]), 1500)
-        return lerp_pose(p, gate, ease_in(t, 42.75, 43.5, 2))
+        return lerp_pose(p, gate, ease_in(t, 42.75, 43.46, 2))
 
     def render(self, t):
         p = self.pose(t)
@@ -548,7 +548,7 @@ class C10(Shot):
                 q = (1 - ee) ** 2 * self.FIRE + 2 * (1 - ee) * ee * mid + ee * ee * palm
                 fr.points(q[None], WARM, (1.6 if j == 0 else 0.3 * (1 - j / 12)), min_r=0.6)
         flame = smooth(t, 42.55, 42.9)
-        gate = ease_in(t, 42.75, 43.5, 2)
+        gate = ease_in(t, 42.75, 43.46, 2)
         if flame > 0:
             hero(fr, palm + np.array([0, 0.06, 0]), np.array([1.0, 0.62, 0.25]), 1.3 * flame * fl + 0.6 * gate, 1.4 + 5.0 * gate)
         k = smooth(t, 39.9, 41.0)
@@ -623,7 +623,7 @@ class C12(Shot):
         cam = cam_of(p, t, amp=0.6)
         fr = Frame(cam, focus=22.0, aperture=0.02 * (1 - smooth(t, 45.0, 47.0)))
         dz = np.clip((self.A[:, 2] - 4) / 60, 0, 1)
-        fade_f = 1 - 0.75 * smooth(t, 47.0, 49.0)
+        fade_f = smooth(t, 43.5, 44.3) * (1 - 0.75 * smooth(t, 47.0, 49.0)) * (1 - smooth(t, 51.0, 52.3))
         fr.segments(self.A, self.B, STAR * 0.5, 0.10 * (1 - 0.7 * dz) * fade_f, width=1.0)
         fl = flick(t)
         gate = 1 - ease_out(t, 43.5, 44.3, 2)
@@ -732,7 +732,7 @@ class C14(Shot):
                 for b in g[::2]:
                     A_.append((a, b, -600)); B_.append((a, b, 600))
                     A_.append((-600, a, b)); B_.append((600, a, b))
-            fr.segments(np.array(A_), np.array(B_), STAR * 0.4, 0.06 * lk, width=1.0)
+            fr.segments(np.array(A_), np.array(B_), STAR * 0.4, 0.06 * lk * (1 - smooth(t, 58.8, 59.55)), width=1.0)
         out = smooth(t, 56.05, 56.9)
         halo(fr, RC, RR, t, col=GOLD, inten=0.3 * (1 - out) + 0.25 * smooth(t, 52.5, 53.2) * (1 - out), normal=D13)
         # the singer
@@ -773,7 +773,7 @@ class C14(Shot):
                 fr.points(RC + self.S * min(r0, 9.0), WARM, 0.06 * e * (1 if r0 < 9.0 else np.exp(-(r0 - 9.0) * 3)))
             hit = np.exp(-((t - self.hit) / 0.18) ** 2)
             C = ring_points(RC, 9.0, 360, D13)
-            fr.polyline(np.vstack([C, C[:1]]), STAR, (0.18 * smooth(t, 57.0, 58.0) + 0.9 * hit) * e, width=1.4)
+            fr.polyline(np.vstack([C, C[:1]]), STAR, (0.18 * smooth(t, 57.0, 58.0) * (1 - smooth(t, 59.0, 59.55)) + 0.9 * hit) * e, width=1.4)
         bg = sky(cam, haze=0.5, glow=0.4, warm=0.7) * (1 - 0.5 * smooth(t, 56.2, 58.0))
         return compose2(fr, t, bg=bg, cards=cards, exposure=1.05, flare_k=0.3 * np.exp(-((t - self.hit) / 0.15) ** 2) if e > 0 else 0.0)
 
@@ -922,13 +922,16 @@ class C16(Shot):
             F = self.fog * 0.12 + rng.normal(0, 0.02, self.fog.shape)
             fog = self.local(F, pc, sc * 0.35)
             fr.points(fog, STAR * 0.6 + WARM * 0.4, 0.02 * k3 * (1 - smooth(t, 63.0, 63.8)))
-        draw_stars(fr, t, 0.5)
+        k = 1 - smooth(t, 59.6, 61.0)
+        Qs = np.round(STARS['P'] / 60.0) * 60.0
+        Ps = STARS['P'] + (Qs - STARS['P']) * k
+        fr.points(Ps, STARS['col'], (twinkle(STARS, t) * 0.9 * (1 - 0.3 * k) + 0.25 * k) * (0.5 + 0.5 * k))
         cards = []
         if t > 62.9:
             r = draw_b16(fr, cam, t, fog)
             if r is not None:
                 cards.append(r[:2])
-        bg = sky(cam, haze=0.4, glow=0.3) * 0.6
+        bg = sky(cam, haze=0.5, glow=0.4, warm=0.7) * 0.5
         return compose2(fr, t, bg=bg, cards=cards, exposure=1.05)
 
 
