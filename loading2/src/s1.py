@@ -1023,4 +1023,4 @@ class C18(Shot):
         return compose2(fr, t, bg=bg, cards=cards, exposure=1.05)
 
 
-SHOTS = {k: v for k, v in globals().items() if k[:1] == 'C' and k[1:].isdigit()}
+SHOTS = {k: v for k, v in globals().items() if k[:1] == 'C' and k[1:].isdigit() and isinstance(v, type) and issubclass(v, Shot)}

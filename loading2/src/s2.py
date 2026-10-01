@@ -127,9 +127,9 @@ class C19(Shot):
             fr.segments(self.fA, self.fB, STAR * 0.5, 0.10 * (1 - 0.6 * dz) * fk * dim, width=1.0)
         blink = np.exp(-((t - 79.55) / 0.12) ** 2) + smooth(t, 79.85, 80.1)
         if blink > 0.01:
-            hero(fr, R20, RED, 0.9 * blink + 0.7 * gate, 0.5 + 6.0 * gate)
-        bg = sky(cam, haze=1.0 - 0.6 * fk, glow=1.0 - 0.7 * fk, warm=0.5) * (1 - 0.6 * gate)
-        return compose2(fr, t, bg=bg, exposure=1.05)
+            hero(fr, R20, RED, 0.9 * blink + 1.2 * gate, 0.5 + 12.0 * gate)
+        bg = sky(cam, haze=1.0 - 0.6 * fk, glow=1.0 - 0.7 * fk, warm=0.5) * (1 - 0.6 * gate) + gradient_bg((0.02, 0.006, 0.01), (0.008, 0.004, 0.012)) * gate
+        return compose2(fr, t, bg=bg, exposure=1.05 + 0.4 * gate)
 
 
 # ---------------------------------------------------------------------------------- C21/C22
@@ -204,12 +204,12 @@ class C21(Shot):
                 g = np.exp(-(t - self.bt[j]) / 0.25)
                 fr.points(P[j][None], RED, 0.6 * g * ring, min_r=1.5)
         pl = pulse(t, self.bt, 0.2)
-        hero(fr, Z21 + np.array([0, 0, -0.003]), RED, 0.9 * gate + (0.15 + 0.35 * pl) * ring, 0.3 + 6.2 * gate)
+        hero(fr, Z21 + np.array([0, 0, -0.003]), RED, 1.2 * gate + (0.15 + 0.35 * pl) * ring, 0.3 + 12.2 * gate)
         out = smooth(t, 84.2, 85.2)
         cards = []
         if out < 1:
             im = head('A_x1', t, sing=True, blink_seed=21, blink_extra=(82.9,), yaw=0.2 * np.sin(0.5 * t), roll=0.5 * np.sin(0.3 * t), sway=1.0)
-            r = self.M.render(fr, im, Z21, self.hc, 1 - out, anchor=self.anchor, fade=(0.08, 0.08, 0.0, 0.3), ambient=0.85,
+            r = self.M.render(fr, im, Z21, self.hc, 1 - out, anchor=self.anchor, fade=(0.08, 0.08, 0.0, 0.3), ambient=0.85, opacity=smooth(t, 80.5, 81.2),
                               lights=[(tuple(Z21 + np.array([0, 0, -0.05])), RED, 0.5 * ring, 0.06)], rim=(TEAL, 0.4, (0, -1)))
             if r is not None:
                 cards.append(r[:2])
@@ -231,7 +231,7 @@ class C21(Shot):
                     fr.points(((a_ + b_) / 2)[None], WARM, 0.8 * g, min_r=1.0)
         draw_stars(fr, t, 0.55 * smooth(t, 83.5, 86.0), hold=1.0)
         bg = space_bg(0.5 * smooth(t, 84.0, 86.0)) + gradient_bg((0.02, 0.006, 0.01), (0.008, 0.004, 0.012)) * gate
-        return compose2(fr, t, bg=bg, cards=cards, exposure=1.05)
+        return compose2(fr, t, bg=bg, cards=cards, exposure=1.05 + 0.4 * gate)
 
 
 # ---------------------------------------------------------------------------------- C23/C24/C25
@@ -397,7 +397,7 @@ class C26(Shot):
         rel = self.flat - TOP
         P = page_center(t) + rel @ R.T
         dark = smooth(t, 102.4, 105.5)
-        fr.points(P, CITY_COL, GI * 3.0 * (1 - 0.5 * smooth(t, 106.6, 108.0)))
+        fr.points(P, CITY_COL, GI * (4.0 - 1.0 * smooth(t, 98.5, 100.0)) * (1 - 0.5 * smooth(t, 106.6, 108.0)))
         draw_stars(fr, t, 0.6 * (1 - 0.7 * dark), hold=1.0)
         cards = []
         kin = smooth(t, 98.6, 99.6)
@@ -466,14 +466,14 @@ class C29(Shot):
         fr = Frame(cam)
         R = page_R(t)
         P = page_center(t) + (self.flat - TOP) @ R.T
-        fr.points(P, CITY_COL, GI * 1.1 * (1 - smooth(t, 108.4, 111.0)))
+        fr.points(P, CITY_COL, GI * 1.5 * (1 - smooth(t, 108.4, 111.0)))
         for dx, c in ((-0.35, TEAL), (0.35, AMBER)):
             hero(fr, lc + np.array([dx, 0.1 * np.sin(t * 2 + dx * 9), 0]), c, 0.6, 0.5)
         # lattice layers, each flashing as the lights pass through it
         for y in self.ys:
             Q = np.stack([self.grid[:, 0] + lc[0], np.full(len(self.grid), y), self.grid[:, 1] + lc[2]], 1)
             pas = np.exp(-((lc[1] - y) / 1.5) ** 2)
-            near = np.exp(-np.clip(y - lc[1], 0, None) / 25.0)
+            near = np.exp(-np.clip(y - lc[1], 0, None) / 25.0) * smooth(t, 108.4, 109.3)
             fr.points(Q, STAR * 0.6 + TEAL * 0.25, (0.5 + 2.0 * pas) * near, min_r=1.0)
             gl = np.arange(-24, 24.01, 4.8)
             A_ = [(lc[0] + a, y, lc[2] - 24) for a in gl] + [(lc[0] - 24, y, lc[2] + a) for a in gl]
@@ -551,4 +551,4 @@ class C31(Shot):
         return compose2(fr, t, bg=bg, exposure=1.05, white=white, fade=fade)
 
 
-SHOTS = {k: v for k, v in globals().items() if k[:1] == 'C' and k[1:].isdigit()}
+SHOTS = {k: v for k, v in globals().items() if k[:1] == 'C' and k[1:].isdigit() and isinstance(v, type) and issubclass(v, Shot)}

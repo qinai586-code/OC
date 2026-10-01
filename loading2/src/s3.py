@@ -630,4 +630,4 @@ class C49(Shot):
         return compose2(fr, t, bg=bg, exposure=1.05, fade=1 - smooth(t, 211.6, 213.35))
 
 
-SHOTS = {k: v for k, v in globals().items() if k[:1] == 'C' and k[1:].isdigit()}
+SHOTS = {k: v for k, v in globals().items() if k[:1] == 'C' and k[1:].isdigit() and isinstance(v, type) and issubclass(v, Shot)}
