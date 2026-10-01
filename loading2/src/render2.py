@@ -23,6 +23,7 @@ AUDIO = '/root/.claude/uploads/c9b74a57-085e-5ad1-8a57-5167fd743993/4ccd5715-Loa
 SONG_LEN = 213.40
 
 MODULES = ['s1', 's2', 's3']
+SKIP = '--skip' in sys.argv
 
 
 def registry():
@@ -73,6 +74,8 @@ def render(names, step=1, jobs=4, quality=94, only=None):
         if only is not None:
             fr = [f for f in fr if only[0] <= f / FPS < only[1]]
         fr = fr[::step]
+        if SKIP:
+            fr = [f for f in fr if not os.path.exists(os.path.join(FRAMES, n, f'{f:05d}.jpg'))]
         t = time.time()
         if jobs <= 1:
             for f in fr:
@@ -168,6 +171,7 @@ if __name__ == '__main__':
     ap.add_argument('--clip', action='store_true')
     ap.add_argument('--assemble', action='store_true')
     ap.add_argument('--norender', action='store_true')
+    ap.add_argument('--skip', action='store_true')
     ap.add_argument('--only', type=float, nargs=2, default=None)
     a = ap.parse_args()
     names = a.shots
