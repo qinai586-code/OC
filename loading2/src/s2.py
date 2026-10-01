@@ -84,7 +84,7 @@ class C19(Shot):
         cam = cam_of(p, t, amp=AMP)
         fr = Frame(cam)
         gate = ease_in(t, 79.9, 80.5, 2.2)
-        dim = 1 - 0.8 * gate
+        dim = 1 - gate
         home = 1 - 0.7 * smooth(t, 77.0, 79.0)
         fr.points(G, CITY_COL, GI * 1.5 * home * dim)
         ledge_line(fr, inten=0.35 * home * dim)
@@ -128,7 +128,7 @@ class C19(Shot):
         blink = np.exp(-((t - 79.55) / 0.12) ** 2) + smooth(t, 79.85, 80.1)
         if blink > 0.01:
             hero(fr, R20, RED, 0.9 * blink + 1.2 * gate, 0.5 + 12.0 * gate)
-        bg = sky(cam, haze=1.0 - 0.6 * fk, glow=1.0 - 0.7 * fk, warm=0.5) * (1 - 0.6 * gate) + gradient_bg((0.02, 0.006, 0.01), (0.008, 0.004, 0.012)) * gate
+        bg = sky(cam, haze=1.0 - 0.6 * fk, glow=1.0 - 0.7 * fk, warm=0.5) * (1 - gate) + gradient_bg((0.02, 0.006, 0.01), (0.008, 0.004, 0.012)) * gate
         return compose2(fr, t, bg=bg, exposure=1.05 + 0.4 * gate)
 
 
@@ -490,7 +490,7 @@ class C29(Shot):
         D = self.dome * 400 + np.array([lc[0], WALL_Y + 400, lc[2]])
         fr.points(D, STAR * 0.5 + WARM * 0.5, 0.3 * wk + 1.5 * smooth(t, 114.8, 115.4))
         white = smooth(t, 115.1, 115.4) * (1 - 0.0 * smooth(t, 115.4, 115.7))
-        bg = space_bg(0.4)
+        bg = space_bg(0.5) * (0.4 + 0.6 * smooth(t, 108.4, 110.0))
         return compose2(fr, t, bg=bg, exposure=1.05 + 1.5 * smooth(t, 114.8, 115.4), white=white)
 
 
