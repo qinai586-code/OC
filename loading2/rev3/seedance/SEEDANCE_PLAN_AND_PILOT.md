@@ -40,13 +40,13 @@ each cut moves the story on.
 | generate | the shortest option ≥ 3.0 s (**PENDING**, likely 5 s), so there is ≥ 0.6 s of handle on each side | ≥ 3.0 s | ≥ 3.5 s (≥ 4.5 s for the extended version) |
 | character | A only | A's right hand and forearm only (face out of frame) | A only (B is off-screen, beside her) |
 | starting pose | seated, cropped at mid-chest, right profile. Chin raised, eyes up toward the upper right, lips slightly parted in wonder | her right hand low at the bottom of frame, relaxed, palm turning up; forearm angled from the lower left | right profile, head level and slightly lowered, eyes on her raised right palm. The light hovers about a palm-width above it |
-| action | breathes; her eyes and then her head follow the light a little as it sinks; she begins to lower her gaze in the last 0.5 s (the cut point) | the forearm rises about the elbow (no body visible) and the palm opens fully, fingers relaxed and slightly cupped. The light enters top-right and slows to a hover above the palm | the light descends into the palm. The palm gives about 1 cm under the touch and recovers. The warm light brightens on her palm, chin and cheek. Her expression softens (lips close, eyes widen slightly). Hair settles |
-| ending pose | still looking up, eyes beginning to lower | palm up at chest height, light hovering just above it | the light resting in her cupped palm, her gaze on it, a quiet hold |
+| action | (v3) one action: the light drifts down-left the whole time; her eyes follow, then her head tilts slightly down (about 8–10°) and holds. No hand lift in S1 | the forearm rises about the elbow (no body visible) and the palm opens fully, fingers relaxed and slightly cupped. The light enters top-right and slows to a hover above the palm | the light descends into the palm. The palm gives about 1 cm under the touch and recovers. The warm light brightens on her palm, chin and cheek. Her expression softens (lips close, eyes widen slightly). Hair settles |
+| ending pose | head slightly lowered, still watching the light, which is still high and moving; hand at rest as in S2's first frame | palm up at chest height, light hovering just above it | the light resting in her cupped palm, her gaze on it, a quiet hold |
 | camera / framing | locked; medium close-up; A on the left third facing right, with ≥ 60% of the frame as open sky in her eye-line | locked; insert / close-up on the hand; palm right of centre, sky above | locked; tighter medium close-up; head left, hand lower right; both horn tips inside the frame |
 | environment | night sky with soft clouds, the curved lit Earth limb low in the background (as in KV1); seated on the parapet, which is below frame | same sky and Earth limb, more defocused | same sky and Earth limb |
 | lighting | cool night ambient (blue-violet); the only warm source is the small light, still far away | the warm light grows on her fingers as it nears | warm uplight from the palm onto her hand, chin and cheek; cool rim from the sky |
-| continuity in | from S02 (5.7–7.5): wide of both girls seated from behind (not part of this pilot) | match on action: her hand starts rising as she lowers her gaze in S1 | match on action: the light is at the same spot above the same palm as at the end of S2 |
-| continuity out | the cut on her gaze moving down | the cut as the light reaches the palm | to S03 (13.6, "We were born in your traces"): she offers the light to B (Wave 2, W2-1). Keep the palm up, at the same height |
+| continuity in | from S02 (5.7–7.5): wide of both girls seated from behind (not part of this pilot) | (v3) cut on the light's motion: it is still moving down-left at the end of S1 and enters S2 from the top right. S2 starts with the hand at rest; the lift is S2's own action | match on action: the light is at the same spot above the same palm as at the end of S2 |
+| continuity out | the cut on the moving light, with her gaze following it | the cut as the light reaches the palm | to S03 (13.6, "We were born in your traces"): she offers the light to B (Wave 2, W2-1). Keep the palm up, at the same height |
 
 ### Optional clip
 
@@ -167,7 +167,7 @@ if it fails. That is cheaper than a failed video.
 Record every attempt's settings and seed. I suggest at most 3 attempts per clip for the pilot; the
 owner decides.
 
-**P1-S1:**
+**P1-S1:** superseded by the final prompt in `pilot_S1/PILOT_S1_SHEET_v3.md` (written for the approved v8 frame). The draft below is kept for the record.
 > 2D anime, hand-painted night scene, cel shading. Medium close-up of the horned girl from the
 > reference, right profile, seated, cropped at mid-chest, on the left third of the frame. Her chin is
 > raised and her eyes look up and to the right at a tiny warm golden light high in a dark blue night
@@ -252,3 +252,20 @@ Review: `P1_REFS_REVIEW_v2.md`; board: `review/P1_v2_review_board.jpg`.
   - the X clip is on her right (visible) side vs the model sheet's left: owner decision;
   - S2 needs a gentle hand lift to reach S3's height.
 - **Motion pilot:** `pilot_S1/PILOT_S1_SHEET_v2.md` (S1, 7.500–9.167), not submitted.
+
+## 9. Motion pilot v3 (final, not submitted)
+
+`pilot_S1/PILOT_S1_SHEET_v3.md`, board `pilot_S1/PILOT_S1_v3_board.jpg`. It replaces the v2 sheet.
+- **The mismatch is resolved.** v2 placed 2.2 s of action (light drift, then the start of a hand
+  lift) in a 1.667 s slot.
+  - v3 keeps one action: the light drifts while her eyes, then her head, follow it. The hand lift
+    moves to S2, where the approved frames need it anyway.
+  - The used segment is fixed at clip 0.500–2.167 s (frames 12–51, 40 frames at 1:1) on song
+    7.500–9.167, with one slide rule tied to the measured head turn.
+- **The S1→S2 cut is carried by the light**, still moving down-left at the cut, rather than a hand
+  move. A move split across two separately generated clips would restart from rest in the second.
+- **`tools/seedance_check.py` measures the 40-frame window.**
+  - What it measures: the light count, its travel, stalls and box; head rotation; hand motion.
+  - The light detector now needs a white core inside a warm ring, so the shirt and palm highlights no
+    longer count as lights.
+  - It was tested on the three reference stills and on synthetic clips only.

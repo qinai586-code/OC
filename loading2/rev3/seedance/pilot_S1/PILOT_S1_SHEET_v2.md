@@ -1,4 +1,6 @@
-# Motion pilot P1-S1 (v2): ready for the owner to generate. Not submitted; no credits used.
+# Motion pilot P1-S1 (v2): superseded by `PILOT_S1_SHEET_v3.md`
+
+**Do not generate from this sheet.** Its action ran 2.2 s for a 1.667 s slot. v3 resolves that.
 
 This replaces `PILOT_S1_SHEET.md`, which used the earlier S1 candidate.
 
