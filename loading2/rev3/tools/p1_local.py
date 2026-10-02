@@ -271,6 +271,11 @@ def build_s2(prof3):
     lifted = warp(a_s, ax + w_hand * wx, ay + w_hand * wy, cv2.BORDER_REPLICATE)
     vacated = cv2.dilate(((a_s > 0.5) & (lifted < 0.5)).astype(np.uint8),
                          cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (9, 9))) > 0
+    # the whole original hand gets a clean background under it: during the lift the gaps between thumb and
+    # fingers pass over where the hand was drawn, and the old skin edge must not show through them
+    under_hand = cv2.dilate(((a_s > 0.5) & (xx > 600)).astype(np.uint8),
+                            cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (11, 11))) > 0
+    vacated = vacated | under_hand
     bg = limb_fill(img, vacated)
     cv2.imwrite(os.path.join(WORK, 'S2_plate_check.png'), bg.astype(np.uint8))
     vy, vx = np.nonzero(vacated)

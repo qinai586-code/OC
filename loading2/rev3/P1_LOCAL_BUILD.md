@@ -5,6 +5,15 @@ on the locked music, one continuous encode. Strip: `tests/P1_light_catch_strip.j
 `tools/p1_local.py`. S1 comes from `tools/p1_s1_clip.py`; `P1_S1_SOURCE=local` switches back to the
 local 2D nod.
 
+## S2 hand leak fixed (2026-10-02, after approval)
+
+- **What you reported:** a sliver of the original hand showed through the thumb–index gap while the hand lifted (output frames 52–64).
+- **Cause:** the background behind the hand was filled only where the hand had moved away at the top of the lift. While the hand moved, the gaps between the fingers showed the original thumb edge.
+- **Fix:** `tools/p1_local.py` (`build_s2`) now also fills under the whole original hand (its matte right of x = 600, grown 5 px) before the moving hand goes on top.
+- **Result:** the approved file is rebuilt: sha256/16 **cd7a70a62d7f869a** (was f91e896ce1ebc75f).
+  - S1 differs only by re-encoding (max mean frame difference 0.56/255), and S3 is unchanged.
+  - Only S2's background under the hand changed.
+
 ## S1 from the owner's Seedance 2.5 takes (2026-10-02)
 
 | take | file (sha256/16) | measured | visual | verdict |

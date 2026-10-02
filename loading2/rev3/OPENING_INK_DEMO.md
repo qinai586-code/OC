@@ -8,7 +8,9 @@
 
 - **Generation:** none.
 - **0–7.5:** code compositing over KV1, with procedural paper, ink and pen.
-- **7.500–13.583:** the approved light catch, decoded unchanged. It matches the approved file to within encoding (mean difference 1.9/255); the approved file is untouched (sha256/16 f91e896ce1ebc75f). The S2 masking leak you reported is still untouched, as asked.
+- **7.500–13.583:** the approved light catch, decoded unchanged. It matches the approved file to within encoding (mean difference 1.9/255); the approved file was untouched for this v2 (sha256/16 f91e896ce1ebc75f). The S2 masking leak you reported was left as asked.
+  - **Later:** the leak is now fixed; see `P1_LOCAL_BUILD.md` (new sha256/16 cd7a70a62d7f869a).
+  - `tests/DEMO_0-43_v3_720p.mp4` uses the fixed file. This v2 file still contains the leak.
 - **v1:** `tests/OPENING_INK_demo_720p.mp4` stays in git history for comparison.
 
 ## What changed from v1
