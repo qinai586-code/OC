@@ -48,4 +48,32 @@
 
 ## Review of the actual render
 
-(filled in after the render; see below)
+**Measured** (decoded from the mp4):
+
+| check | result |
+|---|---|
+| container | CONTAINER |
+| approved light catch (frames 180–325) vs `P1_light_catch_720p.mp4` | APPROVED |
+| frame-to-frame change | JUMPS |
+| match cuts | P1b's last point and M1's candle sit at the same pixel (about 400, 290). D6's fire is at (567, 443) and KV5's painted flame in E1 at (566, 445) |
+
+**Fixed after the first full render:**
+- V1b overshot: four frames of blank, too-bright paper came before the cut. The sheet now opens from the light, shows the whole letter already lit as in P1a, and tilts back as it arrives, so the cut dives into the first words.
+- D6's camera move was timed to 43.21 but the shot cuts at 42.75; the move now ends at the cut.
+- The match target was the KV5 glow centre; it is now the painted flame, measured in the frame.
+
+**My judgment from frames (please confirm on playback):**
+- **The letter (P1a/P1b)** now reads: you can see words, the full stop, the cracks and the tear. "Translated" reads as a change of script, and "compressed" as a fold into a point.
+- **The town** reads as a paper pop-up rising from and folding into the page. The bare hill is plain on purpose ("still").
+- **The constellations** read as outlines of the memories. They are drawn warm, in the motif's colour, not as white stars.
+
+**Weak, known:**
+- The five placeholder memory drawings: artwork is requested.
+- The girls' head lift in C1 is a small local deformation (from behind).
+- The pop-up hill's cut edge is visible at the right of D4 and D6.
+
+**Needs your playback:**
+- The pace of P1a, the glide and the tear on "fragments".
+- Whether the cut into the candle (20.458) reads as one light.
+- D1's pop-up timing on "depth".
+- The E1 cut on "hill" (42.75) against holding the hill to 43.2.

@@ -931,21 +931,25 @@ class Verse:
         lit = relight(src, a, pal, 420, 1.0)
         img, M = place(img, lit, a, 400, 380, 1400)
         p = M @ np.array([pal[0], pal[1] - 40, 1.0])
-        u = ease(14.97, 15.85, t)
+        u = ease(14.97, 15.875, t)
         if u <= 0:
             return glow(img, p, 0.45, 1.4)
         cam = Cam((0, 0, -3.0), (0, 0, 0))
-        # the sheet: edge-on, then opening toward us and coming closer
-        ang = (1 - smooth(u)) * np.pi / 2 * 0.95
-        zc = 0.0 - 2.6 * u ** 2.2
-        sz = 0.18 + 1.6 * u ** 1.8
-        ctr = np.array([(p[0] - 640) / F * 3.0 * (1 - u ** 2), -(p[1] - 360) / F * 3.0 * (1 - u ** 2) + 0.25 * u, zc])
+        # the sheet: edge-on, opening to face us as it comes closer, then tilting back to lie as P1a sees it; it is
+        # already the lit letter of P1a's first frame, so the cut is a continuation
+        pw, ph = self.page_wh
+        open_ = smooth(u / 0.6)
+        back = smooth((u - 0.6) / 0.4)
+        ang = -(1 - open_) * np.radians(85) + back * np.radians(38)                     # top edge recedes at the end, as in P1a
+        zc = -1.55 * u ** 1.6
+        sz = 0.16 + 0.80 * u ** 1.4
+        ctr = np.array([(p[0] - 640) / F * 3.0 * (1 - u ** 1.5), -(p[1] - 360) / F * 3.0 * (1 - u ** 1.5) + 0.10 * u, zc])
         v = rot_axis(np.array([0, 1.0, 0]), (1, 0, 0), ang)
-        corners = card_corners(ctr, (1, 0, 0), v, sz * 1.5, sz)
-        tex = np.dstack([cv2.resize(self.page[:, 240:1320], (900, 600), interpolation=cv2.INTER_AREA), np.ones((600, 900), np.float32)])
-        tex[..., :3] = tex[..., :3] * (0.55 + 0.45 * u) + np.array([0.25, 0.42, 0.55]) * (1 - u)
+        corners = card_corners(ctr, (1, 0, 0), v, sz * pw / ph, sz)
+        lit = self.lit_page(15.9)
+        tex = np.dstack([lit * (0.6 + 0.4 * u) + np.array([0.25, 0.42, 0.55], np.float32) * (1 - u) ** 2, np.ones((ph, pw), np.float32)])
         img, _ = put_card(img, cam, corners, tex)
-        return glow(img, cam.project(ctr)[0][0], 0.6 + 0.6 * u, 1.2 * (1 - 0.6 * u))
+        return glow(img, cam.project(ctr)[0][0], 0.6 + 0.4 * u, 1.2 * (1 - 0.7 * u))
 
     # -- the letter, P1a/P1b. Page plane y = 0, x right, z away from camera; texture top = far edge.
     def tex2world(self, q):
@@ -1427,7 +1431,7 @@ class Verse:
             # aim the end of the move so that the fire sits where the flame in A's palm is in E1 (KV5)
             p1 = cam0.p + np.array([0.0, -0.04, 0.35])
             tg = np.array([0.10, 0.36, 1.2])
-            k5 = np.array([1361 * OI.S, (1190 - 160) * OI.S])
+            k5 = np.array([566.0, 445.0])                                                # KV5's painted flame (measured in E1)
             for _ in range(12):
                 c_ = Cam(p1, tg)
                 q, z = c_.project(self.crest + np.array([0, 0.012, 0]))
