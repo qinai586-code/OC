@@ -1,0 +1,1444 @@
+{
+ "frames": [
+  {
+   "frame": 180,
+   "t": 7.5,
+   "drawing": "A1",
+   "head_deg": 0.0,
+   "forearm_deg": 0.0,
+   "light_out": [
+    1767.1,
+    51.0
+   ],
+   "light_power": 0.566
+  },
+  {
+   "frame": 181,
+   "t": 7.542,
+   "drawing": "A1",
+   "head_deg": 0.0,
+   "forearm_deg": 0.0,
+   "light_out": [
+    1734.3,
+    58.1
+   ],
+   "light_power": 0.571
+  },
+  {
+   "frame": 182,
+   "t": 7.583,
+   "drawing": "A1",
+   "head_deg": 0.0,
+   "forearm_deg": 0.0,
+   "light_out": [
+    1702.3,
+    65.8
+   ],
+   "light_power": 0.572
+  },
+  {
+   "frame": 183,
+   "t": 7.625,
+   "drawing": "A1",
+   "head_deg": 0.0,
+   "forearm_deg": 0.0,
+   "light_out": [
+    1671.3,
+    74.0
+   ],
+   "light_power": 0.568
+  },
+  {
+   "frame": 184,
+   "t": 7.667,
+   "drawing": "A1",
+   "head_deg": 0.0,
+   "forearm_deg": 0.0,
+   "light_out": [
+    1641.0,
+    82.6
+   ],
+   "light_power": 0.56
+  },
+  {
+   "frame": 185,
+   "t": 7.708,
+   "drawing": "A1",
+   "head_deg": 0.0,
+   "forearm_deg": 0.0,
+   "light_out": [
+    1611.6,
+    91.7
+   ],
+   "light_power": 0.551
+  },
+  {
+   "frame": 186,
+   "t": 7.75,
+   "drawing": "A1",
+   "head_deg": 0.0,
+   "forearm_deg": 0.0,
+   "light_out": [
+    1582.9,
+    101.1
+   ],
+   "light_power": 0.541
+  },
+  {
+   "frame": 187,
+   "t": 7.792,
+   "drawing": "A1",
+   "head_deg": 0.0,
+   "forearm_deg": 0.0,
+   "light_out": [
+    1555.1,
+    110.9
+   ],
+   "light_power": 0.533
+  },
+  {
+   "frame": 188,
+   "t": 7.833,
+   "drawing": "A1",
+   "head_deg": 0.0,
+   "forearm_deg": 0.0,
+   "light_out": [
+    1528.0,
+    121.0
+   ],
+   "light_power": 0.529
+  },
+  {
+   "frame": 189,
+   "t": 7.875,
+   "drawing": "A1",
+   "head_deg": 0.0,
+   "forearm_deg": 0.0,
+   "light_out": [
+    1501.6,
+    131.4
+   ],
+   "light_power": 0.529
+  },
+  {
+   "frame": 190,
+   "t": 7.917,
+   "drawing": "A1",
+   "head_deg": 0.0,
+   "forearm_deg": 0.0,
+   "light_out": [
+    1475.9,
+    142.0
+   ],
+   "light_power": 0.533
+  },
+  {
+   "frame": 191,
+   "t": 7.958,
+   "drawing": "A1",
+   "head_deg": 0.0,
+   "forearm_deg": 0.0,
+   "light_out": [
+    1451.0,
+    152.9
+   ],
+   "light_power": 0.541
+  },
+  {
+   "frame": 192,
+   "t": 8.0,
+   "drawing": "A1",
+   "head_deg": 0.0,
+   "forearm_deg": 0.0,
+   "light_out": [
+    1426.7,
+    164.0
+   ],
+   "light_power": 0.551
+  },
+  {
+   "frame": 193,
+   "t": 8.042,
+   "drawing": "A1",
+   "head_deg": 0.0,
+   "forearm_deg": 0.0,
+   "light_out": [
+    1403.1,
+    175.2
+   ],
+   "light_power": 0.56
+  },
+  {
+   "frame": 194,
+   "t": 8.083,
+   "drawing": "A1",
+   "head_deg": 0.0,
+   "forearm_deg": 0.0,
+   "light_out": [
+    1380.1,
+    186.6
+   ],
+   "light_power": 0.568
+  },
+  {
+   "frame": 195,
+   "t": 8.125,
+   "drawing": "A1",
+   "head_deg": 0.0,
+   "forearm_deg": 0.0,
+   "light_out": [
+    1357.7,
+    198.2
+   ],
+   "light_power": 0.572
+  },
+  {
+   "frame": 196,
+   "t": 8.167,
+   "drawing": "A1",
+   "head_deg": 0.0,
+   "forearm_deg": 0.0,
+   "light_out": [
+    1336.0,
+    209.8
+   ],
+   "light_power": 0.571
+  },
+  {
+   "frame": 197,
+   "t": 8.208,
+   "drawing": "A1",
+   "head_deg": 0.0,
+   "forearm_deg": 0.0,
+   "light_out": [
+    1314.8,
+    221.5
+   ],
+   "light_power": 0.566
+  },
+  {
+   "frame": 198,
+   "t": 8.25,
+   "drawing": "A1",
+   "head_deg": 0.0,
+   "forearm_deg": 0.0,
+   "light_out": [
+    1294.2,
+    233.3
+   ],
+   "light_power": 0.558
+  },
+  {
+   "frame": 199,
+   "t": 8.292,
+   "drawing": "A1",
+   "head_deg": 0.0,
+   "forearm_deg": 0.0,
+   "light_out": [
+    1274.2,
+    245.1
+   ],
+   "light_power": 0.548
+  },
+  {
+   "frame": 200,
+   "t": 8.333,
+   "drawing": "A1",
+   "head_deg": 0.0,
+   "forearm_deg": 0.0,
+   "light_out": [
+    1254.8,
+    256.9
+   ],
+   "light_power": 0.538
+  },
+  {
+   "frame": 201,
+   "t": 8.375,
+   "drawing": "A1",
+   "head_deg": 0.0,
+   "forearm_deg": 0.0,
+   "light_out": [
+    1235.8,
+    268.8
+   ],
+   "light_power": 0.531
+  },
+  {
+   "frame": 202,
+   "t": 8.417,
+   "drawing": "A1",
+   "head_deg": 0.0,
+   "forearm_deg": 0.0,
+   "light_out": [
+    1217.4,
+    280.7
+   ],
+   "light_power": 0.528
+  },
+  {
+   "frame": 203,
+   "t": 8.458,
+   "drawing": "A1",
+   "head_deg": 0.0,
+   "forearm_deg": 0.0,
+   "light_out": [
+    1199.4,
+    292.5
+   ],
+   "light_power": 0.529
+  },
+  {
+   "frame": 204,
+   "t": 8.5,
+   "drawing": "A1",
+   "head_deg": 0.0,
+   "forearm_deg": 0.0,
+   "light_out": [
+    1182.0,
+    304.4
+   ],
+   "light_power": 0.535
+  },
+  {
+   "frame": 205,
+   "t": 8.542,
+   "drawing": "A1",
+   "head_deg": -0.13,
+   "forearm_deg": 0.0,
+   "light_out": [
+    1165.0,
+    316.2
+   ],
+   "light_power": 0.544
+  },
+  {
+   "frame": 206,
+   "t": 8.583,
+   "drawing": "A1",
+   "head_deg": -0.47,
+   "forearm_deg": 0.0,
+   "light_out": [
+    1148.5,
+    327.9
+   ],
+   "light_power": 0.554
+  },
+  {
+   "frame": 207,
+   "t": 8.625,
+   "drawing": "A1",
+   "head_deg": -0.9,
+   "forearm_deg": 0.0,
+   "light_out": [
+    1132.4,
+    339.6
+   ],
+   "light_power": 0.563
+  },
+  {
+   "frame": 208,
+   "t": 8.667,
+   "drawing": "A1",
+   "head_deg": -1.33,
+   "forearm_deg": 0.0,
+   "light_out": [
+    1116.8,
+    351.2
+   ],
+   "light_power": 0.569
+  },
+  {
+   "frame": 209,
+   "t": 8.708,
+   "drawing": "A1",
+   "head_deg": -1.61,
+   "forearm_deg": 0.0,
+   "light_out": [
+    1104.5,
+    360.5
+   ],
+   "light_power": 0.572
+  },
+  {
+   "frame": 210,
+   "t": 8.75,
+   "drawing": "A1",
+   "head_deg": -1.59,
+   "forearm_deg": 0.0,
+   "light_out": [
+    1089.6,
+    372.0
+   ],
+   "light_power": 0.571
+  },
+  {
+   "frame": 211,
+   "t": 8.792,
+   "drawing": "A1",
+   "head_deg": 1.57,
+   "forearm_deg": 0.0,
+   "light_out": [
+    1075.1,
+    383.4
+   ],
+   "light_power": 0.565
+  },
+  {
+   "frame": 212,
+   "t": 8.833,
+   "drawing": "A1",
+   "head_deg": 6.18,
+   "forearm_deg": 0.0,
+   "light_out": [
+    1061.0,
+    394.7
+   ],
+   "light_power": 0.557
+  },
+  {
+   "frame": 213,
+   "t": 8.875,
+   "drawing": "A3",
+   "head_deg": 9.1,
+   "forearm_deg": 78.0,
+   "light_out": [
+    1047.2,
+    406.0
+   ],
+   "light_power": 0.547
+  },
+  {
+   "frame": 214,
+   "t": 8.917,
+   "drawing": "A3",
+   "head_deg": 3.51,
+   "forearm_deg": 68.92,
+   "light_out": [
+    1033.8,
+    417.1
+   ],
+   "light_power": 0.538
+  },
+  {
+   "frame": 215,
+   "t": 8.958,
+   "drawing": "A3",
+   "head_deg": 2.49,
+   "forearm_deg": 58.6,
+   "light_out": [
+    1020.7,
+    428.2
+   ],
+   "light_power": 0.531
+  },
+  {
+   "frame": 216,
+   "t": 9.0,
+   "drawing": "A3",
+   "head_deg": 1.7,
+   "forearm_deg": 49.37,
+   "light_out": [
+    1008.0,
+    439.1
+   ],
+   "light_power": 0.528
+  },
+  {
+   "frame": 217,
+   "t": 9.042,
+   "drawing": "A3",
+   "head_deg": 1.09,
+   "forearm_deg": 41.16,
+   "light_out": [
+    995.5,
+    449.9
+   ],
+   "light_power": 0.53
+  },
+  {
+   "frame": 218,
+   "t": 9.083,
+   "drawing": "A3",
+   "head_deg": 0.65,
+   "forearm_deg": 33.91,
+   "light_out": [
+    983.4,
+    460.6
+   ],
+   "light_power": 0.536
+  },
+  {
+   "frame": 219,
+   "t": 9.125,
+   "drawing": "A3",
+   "head_deg": 0.34,
+   "forearm_deg": 27.57,
+   "light_out": [
+    971.6,
+    471.3
+   ],
+   "light_power": 0.545
+  },
+  {
+   "frame": 220,
+   "t": 9.167,
+   "drawing": "A3",
+   "head_deg": 0.16,
+   "forearm_deg": 22.08,
+   "light_out": [
+    960.0,
+    481.8
+   ],
+   "light_power": 0.555
+  },
+  {
+   "frame": 221,
+   "t": 9.208,
+   "drawing": "A3",
+   "head_deg": 0.18,
+   "forearm_deg": 17.36,
+   "light_out": [
+    948.8,
+    492.2
+   ],
+   "light_power": 0.564
+  },
+  {
+   "frame": 222,
+   "t": 9.25,
+   "drawing": "A3",
+   "head_deg": 0.32,
+   "forearm_deg": 13.37,
+   "light_out": [
+    937.8,
+    502.5
+   ],
+   "light_power": 0.57
+  },
+  {
+   "frame": 223,
+   "t": 9.292,
+   "drawing": "A3",
+   "head_deg": 0.44,
+   "forearm_deg": 10.05,
+   "light_out": [
+    927.0,
+    512.7
+   ],
+   "light_power": 0.572
+  },
+  {
+   "frame": 224,
+   "t": 9.333,
+   "drawing": "A3",
+   "head_deg": 0.51,
+   "forearm_deg": 7.33,
+   "light_out": [
+    916.5,
+    522.8
+   ],
+   "light_power": 0.571
+  },
+  {
+   "frame": 225,
+   "t": 9.375,
+   "drawing": "A3",
+   "head_deg": 0.53,
+   "forearm_deg": 5.14,
+   "light_out": [
+    906.2,
+    532.8
+   ],
+   "light_power": 0.57
+  },
+  {
+   "frame": 226,
+   "t": 9.417,
+   "drawing": "A3",
+   "head_deg": 0.5,
+   "forearm_deg": 3.45,
+   "light_out": [
+    896.1,
+    542.8
+   ],
+   "light_power": 0.57
+  },
+  {
+   "frame": 227,
+   "t": 9.458,
+   "drawing": "A3",
+   "head_deg": 0.43,
+   "forearm_deg": 2.17,
+   "light_out": [
+    886.3,
+    552.6
+   ],
+   "light_power": 0.574
+  },
+  {
+   "frame": 228,
+   "t": 9.5,
+   "drawing": "A3",
+   "head_deg": 0.34,
+   "forearm_deg": 1.05,
+   "light_out": [
+    876.6,
+    562.3
+   ],
+   "light_power": 0.582
+  },
+  {
+   "frame": 229,
+   "t": 9.542,
+   "drawing": "A3",
+   "head_deg": 0.23,
+   "forearm_deg": -0.13,
+   "light_out": [
+    867.1,
+    572.0
+   ],
+   "light_power": 0.595
+  },
+  {
+   "frame": 230,
+   "t": 9.583,
+   "drawing": "A3",
+   "head_deg": 0.12,
+   "forearm_deg": -1.33,
+   "light_out": [
+    857.8,
+    581.6
+   ],
+   "light_power": 0.616
+  },
+  {
+   "frame": 231,
+   "t": 9.625,
+   "drawing": "A3",
+   "head_deg": 0.0,
+   "forearm_deg": -2.67,
+   "light_out": [
+    846.9,
+    593.0
+   ],
+   "light_power": 0.65
+  },
+  {
+   "frame": 232,
+   "t": 9.667,
+   "drawing": "A3",
+   "head_deg": -0.09,
+   "forearm_deg": -3.52,
+   "light_out": [
+    838.0,
+    602.4
+   ],
+   "light_power": 0.686
+  },
+  {
+   "frame": 233,
+   "t": 9.708,
+   "drawing": "A3",
+   "head_deg": -0.15,
+   "forearm_deg": -3.96,
+   "light_out": [
+    829.2,
+    611.8
+   ],
+   "light_power": 0.727
+  },
+  {
+   "frame": 234,
+   "t": 9.75,
+   "drawing": "A3",
+   "head_deg": -0.19,
+   "forearm_deg": -3.91,
+   "light_out": [
+    820.5,
+    621.2
+   ],
+   "light_power": 0.77
+  },
+  {
+   "frame": 235,
+   "t": 9.792,
+   "drawing": "A3",
+   "head_deg": -0.21,
+   "forearm_deg": -3.39,
+   "light_out": [
+    812.0,
+    630.4
+   ],
+   "light_power": 0.811
+  },
+  {
+   "frame": 236,
+   "t": 9.833,
+   "drawing": "A3",
+   "head_deg": -0.21,
+   "forearm_deg": -2.55,
+   "light_out": [
+    803.5,
+    639.7
+   ],
+   "light_power": 0.848
+  },
+  {
+   "frame": 237,
+   "t": 9.875,
+   "drawing": "A3",
+   "head_deg": -0.19,
+   "forearm_deg": -1.61,
+   "light_out": [
+    795.2,
+    648.9
+   ],
+   "light_power": 0.878
+  },
+  {
+   "frame": 238,
+   "t": 9.917,
+   "drawing": "A3",
+   "head_deg": -0.16,
+   "forearm_deg": -0.77,
+   "light_out": [
+    787.0,
+    658.1
+   ],
+   "light_power": 0.899
+  },
+  {
+   "frame": 239,
+   "t": 9.958,
+   "drawing": "A3",
+   "head_deg": -0.12,
+   "forearm_deg": -0.21,
+   "light_out": [
+    778.9,
+    667.3
+   ],
+   "light_power": 0.913
+  },
+  {
+   "frame": 240,
+   "t": 10.0,
+   "drawing": "A3",
+   "head_deg": -0.08,
+   "forearm_deg": -0.0,
+   "light_out": [
+    770.8,
+    676.5
+   ],
+   "light_power": 0.921
+  },
+  {
+   "frame": 241,
+   "t": 10.042,
+   "drawing": "A3",
+   "head_deg": -0.03,
+   "forearm_deg": -0.0,
+   "light_out": [
+    762.8,
+    685.6
+   ],
+   "light_power": 0.926
+  },
+  {
+   "frame": 242,
+   "t": 10.083,
+   "drawing": "A3",
+   "head_deg": 0.01,
+   "forearm_deg": -0.0,
+   "light_out": [
+    754.9,
+    694.8
+   ],
+   "light_power": 0.932
+  },
+  {
+   "frame": 243,
+   "t": 10.125,
+   "drawing": "A3",
+   "head_deg": 0.04,
+   "forearm_deg": -0.0,
+   "light_out": [
+    747.0,
+    704.1
+   ],
+   "light_power": 0.94
+  },
+  {
+   "frame": 244,
+   "t": 10.167,
+   "drawing": "A3",
+   "head_deg": 0.07,
+   "forearm_deg": -0.0,
+   "light_out": [
+    739.2,
+    713.3
+   ],
+   "light_power": 0.952
+  },
+  {
+   "frame": 245,
+   "t": 10.208,
+   "drawing": "A3",
+   "head_deg": 0.08,
+   "forearm_deg": -0.0,
+   "light_out": [
+    731.4,
+    722.6
+   ],
+   "light_power": 0.969
+  },
+  {
+   "frame": 246,
+   "t": 10.25,
+   "drawing": "A3",
+   "head_deg": 0.09,
+   "forearm_deg": -0.0,
+   "light_out": [
+    723.7,
+    731.9
+   ],
+   "light_power": 1.529
+  },
+  {
+   "frame": 247,
+   "t": 10.292,
+   "drawing": "A3",
+   "head_deg": 0.09,
+   "forearm_deg": 1.16,
+   "light_out": [
+    723.7,
+    734.3
+   ],
+   "light_power": 1.495
+  },
+  {
+   "frame": 248,
+   "t": 10.333,
+   "drawing": "A3",
+   "head_deg": 0.08,
+   "forearm_deg": 1.38,
+   "light_out": [
+    723.7,
+    735.8
+   ],
+   "light_power": 1.464
+  },
+  {
+   "frame": 249,
+   "t": 10.375,
+   "drawing": "A3",
+   "head_deg": 0.06,
+   "forearm_deg": 0.9,
+   "light_out": [
+    723.7,
+    736.4
+   ],
+   "light_power": 1.432
+  },
+  {
+   "frame": 250,
+   "t": 10.417,
+   "drawing": "A3",
+   "head_deg": 0.05,
+   "forearm_deg": 0.2,
+   "light_out": [
+    723.7,
+    736.3
+   ],
+   "light_power": 1.395
+  },
+  {
+   "frame": 251,
+   "t": 10.458,
+   "drawing": "A3",
+   "head_deg": 0.03,
+   "forearm_deg": 0.19,
+   "light_out": [
+    723.7,
+    735.6
+   ],
+   "light_power": 1.352
+  },
+  {
+   "frame": 252,
+   "t": 10.5,
+   "drawing": "A3",
+   "head_deg": 0.01,
+   "forearm_deg": 0.35,
+   "light_out": [
+    723.7,
+    734.6
+   ],
+   "light_power": 1.303
+  },
+  {
+   "frame": 253,
+   "t": 10.542,
+   "drawing": "A3",
+   "head_deg": -0.01,
+   "forearm_deg": 0.38,
+   "light_out": [
+    723.7,
+    733.6
+   ],
+   "light_power": 1.253
+  },
+  {
+   "frame": 254,
+   "t": 10.583,
+   "drawing": "A3",
+   "head_deg": -0.02,
+   "forearm_deg": 0.3,
+   "light_out": [
+    723.7,
+    732.5
+   ],
+   "light_power": 1.204
+  },
+  {
+   "frame": 255,
+   "t": 10.625,
+   "drawing": "A3",
+   "head_deg": -0.03,
+   "forearm_deg": 0.18,
+   "light_out": [
+    723.7,
+    731.9
+   ],
+   "light_power": 1.16
+  },
+  {
+   "frame": 256,
+   "t": 10.667,
+   "drawing": "A3",
+   "head_deg": -0.03,
+   "forearm_deg": 0.04,
+   "light_out": [
+    723.7,
+    731.9
+   ],
+   "light_power": 1.126
+  },
+  {
+   "frame": 257,
+   "t": 10.708,
+   "drawing": "A3",
+   "head_deg": -0.04,
+   "forearm_deg": -0.07,
+   "light_out": [
+    723.7,
+    731.9
+   ],
+   "light_power": 1.103
+  },
+  {
+   "frame": 258,
+   "t": 10.75,
+   "drawing": "A3",
+   "head_deg": -0.03,
+   "forearm_deg": -0.13,
+   "light_out": [
+    723.7,
+    731.9
+   ],
+   "light_power": 1.091
+  },
+  {
+   "frame": 259,
+   "t": 10.792,
+   "drawing": "A3",
+   "head_deg": -0.03,
+   "forearm_deg": -0.14,
+   "light_out": [
+    723.7,
+    730.2
+   ],
+   "light_power": 1.089
+  },
+  {
+   "frame": 260,
+   "t": 10.833,
+   "drawing": "A3",
+   "head_deg": -0.02,
+   "forearm_deg": -0.11,
+   "light_out": [
+    723.7,
+    730.3
+   ],
+   "light_power": 1.095
+  },
+  {
+   "frame": 261,
+   "t": 10.875,
+   "drawing": "A3",
+   "head_deg": -0.02,
+   "forearm_deg": -0.06,
+   "light_out": [
+    723.7,
+    730.4
+   ],
+   "light_power": 1.103
+  },
+  {
+   "frame": 262,
+   "t": 10.917,
+   "drawing": "A3",
+   "head_deg": -0.01,
+   "forearm_deg": -0.01,
+   "light_out": [
+    723.7,
+    730.6
+   ],
+   "light_power": 1.11
+  },
+  {
+   "frame": 263,
+   "t": 10.958,
+   "drawing": "A3",
+   "head_deg": -0.0,
+   "forearm_deg": 0.03,
+   "light_out": [
+    723.7,
+    730.9
+   ],
+   "light_power": 1.112
+  },
+  {
+   "frame": 264,
+   "t": 11.0,
+   "drawing": "A3",
+   "head_deg": 0.0,
+   "forearm_deg": 0.05,
+   "light_out": [
+    723.7,
+    731.2
+   ],
+   "light_power": 1.107
+  },
+  {
+   "frame": 265,
+   "t": 11.042,
+   "drawing": "A3",
+   "head_deg": 0.01,
+   "forearm_deg": 0.05,
+   "light_out": [
+    723.7,
+    731.5
+   ],
+   "light_power": 1.094
+  },
+  {
+   "frame": 266,
+   "t": 11.083,
+   "drawing": "A3",
+   "head_deg": 0.01,
+   "forearm_deg": 0.04,
+   "light_out": [
+    723.7,
+    731.9
+   ],
+   "light_power": 1.075
+  },
+  {
+   "frame": 267,
+   "t": 11.125,
+   "drawing": "A3",
+   "head_deg": 0.01,
+   "forearm_deg": 0.02,
+   "light_out": [
+    723.7,
+    732.2
+   ],
+   "light_power": 1.051
+  },
+  {
+   "frame": 268,
+   "t": 11.167,
+   "drawing": "A3",
+   "head_deg": 0.01,
+   "forearm_deg": 0.01,
+   "light_out": [
+    723.7,
+    732.6
+   ],
+   "light_power": 1.027
+  },
+  {
+   "frame": 269,
+   "t": 11.208,
+   "drawing": "A3",
+   "head_deg": 0.01,
+   "forearm_deg": -0.01,
+   "light_out": [
+    723.7,
+    732.9
+   ],
+   "light_power": 1.007
+  },
+  {
+   "frame": 270,
+   "t": 11.25,
+   "drawing": "A3",
+   "head_deg": 0.01,
+   "forearm_deg": -0.02,
+   "light_out": [
+    723.7,
+    733.2
+   ],
+   "light_power": 0.993
+  },
+  {
+   "frame": 271,
+   "t": 11.292,
+   "drawing": "A3",
+   "head_deg": 0.01,
+   "forearm_deg": -0.02,
+   "light_out": [
+    723.7,
+    733.4
+   ],
+   "light_power": 0.987
+  },
+  {
+   "frame": 272,
+   "t": 11.333,
+   "drawing": "A3",
+   "head_deg": 0.01,
+   "forearm_deg": -0.02,
+   "light_out": [
+    723.7,
+    733.5
+   ],
+   "light_power": 0.99
+  },
+  {
+   "frame": 273,
+   "t": 11.375,
+   "drawing": "A3",
+   "head_deg": 0.0,
+   "forearm_deg": -0.01,
+   "light_out": [
+    723.7,
+    733.6
+   ],
+   "light_power": 1.001
+  },
+  {
+   "frame": 274,
+   "t": 11.417,
+   "drawing": "A3",
+   "head_deg": 0.0,
+   "forearm_deg": -0.0,
+   "light_out": [
+    723.7,
+    733.6
+   ],
+   "light_power": 1.016
+  },
+  {
+   "frame": 275,
+   "t": 11.458,
+   "drawing": "A3",
+   "head_deg": -0.0,
+   "forearm_deg": 0.0,
+   "light_out": [
+    723.7,
+    733.5
+   ],
+   "light_power": 1.032
+  },
+  {
+   "frame": 276,
+   "t": 11.5,
+   "drawing": "A3",
+   "head_deg": -0.0,
+   "forearm_deg": 0.01,
+   "light_out": [
+    723.7,
+    733.4
+   ],
+   "light_power": 1.046
+  },
+  {
+   "frame": 277,
+   "t": 11.542,
+   "drawing": "A3",
+   "head_deg": -0.01,
+   "forearm_deg": 0.01,
+   "light_out": [
+    723.7,
+    733.2
+   ],
+   "light_power": 1.053
+  },
+  {
+   "frame": 278,
+   "t": 11.583,
+   "drawing": "A3",
+   "head_deg": -0.01,
+   "forearm_deg": 0.01,
+   "light_out": [
+    723.7,
+    732.9
+   ],
+   "light_power": 1.052
+  },
+  {
+   "frame": 279,
+   "t": 11.625,
+   "drawing": "A3",
+   "head_deg": -0.01,
+   "forearm_deg": 0.0,
+   "light_out": [
+    723.7,
+    732.6
+   ],
+   "light_power": 1.043
+  },
+  {
+   "frame": 280,
+   "t": 11.667,
+   "drawing": "A3",
+   "head_deg": -0.01,
+   "forearm_deg": 0.0,
+   "light_out": [
+    723.7,
+    732.2
+   ],
+   "light_power": 1.028
+  },
+  {
+   "frame": 281,
+   "t": 11.708,
+   "drawing": "A3",
+   "head_deg": -0.0,
+   "forearm_deg": -0.0,
+   "light_out": [
+    723.7,
+    731.9
+   ],
+   "light_power": 1.009
+  },
+  {
+   "frame": 282,
+   "t": 11.75,
+   "drawing": "A3",
+   "head_deg": -0.0,
+   "forearm_deg": -0.0,
+   "light_out": [
+    723.7,
+    731.5
+   ],
+   "light_power": 0.99
+  },
+  {
+   "frame": 283,
+   "t": 11.792,
+   "drawing": "A3",
+   "head_deg": -0.0,
+   "forearm_deg": -0.0,
+   "light_out": [
+    723.7,
+    731.2
+   ],
+   "light_power": 0.975
+  },
+  {
+   "frame": 284,
+   "t": 11.833,
+   "drawing": "A3",
+   "head_deg": -0.0,
+   "forearm_deg": -0.0,
+   "light_out": [
+    723.7,
+    730.9
+   ],
+   "light_power": 0.967
+  },
+  {
+   "frame": 285,
+   "t": 11.875,
+   "drawing": "A3",
+   "head_deg": -0.0,
+   "forearm_deg": -0.0,
+   "light_out": [
+    723.7,
+    730.6
+   ],
+   "light_power": 0.966
+  },
+  {
+   "frame": 286,
+   "t": 11.917,
+   "drawing": "A3",
+   "head_deg": 0.0,
+   "forearm_deg": -0.0,
+   "light_out": [
+    723.7,
+    730.4
+   ],
+   "light_power": 0.974
+  },
+  {
+   "frame": 287,
+   "t": 11.958,
+   "drawing": "A3",
+   "head_deg": 0.0,
+   "forearm_deg": 0.0,
+   "light_out": [
+    723.7,
+    730.3
+   ],
+   "light_power": 0.988
+  },
+  {
+   "frame": 288,
+   "t": 12.0,
+   "drawing": "A3",
+   "head_deg": 0.0,
+   "forearm_deg": 0.0,
+   "light_out": [
+    723.7,
+    730.2
+   ],
+   "light_power": 1.006
+  },
+  {
+   "frame": 289,
+   "t": 12.042,
+   "drawing": "A3",
+   "head_deg": 0.0,
+   "forearm_deg": 0.0,
+   "light_out": [
+    723.7,
+    730.2
+   ],
+   "light_power": 1.023
+  },
+  {
+   "frame": 290,
+   "t": 12.083,
+   "drawing": "A3",
+   "head_deg": 0.0,
+   "forearm_deg": 0.0,
+   "light_out": [
+    723.7,
+    730.3
+   ],
+   "light_power": 1.036
+  },
+  {
+   "frame": 291,
+   "t": 12.125,
+   "drawing": "A3",
+   "head_deg": 0.0,
+   "forearm_deg": 0.0,
+   "light_out": [
+    723.7,
+    730.5
+   ],
+   "light_power": 1.042
+  },
+  {
+   "frame": 292,
+   "t": 12.167,
+   "drawing": "A3",
+   "head_deg": 0.0,
+   "forearm_deg": 0.0,
+   "light_out": [
+    723.7,
+    730.7
+   ],
+   "light_power": 1.04
+  },
+  {
+   "frame": 293,
+   "t": 12.208,
+   "drawing": "A3",
+   "head_deg": 0.0,
+   "forearm_deg": -0.0,
+   "light_out": [
+    723.7,
+    731.0
+   ],
+   "light_power": 1.031
+  },
+  {
+   "frame": 294,
+   "t": 12.25,
+   "drawing": "A3",
+   "head_deg": 0.0,
+   "forearm_deg": -0.0,
+   "light_out": [
+    723.7,
+    731.3
+   ],
+   "light_power": 1.015
+  },
+  {
+   "frame": 295,
+   "t": 12.292,
+   "drawing": "A3",
+   "head_deg": 0.0,
+   "forearm_deg": -0.0,
+   "light_out": [
+    723.7,
+    731.7
+   ],
+   "light_power": 0.997
+  },
+  {
+   "frame": 296,
+   "t": 12.333,
+   "drawing": "A3",
+   "head_deg": -0.0,
+   "forearm_deg": -0.0,
+   "light_out": [
+    723.7,
+    732.0
+   ],
+   "light_power": 0.98
+  },
+  {
+   "frame": 297,
+   "t": 12.375,
+   "drawing": "A3",
+   "head_deg": -0.0,
+   "forearm_deg": -0.0,
+   "light_out": [
+    723.7,
+    732.4
+   ],
+   "light_power": 0.967
+  },
+  {
+   "frame": 298,
+   "t": 12.417,
+   "drawing": "A3",
+   "head_deg": -0.0,
+   "forearm_deg": -0.0,
+   "light_out": [
+    723.7,
+    732.7
+   ],
+   "light_power": 0.961
+  },
+  {
+   "frame": 299,
+   "t": 12.458,
+   "drawing": "A3",
+   "head_deg": -0.0,
+   "forearm_deg": 0.0,
+   "light_out": [
+    723.7,
+    733.0
+   ],
+   "light_power": 0.964
+  }
+ ]
+}
