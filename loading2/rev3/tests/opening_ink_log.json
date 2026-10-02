@@ -1,0 +1,22 @@
+{
+ "frames": 326,
+ "fps": 24,
+ "size": [
+  1280,
+  720
+ ],
+ "approved_from": 180,
+ "final_camera": {
+  "f": 1100.0,
+  "cx": 610.51,
+  "altitude": 0.110695805,
+  "pitch_deg": 30.137338235691757
+ },
+ "start_distance": 0.03361111111111111,
+ "final_distance": 0.2282993109625046,
+ "scale_change": 6.792376193925756,
+ "stroke_centre_final": [
+  610.51,
+  440.0
+ ]
+}
