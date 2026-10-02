@@ -269,3 +269,26 @@ Review: `P1_REFS_REVIEW_v2.md`; board: `review/P1_v2_review_board.jpg`.
   - The light detector now needs a white core inside a warm ring, so the shirt and palm highlights no
     longer count as lights.
   - It was tested on the three reference stills and on synthetic clips only.
+
+## 10. P1-S1 try 1 rejected; v4 request (not submitted)
+
+- **Try 1** (`returned/P1-S1_try1.mp4`) was rejected by the owner. Inspection:
+  `P1-S1_try1_REVIEW.md`; board: `review/P1-S1_try1_review_board.jpg`.
+  - The head drops 17.7° and turns toward the camera; she blinks inside the window.
+  - The light slides like a moon on a rail.
+  - No 40-frame window is usable (measured).
+- **Cause:** the approved frame's drawn gaze (~30–40° up) does not meet the light (15° up), so a
+  "follow" forced a large head drop. The light's motion was also left to the model.
+- **v4** (`pilot_S1/PILOT_S1_SHEET_v4.md`):
+  - The light is local: the approved orb's measured look, on a designed path that starts on her
+    eyeline.
+  - The one generation is her performance only, from `refs_in2/P1_S1_v8_nolight.png`: a 6° pitch-only
+    dip with the eyes leading, then a hold.
+  - Timing is fixed per window frame; the trim is IN = head-turn frame − 9, 40 frames at 1:1 on
+    7.500–9.167.
+  - Animatic: `pilot_S1/P1-S1_v4_timing_animatic.mp4`.
+- **Owner decision needed:** moving the light's start from (1205, 121) to her eyeline at (905, 50).
+- **`tools/seedance_check.py`:** the camera shift is now an ECC fit on the background, because the
+  whole-frame phase correlation reported 457 px on a locked shot. Frame change is now measured in
+  colour, which catches one-frame pops.
+

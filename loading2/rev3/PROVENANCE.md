@@ -16,3 +16,12 @@ Every pixel source used by the rev3 renders, with the first 16 hex digits of its
 
 Not used: KV*_PLATE.png from the 0-33 asset archive (they are diamond-shaped smear fills, not clean plates).
 Storyboard panels: drawn from scratch by tools/sbdraw.py + tools/storyboard.py (no source images).
+
+## Seedance pilot (P1-S1)
+
+| used as | source file | sha256 (16) | processing |
+|---|---|---|---|
+| rejected S1 take (inspection only; not used in any output) | owner upload 1ac11a8e-___________.mp4 -> seedance/returned/P1-S1_try1.mp4 | 475561b06597aa8e | measured with tools/seedance_check.py; its own generated audio is ignored |
+| v4 generation input (first frame) | seedance/refs_in2/P1_S1_v8_nolight.png, derived from P1_S1_original_reference_v8.png (0d4bb512df959b04) | 1c547cd0383355e3 | orb removed locally: the radial glow measured on the sky above the orb is subtracted, then a 15 px core and leftover warm pixels are inpainted. Only pixels within 165 px of (1205, 121) change |
+| S1 light (local) | radial glow measured from P1_S1_original_reference_v8.png | (derived) | tools/p1s1_light.py; additive composite on the designed path |
+

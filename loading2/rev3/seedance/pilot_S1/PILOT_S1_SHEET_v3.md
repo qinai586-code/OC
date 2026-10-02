@@ -1,4 +1,7 @@
-# Motion pilot P1-S1 (v3): final, for the owner to generate. Not submitted; no credits used.
+# Motion pilot P1-S1 (v3): superseded by `PILOT_S1_SHEET_v4.md`
+
+**Do not generate from this sheet.** Try 1 was made from it and was rejected (see `../P1-S1_try1_REVIEW.md`).
+Its prompt asked the model to move the light, and the light sat off her drawn eyeline; together these produced the 18° head drop.
 
 Replaces `PILOT_S1_SHEET_v2.md`. Board: `PILOT_S1_v3_board.jpg`.
 

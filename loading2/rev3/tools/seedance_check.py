@@ -133,6 +133,8 @@ def main():
     ap.add_argument('--min-move', type=float, default=0.0)
     ap.add_argument('--head', default=None, help='head box (horns, clip, face) for the rotation track')
     ap.add_argument('--hand', default=None, help='hand box for the hand-motion track')
+    ap.add_argument('--bg-box', default='1000,300,1672,941',
+                    help='background-only region (sky and Earth, no character) for the camera-shift measure')
     args = ap.parse_args()
     od = os.path.join(R, 'seedance', 'checks', args.name)
     os.makedirs(od, exist_ok=True)
@@ -146,7 +148,12 @@ def main():
 
     # light track, camera drift, mouth activity, frame-change spikes (whole clip)
     g0 = cv2.cvtColor(frames[0], cv2.COLOR_BGR2GRAY).astype(np.float32)
-    win = cv2.createHanningWindow((W, H), cv2.CV_32F)
+    # camera shift: ECC translation of a background-only region against frame 0, lights masked out.
+    # (A whole-frame phase correlation was used before; it reported a 457 px shift on P1-S1 try 1,
+    # whose background moves under 2 px. The moving character and the light confused it.)
+    bx0, by0, bx1, by1 = [float(v) for v in args.bg_box.split(',')]
+    bgm = np.zeros((H, W), np.uint8)
+    bgm[int(by0 * sy):int(by1 * sy), int(bx0 * sx):int(bx1 * sx)] = 1
     track, drift, mouth, dchg = [], [], [], []
     prev = None
     m0 = frames[0][my0:my1, mx0:mx1].astype(np.float32)
@@ -154,14 +161,24 @@ def main():
         L = lights(f)
         track.append(dict(frame=i, t=round(i / fps, 3), n_lights=len(L), main=L[0] if L else None))
         g = cv2.cvtColor(f, cv2.COLOR_BGR2GRAY).astype(np.float32)
-        (dx, dy), _ = cv2.phaseCorrelate(g0, g, win)
-        drift.append((round(dx, 2), round(dy, 2)))
+        mk = bgm.copy()
+        for a, lx, ly in L:
+            cv2.circle(mk, (int(lx), int(ly)), int(6 * np.sqrt(a / np.pi) + 20), 0, -1)
+        warp = np.eye(2, 3, dtype=np.float32)
+        if i:
+            try:
+                _, warp = cv2.findTransformECC(g0, g, warp, cv2.MOTION_TRANSLATION,
+                                               (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 100, 1e-5), mk, 5)
+            except cv2.error:
+                warp[:] = np.nan
+        drift.append((round(float(warp[0, 2]), 2), round(float(warp[1, 2]), 2)))
         mouth.append(float(np.abs(f[my0:my1, mx0:mx1].astype(np.float32) - m0).mean()))
         if prev is not None:
-            dchg.append(float(np.abs(g - prev).mean()))
-        prev = g
+            dchg.append(float(np.abs(f.astype(np.float32) - prev).mean()))   # colour: flashes can be hue-only
+        prev = f.astype(np.float32)
     med = float(np.median(dchg)) if dchg else 0.0
-    spikes = [i + 1 for i, v in enumerate(dchg) if med > 0 and v > 4 * med and v > 2.0]
+    # one-frame flashes: P1-S1 try 1 frame 60 (texture flash) changed 1.63 against a median of 0.45
+    spikes = [i + 1 for i, v in enumerate(dchg) if med > 0 and v > 3 * med and v - med > 0.8]
     multi = [t['frame'] for t in track if t['n_lights'] > 1]
     path = [(t['main'][1], t['main'][2]) for t in track if t['main']]
     report = dict(meta=meta, frames_read=len(frames), usable=dict(clip_in=args.tin, song_start=args.song, dur=args.dur),
@@ -169,9 +186,11 @@ def main():
                              light_path_start_clip_px=path[0] if path else None,
                              light_path_end_clip_px=path[-1] if path else None,
                              light_moves_down_left=bool(path and path[-1][0] < path[0][0] and path[-1][1] > path[0][1]),
-                             max_camera_shift_px=float(max(abs(a) + abs(b) for a, b in drift)),
-                             max_camera_shift_pct_of_width=round(100 * max(abs(a) for a, b in drift) / W, 2),
+                             max_camera_shift_clip_px=round(float(np.nanmax([np.hypot(a, b) for a, b in drift])), 2),
+                             max_camera_shift_pct_of_width=round(100 * float(np.nanmax([abs(a) for a, b in drift])) / W, 2),
+                             camera_unmeasured_frames=[i for i, (a, b) in enumerate(drift) if np.isnan(a)],
                              mouth_change_mean=round(float(np.mean(mouth)), 2), mouth_change_max=round(float(np.max(mouth)), 2),
+                             mouth_note='fixed box: head motion also counts as mouth change; judge speech visually',
                              frame_change_median=round(med, 3), frame_change_spike_frames=spikes),
                   track=track)
 
@@ -193,7 +212,7 @@ def main():
                light_end=[round(v, 1) for v in wpath[-1][1:]] if wpath else None,
                travel_per_quarter_second_px=bins,
                stalled_quarter_seconds=[k for k, v in enumerate(bins) if v is None or v < 3.0],
-               max_camera_shift_px=float(max(abs(drift[i][0]) + abs(drift[i][1]) for i in sel)),
+               max_camera_shift_clip_px=round(float(np.nanmax([np.hypot(*drift[i]) for i in sel])), 2),
                mouth_change_max=round(float(max(mouth[i] for i in sel)), 2),
                frame_change_spike_frames=[i for i in spikes if sel[0] < i <= sel[-1]])
     if wpath:
