@@ -242,3 +242,13 @@ See `P1_REFS_REVIEW.md` and `review/P1_refs_review_board.jpg`. The first pilot s
 - **S2 needs a choice:** keep or remove the same warm point.
 
 The returned clips are checked and fitted with `tools/seedance_check.py`.
+
+## 8. Reference pack v2 review (MV_S1-S3.zip)
+
+Review: `P1_REFS_REVIEW_v2.md`; board: `review/P1_v2_review_board.jpg`.
+- **Resolved from v1:** S1 (owner-approved v8), S2 and S3 v2 have a single light in total; the
+  duplicate orb is gone and the hairstyle is consistent.
+- **Open:**
+  - the X clip is on her right (visible) side vs the model sheet's left: owner decision;
+  - S2 needs a gentle hand lift to reach S3's height.
+- **Motion pilot:** `pilot_S1/PILOT_S1_SHEET_v2.md` (S1, 7.500–9.167), not submitted.
