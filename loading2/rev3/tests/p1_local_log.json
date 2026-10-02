@@ -12,14 +12,92 @@
   "S3": 10.667
  },
  "S1": {
-  "head_deg_end": 14.0,
+  "source": "P1-S1_v5_take_v2.mp4",
+  "clip_frames": [
+   52,
+   91
+  ],
   "light_start": [
-   905.0,
-   50.0
+   1205.0,
+   121.0
   ],
   "light_end": [
-   897.8969114935492,
-   240.0
+   1010.0,
+   425.0
+  ],
+  "track": [
+   {
+    "k": 0,
+    "clip_frame": 52,
+    "light_clip_px": [
+     907.5,
+     89.7
+    ],
+    "nod_fraction": 0.0
+   },
+   {
+    "k": 6,
+    "clip_frame": 58,
+    "light_clip_px": [
+     892.3,
+     110.1
+    ],
+    "nod_fraction": 0.012
+   },
+   {
+    "k": 12,
+    "clip_frame": 64,
+    "light_clip_px": [
+     864.6,
+     141.9
+    ],
+    "nod_fraction": 0.09
+   },
+   {
+    "k": 18,
+    "clip_frame": 70,
+    "light_clip_px": [
+     828.7,
+     183.4
+    ],
+    "nod_fraction": 0.244
+   },
+   {
+    "k": 24,
+    "clip_frame": 76,
+    "light_clip_px": [
+     793.3,
+     234.2
+    ],
+    "nod_fraction": 0.446
+   },
+   {
+    "k": 30,
+    "clip_frame": 82,
+    "light_clip_px": [
+     775.8,
+     272.9
+    ],
+    "nod_fraction": 0.65
+   },
+   {
+    "k": 36,
+    "clip_frame": 88,
+    "light_clip_px": [
+     768.4,
+     296.8
+    ],
+    "nod_fraction": 0.831
+   },
+   {
+    "k": 39,
+    "clip_frame": 91,
+    "light_clip_px": [
+     767.0,
+     299.9
+    ],
+    "nod_fraction": 0.889
+   }
   ]
  },
  "S2": {

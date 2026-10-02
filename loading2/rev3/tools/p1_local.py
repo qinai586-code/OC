@@ -27,7 +27,7 @@ from matte import isnet  # noqa: E402
 
 REFS = os.path.join(R, 'seedance', 'refs_in2')
 WORK = os.path.join(R, 'work', 'p1')
-OUT = os.path.join(R, 'tests', 'P1_local_720p.mp4')
+OUT = os.path.join(R, 'tests', 'P1_light_catch_720p.mp4')
 LOG = os.path.join(R, 'tests', 'p1_local_log.json')
 AUDIO = '/root/.claude/uploads/c9b74a57-085e-5ad1-8a57-5167fd743993/4ccd5715-Loading_P0_endfix_candidate01.mp3'
 OW, OH = 1280, 720
@@ -355,7 +355,11 @@ def build_s3():
 def main():
     os.makedirs(WORK, exist_ok=True)
     f3, prof3, log3 = build_s3()
-    f1, log1 = build_s1()
+    if os.environ.get('P1_S1_SOURCE', 'take') == 'take':   # owner's Seedance take (v2), light masked and redone
+        from p1_s1_clip import build_s1_clip
+        f1, log1 = build_s1_clip()
+    else:                                                  # fully local fallback (2D nod)
+        f1, log1 = build_s1()
     f2, log2 = build_s2(prof3)
     frames = f1 + f2 + f3
     assert len(frames) == N1 + N2 + N3 == 146

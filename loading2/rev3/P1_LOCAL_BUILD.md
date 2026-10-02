@@ -1,12 +1,61 @@
-# P1 light catch: local build from the approved stills (no generated video)
+# P1 light catch: S1 from the owner's Seedance take, S2 and S3 built locally
+
+**Current output: `tests/P1_light_catch_720p.mp4`.** 1280×720, 24 fps, 146 frames, song 7.500–13.583
+on the locked music, one continuous encode. Strip: `tests/P1_light_catch_strip.jpg`. Build:
+`tools/p1_local.py`. S1 comes from `tools/p1_s1_clip.py`; `P1_S1_SOURCE=local` switches back to the
+local 2D nod.
+
+## S1 from the owner's Seedance 2.5 takes (2026-10-02)
+
+| take | file (sha256/16) | measured | visual | verdict |
+|---|---|---|---|---|
+| v2 | `seedance/returned/P1-S1_v5_take_v2.mp4` (76792d17a4d9102e) | Still until frame 60; the head turn starts at frame 61 (> 1°). One nod to about 37°, settled by frame 98. Camera 0.13 px. One light, fixed at (907, 89) in every frame | One smooth nod in profile, ending looking forward and slightly down. The jaw tucks and the neck reads naturally. Eyes close during frames 70–78 as the nod starts | **chosen** |
+| v3 | `seedance/returned/P1-S1_v5_take_v3.mp4` (3a6ec42f647245e9) | The head drifts from frame 12. Two eye closures (around 46 and 82–90). Tracking reads up to 66° with large head travel | Ends in a deep bow, the face moving far forward and almost out of the head crop | not used |
+
+Both are 1280×720 HEVC, 24 fps, 121 frames, about 280 kbps. Both carry generated audio, which is
+discarded. Both were made from the approved S1 *with* its light, and the model kept that light fixed.
+
+**Masking and compositing (`tools/p1_s1_clip.py`):**
+- **Trim:** the rule is the head-turn frame (61) minus 9, so clip frames **52–91** play at 1:1 on song
+  7.500–9.167. The nod is about 33° at the cut and settles (37°) just after it. The cut to the hand
+  insert comes on the last part of the nod.
+- **Generated light masked out:** inside a disc around (907, 89), the sky comes from the light-free
+  approved frame. It is aligned to the take (affine fit on frame 0) and colour-matched on the ring
+  where it fades out (r 120–155 px). Measuring the take's own glow left faint rings, because that
+  light sits too close to the top of frame.
+- **Designed light composited:** it has the approved orb's measured look. It starts exactly where the
+  approved light is (at most 0.5 px from the take's), sinks ahead of her nod (leading her measured
+  nod curve by 4 frames, along a gentle curve with a slow float and pulse), and ends in front of her
+  lowered gaze, above her hand (approved-frame coordinates (1010, 425)). In S2 it enters from the
+  top.
+
+**Measured on the output:**
+- 146 frames, 0 irregular steps; audio 6.083 s.
+- S1: the old light's spot is empty in every frame, and the new light is the only light.
+- Head turn: 1.6° at frame 10, 8.9° at 20, 16.7° at 26, 25.5° at 32, 33.2° at 39.
+- Sky shift 0.0 px.
+- The take's body follows the nod slightly: the collar moves 8.7 px and the hand 24.8 px by the cut.
+- Frame-to-frame change: the two cuts dominate. Inside S1 there are steps of up to 2.6, because the
+  take moves on threes.
+
+**For your playback:**
+- **The eye closure** during the nod (song 8.25–8.58). It reads like a natural blink with a gaze shift.
+  If you don't want it, the only fix is another take.
+- **The motion on threes** (the take's own animation) against the smooth local S2 and S3.
+- **The S1→S2 cut** on the end of the nod.
+
+---
+
+## Earlier local build notes (S1 local 2D nod, kept as fallback)
+
 
 Owner decision (2026-10-02): no more generation for this sequence. Use the approved S1–S3 images
 directly, and deliver at 720p.
 
 | file | what it is |
 |---|---|
-| `tests/P1_local_720p.mp4` | 1280×720, 24 fps, 146 frames: song 7.500–13.583 on the locked music, one continuous encode |
-| `tests/P1_local_strip.jpg` | 10 frames with song time |
+| `tests/P1_light_catch_720p.mp4` (S1 local when built with P1_S1_SOURCE=local) | 1280×720, 24 fps, 146 frames: song 7.500–13.583 on the locked music, one continuous encode |
+| `tests/P1_light_catch_strip.jpg` | 10 frames with song time |
 | `tests/p1_local_log.json`, `tests/p1_local_checks.json` | build log and measurements |
 | `tools/p1_local.py` | the build (about 1 min on CPU). Amplitudes are constants at its top |
 

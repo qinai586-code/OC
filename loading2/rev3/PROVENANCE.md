@@ -24,4 +24,5 @@ Storyboard panels: drawn from scratch by tools/sbdraw.py + tools/storyboard.py (
 | rejected S1 take (inspection only; not used in any output) | owner upload 1ac11a8e-___________.mp4 -> seedance/returned/P1-S1_try1.mp4 | 475561b06597aa8e | measured with tools/seedance_check.py; its own generated audio is ignored |
 | v4 generation input (first frame) | seedance/refs_in2/P1_S1_v8_nolight.png, derived from P1_S1_original_reference_v8.png (0d4bb512df959b04) | 1c547cd0383355e3 | orb removed locally: the radial glow measured on the sky above the orb is subtracted, then a 15 px core and leftover warm pixels are inpainted. Only pixels within 165 px of (1205, 121) change |
 | S1 light (local) | radial glow measured from P1_S1_original_reference_v8.png | (derived) | tools/p1s1_light.py; additive composite on the designed path |
-
+| S1 source footage (used: frames 52-91) | owner upload 7f323373-horned_girl_night_5s_v2.mp4 (Seedance 2.5) -> seedance/returned/P1-S1_v5_take_v2.mp4 | 76792d17a4d9102e | its fixed generated light masked out with the aligned light-free approved frame; designed light composited (tools/p1_s1_clip.py); its audio ignored |
+| S1 alternative take (not used) | owner upload af40b110-horned_girl_night_5s_v3.mp4 -> seedance/returned/P1-S1_v5_take_v3.mp4 | 3a6ec42f647245e9 | measured only |
