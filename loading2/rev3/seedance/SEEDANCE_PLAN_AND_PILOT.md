@@ -35,8 +35,8 @@ each cut moves the story on.
 
 | field | **P1-S1** (required) | **P1-S2** (required) | **P1-S3** (required) |
 |---|---|---|---|
-| song time used | 7.500–9.167 (frames 180–219) | 9.167–10.667 (frames 220–255) | 10.667–12.500 (frames 256–299); extend to 13.600 (frame 326) if the next shot starts there |
-| usable duration | 1.67 s | 1.50 s | 1.83 s (2.93 s extended) |
+| song time used | 7.500–9.167 (frames 180–219) | 9.167–10.667 (frames 220–255) | 10.667–13.600 (frames 256–325): the edit covers the hold through "Loading." (12.6) up to the next shot at 13.6; the before/after comparison still stops at 12.500 |
+| usable duration | 1.67 s | 1.50 s | 2.93 s (1.83 s inside the 7.5–12.5 comparison) |
 | generate | the shortest option ≥ 3.0 s (**PENDING**, likely 5 s), so there is ≥ 0.6 s of handle on each side | ≥ 3.0 s | ≥ 3.5 s (≥ 4.5 s for the extended version) |
 | character | A only | A's right hand and forearm only (face out of frame) | A only (B is off-screen, beside her) |
 | starting pose | seated, cropped at mid-chest, right profile. Chin raised, eyes up toward the upper right, lips slightly parted in wonder | her right hand low at the bottom of frame, relaxed, palm turning up; forearm angled from the lower left | right profile, head level and slightly lowered, eyes on her raised right palm. The light hovers about a palm-width above it |
@@ -232,3 +232,13 @@ confirmed and tested on one line. All of the above are mute visuals placed on th
     join) and the storyboard reel (three joins).
 
   These resume after this list is reviewed.
+
+## 7. Reference pack review (2026-10-02)
+
+See `P1_REFS_REVIEW.md` and `review/P1_refs_review_board.jpg`. The first pilot shot is **P1-S1**
+(`pilot_S1/PILOT_S1_SHEET.md`).
+- **S3 is blocked until its duplicate upper-right light is removed.** An optional local fix is in
+  `refs_fixed/`.
+- **S2 needs a choice:** keep or remove the same warm point.
+
+The returned clips are checked and fitted with `tools/seedance_check.py`.
