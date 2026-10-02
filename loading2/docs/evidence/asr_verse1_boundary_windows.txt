@@ -1,0 +1,86 @@
+Verse 1 boundary evidence (2026-10-02). Whisper large-v3 (sherpa-onnx, int8) on the separated vocal stem; each line is one 1.2-1.4 s window: start-end, then what the model heard. Start-anchored windows: the first word heard begins near or shortly after the window start. Misheard words are kept as heard.
+
+## sliding windows 14.2-17.7
+  14.20-  15.60 We were born in your church.
+  14.50-  15.90 We were born in your tray
+  14.80-  16.20 Born in your traces
+  15.10-  16.50 and your traces and
+  15.40-  16.80 traces in the
+  15.70-  17.10 She's in the worst state
+  16.00-  17.40 Decision, the words that you
+  16.30-  17.70 And the words that you left
+  16.60-  18.00 Words that you left
+  16.90-  18.30 that you left
+  17.20-  18.60 you left, we met again
+  17.50-  18.90 We met you
+  17.80-  19.20 We met you in
+  18.10-  19.50 We met you in France
+
+## targeted windows
+  13.55-  14.95 We were born
+  15.90-  17.30 Decision, the words that you
+  16.20-  17.60 Listen the words that you left
+  17.50-  18.90 We met you
+  17.80-  19.20 We met you in
+  18.10-  19.50 We met you in France
+  19.00-  20.40 When fragments translate
+  19.60-  21.00 Translated
+  20.20-  21.60 Compressed
+  21.00-  22.40 I pressed every one
+  21.40-  22.80 Every war, heavy
+  21.70-  23.10 ♪ Heavy love ♪ ♪ Heavy love ♪
+  22.00-  23.40 Happy
+  22.30-  23.70 Heavy lalalalapa
+  22.60-  24.00 I feel all on the bike
+  22.90-  24.30 Lullaby every
+  23.20-  24.60 I
+  23.50-  24.90 Bye, every last good
+  23.80-  25.20 Every last goodbye
+  24.10-  25.50 Every last goodbye
+  24.40-  25.80 Last goodbye became
+  24.70-  26.10 Goodbye, Bikin
+  25.00-  26.40 I became a concert
+  25.30-  26.70 became constant
+  26.20-  27.60 constellations in them
+  27.00-  28.40 In a mind with no
+  27.40-  28.80 A mind with no sky
+  27.80-  29.20 with no sky that you
+  28.20-  29.60 No sky, but you had to
+  28.60-  30.00 Bet you had debts
+  29.00-  30.40 You had depth, you had
+  29.30-  30.70 At death you had time
+  29.60-  31.00 You had time you
+  30.00-  31.40 You had time, you had he-
+  30.40-  31.80 Time you had he-
+  30.80-  32.20 You had he-
+  31.20-  32.60 he
+  32.40-  33.80 Three dimensional
+  32.70-  34.10 3 dimensional heart
+  33.00-  34.40 dimensional hearts that
+  34.20-  35.60 That we're learning to
+  34.60-  36.00 We're learning to be.
+  35.00-  36.40 Learning to be the
+  35.30-  36.70 to be the
+  35.60-  37.00 ♪ Be because ♪
+  37.00-  38.40 The smalls are silent, the
+  37.40-  38.80 Silent the cars
+  37.80-  39.20 The cosmos
+  38.20-  39.60 The cosmos was still
+  38.60-  40.00 The cosmos was still, till you
+  39.00-  40.40 But still, till you lit
+  40.00-  41.40 You lit the first fire
+  41.00-  42.40 Fire on the first
+  42.20-  43.60 First cold head
+  42.60-  44.00 cold hairs
+  43.00-  44.40 Silent
+  43.30-  44.70 Silence in
+
+## cosmos-line windows
+  34.50-  35.90 We're learning to be
+  34.80-  36.20 We're learning to be
+  35.10-  36.50 Learning to be the
+  35.60-  36.80 Beat the c-
+  35.90-  37.10 the cause
+  36.20-  37.40 the cosmos
+  36.50-  37.70 Cosmos aside
+  36.80-  38.00 The cosmos is silent
