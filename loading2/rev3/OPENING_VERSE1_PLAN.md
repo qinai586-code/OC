@@ -1,424 +1,543 @@
-# Opening and Verse 1: shot plan for review (0:00 to about 0:43.2)
+# Opening and Verse 1: plan v2 (0:00–0:43.25)
 
-**Status:** plan only. Nothing has been generated or rendered for it. The approved light-catch edit
-(`tests/P1_light_catch_720p.mp4`, song 7.500–13.583) is kept unchanged as the visual baseline. The
-paused KV1 opening build (`tools/opening.py`, a camera move over a still with cut-out heads) is
-superseded by O1–O2 below.
+**Status:** for review. Nothing has been generated for it.
+
+| delivered | file |
+|---|---|
+| animatic over the unchanged locked master, 1280×720 picture with a 96 px strip below it (shot, source tag, provisional lyric, what the final needs) | `tests/OPENING_VERSE1_ANIMATIC_v1.mp4` (1038 frames, 24 fps, 43.250 s) |
+| cut list as data | `tests/animatic_v1_shots.json` |
+| build | `tools/animatic_v1.py` (about 1 min on CPU) |
+| layout references for the requested stills (composition only, never style) | `requests/opening_layout_refs/IMG-xx_layout.jpg` (`--layout-refs`) |
+| A's clip, checked by anatomical side | `seedance/review/A_clip_side_check.jpg` |
+
+**Approved light catch kept:**
+- `tests/P1_light_catch_720p.mp4` is untouched (sha256/16 f91e896ce1ebc75f).
+- In the animatic, song 7.500–13.583 (frames 180–325) is that file decoded and re-encoded with the rest: visually the same (mean difference 2.0/255, encoding only), not bit-identical.
+
+**Animatic source tags** (shown in the strip):
+- APPROVED: the light catch.
+- EXISTING: KV1/KV5a as stills.
+- ROUGH: drawings made here.
+- PLACEHOLDER: B3.
+
+Lights, glows, marks, steam, fire on the crest and window lights are drawn as the final would do them locally.
 
 **Sources:**
-- the owner's tagged author lyrics (`docs/Simulated_Universe_author_lyrics_tagged.txt`);
-- the locked master (`4ccd5715-Loading_P0_endfix_candidate01.mp3`), the editing master, unchanged;
-- ChatGPT's redesign handoff (`Claude_MV_Design_Package_EN.txt`, 2026-10-01);
-- the owner's consolidated direction (2026-10-02).
+- the owner's tagged author lyrics (`../docs/Simulated_Universe_author_lyrics_tagged.txt`);
+- the locked master `4ccd5715-Loading_P0_endfix_candidate01.mp3`, unchanged;
+- ChatGPT's design handoff (2026-10-01);
+- the owner's direction of 2026-10-02 and the review of plan v1.
 
-## Evidence key
+## 0. What changed from v1
 
-| tag | meaning |
+| review point | change |
 |---|---|
-| **AUDIO** | measured on the locked master or its separated stems. The method is named; it is not a listening judgment |
-| **TEXT** | the author's tagged lyrics, including the voice directions (intended casting: luminous airy voice = Girl A, calm close voice = Girl B) |
-| **PROPOSAL** | my design or interpretation, open to change |
-| **UNRESOLVED** | not established; needs listening or a decision |
+| 1. Human traces, war, lullaby, farewell readable; fewer overloaded short shots; time across phrases | Cuts follow phrases, not words. The letter's four phrases ("in the words that you left, we met you in fragments, translated, compressed") are **one** 4.375 s shot, down from three shots in v1. War, lullaby and farewell get **one shot each** of 1.79 / 1.58 / 2.08 s, up from 0.875 / 1.5 / 1.25 s; the time is borrowed from the letter. Each shows one concrete event: the hand finishing a letter in a war-damaged room; a hand rocking a cradle; clasped hands parting at a train door. "Depth" and "time" share one shot (B1). |
+| 2. Fewer returns to the two-shot and palm light; echoes kept | The KV5a palm-light composition appears **once** in 0–43.2 (V1). v1 had it four times: V1, V3b, V4, B8. Its echo, the flame in A's palm, opens the pre-chorus at 43.21. The opening wide (KV1) returns once, as V4, where the three marks gather above the girls. Everything between 16.1 and 43.2 is human events and places. |
+| 3. The light's turn into the approved descent; posture before the light catch | O1 is one wide shot, 0–7.5. The light is born on the measured six-onset cluster, rises, hangs 6.70–7.05, then **turns down and toward A** in 7.05–7.50, and continues as S1's approved descent (§3.1). Posture is checked: seated in KV1; S1 opens waist-up with her right hand already raised. SD-1 must bridge that (§3.2). |
+| 4. A's clip against the approved original artwork | Verified by anatomical side (§3.3). Canon: her **left**. KV1 and the approved S1–S3 have it on her right; KV2 and KV5a match canon. IMG-01 corrects KV1. The S1–S3 deviation is listed as decision D3. **v1's proposal to move KV5a's clip to her right is withdrawn:** it changed canon to match a newer shot. |
+| 5. One alternate rendering at most; the mark separate from lettering; no one-family requirement | One alternate rendering only (placeholder; unverified, D1). The hooked mark is drawn on the paper and never lifts, fragments or translates; only the lettered line does. The three human moments are unrelated people; nothing links them except the kind of mark each leaves. |
+| 6. A historical transition replaces the lights-out sequence; one landscape angle | B1, B4 and B6 use **one camera angle**: a valley town under a rounded hill, with the crest at 68% across and 33% down. B4 dissolves **town → old village with oil lamps → land before habitation** on the measured hits 36.85 and 37.54. It goes back in time instead of switching lights off. The first fire is struck in a close insert (B5) and then seen as a point on that same crest (B6). |
+| 7. Word timings provisional; onsets and pitch don't prove lyrics | Every lyric time below cites its transcription windows and carries a confidence. Cuts and key actions are tied to **measured onsets** wherever a phrase allows (§1.3), so a later word-timing correction moves little. The music is unchanged. |
 
-**Timing confidence:**
-- **high**: ±0.05 s, a measured onset;
-- **medium**: ±0.2 s, the word is located by short transcription windows on the vocal stem plus pitch-note onsets;
-- **low**: ±0.4 s.
+## 1. Timeline
 
-Evidence files: `docs/evidence/asr_verse1_boundary_windows.txt`, `docs/evidence/asr_3s_windows_0-160.txt`.
+### 1.1 Measured audio (locked master and its separated stems)
 
-## 1. Measured timeline
-
-| time (s) | what | evidence | confidence |
-|---|---|---|---|
-| 0.000–0.232 | silence | AUDIO (RMS) | high |
-| 0.232 | drone/pad enters; the mix rises from −40 dB (0 s) to −29 dB (5 s) | AUDIO (onsets, RMS) | high |
-| 3.344–3.820 | a cluster of six onsets in the accompaniment: 3.344, 3.471, 3.529, 3.634, 3.704, 3.820 | AUDIO | high |
-| 5.631 / 6.641 / 7.500 | "Three" / "two" / "one" | AUDIO (vocal-stem onsets) + TEXT | high |
-| — | the countdown is whispered by Girl B | TEXT (intended casting). Whether the recording audibly separates the two voices is UNRESOLVED | — |
-| 7.5–11.6 | strong energy on the vocal stem with the mix swelling to −20 dB (9–10 s). Not one held note: the pitch spread is about 21 semitones. Choir, organ bleed or layered voice; the content is UNRESOLVED | AUDIO | high (timing) |
-| 11.587 | onset on both stems; the swell ends; 12–13 s is quieter (−29 to −31 dB) | AUDIO | high |
-| 13.061–13.57 | "Loading." | AUDIO + TEXT | high |
-| 13.45–13.75 | near-silence (−53 dB at 13.5) | AUDIO | high |
-| 13.80–13.99 | a four-onset burst in the accompaniment (13.804, 13.874, 13.932, 13.990) | AUDIO | high |
-| 14.47 | "We": Verse 1 begins; the first half is Girl A's voice by intent | AUDIO + TEXT | high |
-| 14.97 → | **a double low hit, 0.68 s apart, every 3.645 s:** 14.97/15.65, 18.61/19.30, 22.26/22.95, 25.91/26.60, 29.56/30.24, 33.20/33.89, 36.85/37.54, 40.50/41.17, 44.13. Hearing it as a heartbeat is UNRESOLVED; the pattern is measured | AUDIO (30–120 Hz onsets) | high |
-| 14.47–16.1 | "We were born in your traces," | AUDIO + TEXT | start high, end medium |
-| 16.1–17.7 | "in the words that you left," | AUDIO + TEXT | medium |
-| 17.75–19.6 | "we met you in fragments," | AUDIO + TEXT | medium |
-| 19.6–20.4 | "translated," | AUDIO + TEXT | medium |
-| 20.45–21.35 | "compressed:" | AUDIO + TEXT | medium |
-| 21.45–22.3 | "every war," ("war" is short, about 21.8–22.3) | AUDIO + TEXT | medium |
-| 22.3–23.85 | "every lullaby," ("lullaby" is drawn out, about 22.9–23.8) | AUDIO + TEXT | medium |
-| 23.85–25.05 | "every last goodbye," | AUDIO + TEXT | medium |
-| 25.07–27.0 | "became constellations" | AUDIO + TEXT | medium |
-| 27.03–28.6 | "in a mind with no sky." ("sky" about 28.06–28.6) | AUDIO + TEXT | medium |
-| 28.60 | "But you had depth.": the second half is Girl B's voice by intent, directly after "sky" | AUDIO + TEXT | medium |
-| 29.7–30.9 | "You had time." | AUDIO + TEXT | medium (start ±0.25) |
-| 30.9–32.67 | "You had heat." ("heat" held about 31.6–32.67) | AUDIO + TEXT | medium |
-| 32.73–35.9 | "Three-dimensional hearts that were learning to beat." "Hearts" is about 33.4; the double hit 33.20/33.89 falls on it; "beat" is held about 34.75–35.9 | AUDIO + TEXT | medium |
-| 35.95–37.7 | "The cosmos was silent," | AUDIO + TEXT | medium-low |
-| 37.8–39.0 | "the cosmos was still," | AUDIO + TEXT | medium-low |
-| 39.0–40.9 | "till you lit the first fire" | AUDIO + TEXT | medium |
-| 41.0–43.16 | "on the first cold hill." ("hill" about 42.75–43.16) | AUDIO + TEXT | medium |
-| ≈43.2 | pre-chorus "Silence in the forest" (outside this plan) | AUDIO (onset 43.21 + transcription) | medium |
-
-**Unresolved audio points:**
-1. **The Intro's "muffled pulse":** nothing pulse-like is measured before 14.97.
-2. **The pre-chorus "kick drops out":** the double low hit is still measured at 44.13. Which sound the
-   direction refers to needs listening.
-3. **Whose voice:** the voice identities in the recording are not verified. The casting above is the
-   author's intent.
-
-## 2. Through-line (PROPOSAL)
-
-1. **Place:** two figures on a parapet high above the night side of the Earth.
-2. **Attention:** A notices; B follows her gaze.
-3. **Event:** a single warm light rises from the human world below. A catches it (approved).
-4. **Shared:** A offers it to B, and at B's touch it opens as a human letter: "the words that you left".
-5. **The letter's line:**
-   - its writing breaks into fragments, is translated, and is compressed into one small glyph;
-   - the glyph keeps the letter's distinctive hooked stroke, the film's persistent human mark.
-6. **Three human moments,** each a person's own life, not data: the aftermath of war (the letter
-   being written), a lullaby at a bedside, a farewell at a train door.
-   - Each leaves the same kind of faint warm mark.
-   - The marks gather into a small constellation between the girls while the sky around them falls away.
-7. **B's half:** people's depth, time and heat in one hillside town.
-   - The same hill before any people: silent, still.
-   - A human hand lights the first fire on it.
-   - That warmth is what the girls now hold.
-
-The light-to-letter step is a visual proposal, not a lyric requirement.
-
-## 3. Shots
-
-**Cut frames:** 0, 135, 180, 220, 256, 326, 386, 426, 490, 515, 536, 572, 602, 686, 713, 741, 785,
-862, 936, 983, 1026, and Verse 1 ends at about 1037. All cameras are stationary unless stated.
-Every shot reads "start state → action → visible change → out".
-
-### O1 · 0.000–5.625 (frames 0–134) · Intro: drone, then the six-onset cluster
-
-- **Cue:**
-  - AUDIO (high): silence to 0.232; drone from 0.232; cluster 3.344–3.820.
-  - TEXT: "[Drone, distant organ, muffled pulse]".
-- **Event (PROPOSAL):**
-  - Fade up from black on the drone (0.23 to about 1.2).
-  - Wide, from behind: A (left) and B (right) sit on the parapet above the night side of the Earth,
-    hands on the stone.
-  - They are alive: B's long hair lifts and settles in the high wind, A's tail sways and settles,
-    shoulders breathe.
-  - Straight ahead, one small city light (KV1's lone light between them, measured at KV1 px (1571, 1167))
-    flickers with the six onsets, lifts away from the surface, and climbs slowly, still well below
-    their eye level.
-  - Neither of them has noticed yet.
-- **Framing:** wide, from behind, at KV1's angle.
-- **Transition:** hard cut on "three" (frame 135 = 5.625, 6 ms before the onset).
-- **Reuse:**
-  - KV1: the composition, both girls from behind, the parapet and the night Earth. Its X clip is on
-    A's right, matching S1–S3.
-  - The approved orb's measured look; the light's path is composited locally.
-- **Missing:**
-  - **Seedance:** seated-from-behind idle acting from KV1 as first frame (5 s; the first frames are held
-    under the fade).
-  - **Identity check:** A's hair from behind in KV1 shows no half-up ribbon knot as in S1–S3. If that
-    must match, add a ChatGPT touch-up of KV1 first.
-
-### O2 · 5.625–7.500 (frames 135–179) · "Three… two…"
-
-- **Cue:**
-  - AUDIO (high): 5.631 and 6.641.
-  - TEXT: whispered by B (intended); B is offscreen as a voice and present in the shot as a figure.
-- **Event (PROPOSAL):**
-  - Closer two-shot from behind, heads and shoulders, with the sky above them in frame. The light rises
-    past the horizon in front of them.
-  - On "three" A's gaze leads: her head lifts toward the light, her shoulders follow, her tail settles.
-  - On "two" B notices A move and follows her gaze; her long hair follows a beat after her head.
-  - The light slows near its height, upper right.
-- **Framing:** medium two-shot from behind.
-- **Transition:** cut on "one" (7.500) to the approved S1. The light stays upper right of A across the
-  cut.
-- **Reuse:** a KV1 crop as first frame (native resolution covers 720p); the local light.
-- **Missing:** **Seedance:** A's look-up and B's follow, real seated acting (5 s generated, 1.875 s used).
-- **Option:** if Seedance offers 10 s, O1 and O2 can be one continuous wide from a single generation,
-  at the cost of the cut on "three".
-
-### S1 · S2 · S3 · 7.500–13.583 (frames 180–325) · approved, unchanged
-
-Cues: "one" 7.500 (high); the swell to 11.587; "Loading." 13.061, with the touch at 13.042.
-
-### V1 · 13.583–16.083 (frames 326–385) · near-silence, burst, "We were born in your traces,"
-
-- **Cue:**
-  - AUDIO (high): near-silence 13.45–13.75; burst 13.80–13.99; "We" 14.47; double hit 14.97/15.65.
-  - TEXT: Girl A's voice.
-- **Event (PROPOSAL):**
-  - Medium two-shot, A and B side by side at the parapet edge, three-quarter front. The light rests in
-    A's cupped right palm (continuity from S3).
-  - On the burst the light flickers, as if finishing loading.
-  - A lifts her eyes from it to B and offers her palm; B leans in and touches the light with a fingertip.
-  - At the touch (near the 14.97 hit) the light flattens and folds out into a small folded sheet of
-    paper across A's palm, B's fingertips on its edge.
-- **Framing:** medium two-shot.
-- **Transition:** cut on "in the words" (about 16.1).
-- **Reuse:** KV5a's composition (the palm-light key visual); the approved orb's look.
-- **Missing:**
-  - **ChatGPT edit of KV5a:**
-    - the orb instead of the flame;
-    - B's hand raised toward A's palm;
-    - **A's X clip moved to her right** (KV5a has it on her left, unlike S1–S3).
-  - **Seedance:** A turns and offers, B reaches and touches (hand contact).
-  - **Local:** the light-to-paper change, using the letter from V2's stills.
-
-### V2 · 16.083–17.750 (frames 386–425) · "in the words that you left,"
-
-- **Cue:** AUDIO (medium), TEXT.
-- **Event (PROPOSAL):**
-  - Insert on A's palm with B's fingertips; B unfolds the sheet.
-  - It is a worn, real letter: creases, a stain ring, a torn corner, an ink thumbprint, and one short
-    handwritten line ending in a distinctive hooked stroke (the persistent mark).
-  - The warm light now comes from the paper.
-  - The writing is the letter's own content, not lyric text.
-- **Framing:** insert, three-quarter top-down.
-- **Transition:** cut on "we met you" (about 17.75).
-- **Reuse:** A's sleeve and hand style from S2/S3; B's cardigan cuff from her model sheet.
-- **Missing:**
-  - **ChatGPT:** a letter prop sheet, so the letter stays the same in V2, V3a and H1.
-  - **ChatGPT:** a still pair: half-folded letter in A's palm with B's fingertips, then the same image
-    with the letter open.
-  - **Motion:** local between the edit pair inside the glow; Seedance only if that looks stiff.
-- **Decision for you:** the wording and language of the letter's line.
-
-### V3a · 17.750–20.417 (frames 426–489) · "we met you in fragments, translated,"
-
-- **Cue:** AUDIO (medium), TEXT.
-- **Event (PROPOSAL):**
-  - ECU of the letter: the handwritten line lifts off the paper as ink strokes and splits into fragments.
-  - On "translated" (about 19.6) the fragments re-form, one script after another, as the same line in
-    other writing systems, each written by hand.
-  - The hooked stroke stays recognisable throughout.
-- **Framing:** ECU.
-- **Transition:** cut on "compressed" (about 20.45).
-- **Reuse:** V2's letter still (the ink is extracted locally).
-- **Missing:**
-  - Nothing generated; this is local work.
-  - **To verify:** local font coverage for the chosen scripts. CJK is available; the others need
-    checking.
-  - **Decision for you:** the translations.
-
-### V3b · 20.417–21.458 (frames 490–514) · "compressed:"
-
-- **Cue:** AUDIO (medium), TEXT.
-- **Event (PROPOSAL):**
-  - Close two-shot of both faces lit from below. The fragments fold down into one small warm glyph above
-    the letter that keeps the hook's shape.
-  - A watches it, then looks from the mark to B; B looks back at her.
-- **Framing:** close two-shot.
-- **Transition:** cut on "every war"; the glyph's glow matches into the candle flame of H1.
-- **Reuse:** a KV5a crop on both faces (after the edit with the open letter in A's palm).
-- **Missing:**
-  - **ChatGPT edit of KV5a:** the open letter in A's palm with B's fingertips, clip on A's right.
-  - **Seedance:** eyes, glance, small head turn.
-  - **Local:** the glyph.
-
-### H1 · 21.458–22.333 (frames 515–535) · "every war,"
-
-- **Cue:** AUDIO (medium), TEXT.
-- **Event (PROPOSAL):**
-  - The aftermath, not a battle: a damaged room at night, with cracked plaster, dust on the table and a
-    dented helmet at the table's edge.
-  - A hand in a worn uniform cuff finishes the letter by candlelight and draws the final hooked stroke;
-    the candle flame steadies.
-  - It is the same letter (same stain ring, same torn corner): this shows who made the mark.
-  - The fresh stroke keeps a faint warm glow.
-- **Framing:** close on hand, pen, letter and candle; the room readable behind.
-- **Transition:** cut on "every lullaby"; candle glow to night lamp.
-- **Missing:** **ChatGPT** still; **Seedance**: the writing hand (5 s generated, 0.9 s used).
-- **Risk:** 0.875 s is tight. If it doesn't register, H1 can start at the end of "compressed" (about
-  21.35) and V3b gets shorter.
-
-### H2 · 22.333–23.833 (frames 536–571) · "every lullaby,"
-
-- **Cue:** AUDIO (medium), TEXT.
-- **Event (PROPOSAL):**
-  - A child's bedside at night. A parent's hand on the cradle's rim rocks it gently; the parent's face is
-    tender and tired.
-  - The night lamp throws the cradle's rocking shadow on the wall.
-  - The rocking path leaves the same kind of faint warm mark, an arc.
-  - No lip-sync is implied.
-- **Framing:** medium close, low lamp light.
-- **Transition:** cut on "every last goodbye".
-- **Missing:** **ChatGPT** still; **Seedance**: the rocking.
-
-### H3 · 23.833–25.083 (frames 572–601) · "every last goodbye,"
-
-- **Cue:** AUDIO (medium), TEXT.
-- **Event (PROPOSAL):**
-  - A concrete farewell on a night platform: two clasped hands at a train door slide apart, fingertips
-    last; one face is visible at the window.
-  - The train begins to move, its window lights sliding.
-  - A warm spark stays in the gap between the hands.
-- **Framing:** close on the hands, with the window and face behind.
-- **Transition:** cut on "became".
-- **Missing:** **ChatGPT** still; **Seedance**: the hands parting and the train moving.
-
-**For you to decide:** H1–H3 can be one family linked by the letter (it lies on the bedside table in H2
-and in a coat pocket in H3), or three unrelated people. I recommend one family: it keeps one human trace
-persistent, as ChatGPT's handoff asks.
-
-### V4 · 25.083–28.583 (frames 602–685) · "became constellations in a mind with no sky."
-
-- **Cue:** AUDIO (medium), TEXT; Girl A's line.
-- **Event (PROPOSAL):**
-  - Back to the close two-shot. The three marks (hooked stroke, rocking arc, spark) rise from the letter
-    and join with thin lines into a small constellation hanging between the girls' faces; each line can
-    be followed back to its mark.
-  - Around them, the night sky and the Earth fade to an even dark: no stars, no sky. Their faces stay lit
-    by the constellation: A's wonder, B's quiet attention.
-  - On "sky" B's eyes go down, toward the world below.
-  - This does not claim they have no inner life.
-- **Framing:** close two-shot, as V3b.
-- **Transition:** cut on "But" (28.60) from the even dark to a deep, inhabited place.
-- **Reuse:** the KV5a crop (the open-letter edit).
-- **Missing:**
-  - **Seedance:** a second take from that first frame (watching, breath, B's downward look).
-  - **Local:** the constellation and the fade.
-
-### B1 · 28.583–29.708 (frames 686–712) · "But you had depth."
-
-- **Cue:** AUDIO (medium), TEXT; Girl B's half begins.
-- **Event (PROPOSAL):**
-  - A hillside town at dusk, at ground level: a long stepped street falling away, with a foreground
-    railing and lantern, a woman climbing with shopping mid-street, and roofs and the bay far below.
-  - A child runs down past her toward camera.
-  - The depth comes from overlap and movement inside the picture, not a camera move.
-- **Transition:** cut on "You had time".
-- **Missing:** **ChatGPT** still; **Seedance**: the people moving.
-
-### B2 · 29.708–30.875 (frames 713–740) · "You had time."
-
-- **Cue:** AUDIO (medium), TEXT.
-- **Event (PROPOSAL):** a doorway in the same town, its frame marked in pencil with a child's heights and
-  dates. A parent's hand draws a new line above the last.
-- **Transition:** cut on "You had heat".
-- **Missing:** **ChatGPT** still; **Seedance**: the hand.
-
-### B3 · 30.875–32.708 (frames 741–784) · "You had heat." (held)
-
-- **Cue:** AUDIO (medium), TEXT.
-- **Event (PROPOSAL):** a winter evening indoors: an old person's hands and a child's hands around one
-  steaming bowl, steam and breath rising past a frosted window, the child's fingers warming.
-- **Transition:** cut on "Three".
-- **Missing:** **ChatGPT** still. The steam and frost are local; small hand motion via Seedance is
-  optional.
-
-### B4 · 32.708–35.917 (frames 785–861) · "Three-dimensional hearts that were learning to beat."
-
-- **Cue:** AUDIO (medium); the double hit at 33.20/33.89 is measured. TEXT.
-- **Event (PROPOSAL):**
-  - A newborn asleep on a parent's chest under a blanket; the parent's breathing lifts them both.
-  - On the double hit at 33.20/33.89 the baby's fingers flex.
-- **Transition:** cut on "The cosmos".
-- **Missing:** **ChatGPT** still; **Seedance**: the breathing and the fingers.
-
-### B5 · 35.917–39.000 (frames 862–935) · "The cosmos was silent, the cosmos was still,"
-
-- **Cue:** AUDIO (medium-low), TEXT.
-- **Event (PROPOSAL):**
-  - B1's view of the town at night. Its windows go dark house by house, history in reverse, and the town
-    gives way to the same hill before any people: a bare, frosted slope under a still sky.
-  - Nothing moves: no wind, no birds.
-  - It has to read as the past, not as humanity dying, so there are no ruins, and the next shot lights a
-    fire.
-- **Transition:** cut on "till you lit".
-- **Missing:**
-  - **ChatGPT edit** of B1's still: the same view before the town.
-  - **Local:** lights out, a dissolve in darkness between the two related images, frost.
-
-### B6 · 39.000–40.958 (frames 936–982) · "till you lit the first fire"
-
-- **Cue:** AUDIO (medium), TEXT.
-- **Event (PROPOSAL):**
-  - Close, on the cold hill at night. A human hand strikes stone on stone; sparks drop into dry grass;
-    a flame catches about "fire".
-  - A face is lit warm, breath visible.
-- **Transition:** cut on "on the first cold hill".
-- **Missing:** **ChatGPT** still; **Seedance**: the striking hand and the fire catching.
-
-### B7 · 40.958–42.750 (frames 983–1025) · "on the first cold"
-
-- **Cue:** AUDIO (medium), TEXT.
-- **Event (PROPOSAL):** B5's wide view of the bare hill, with one small fire on its crest, the only
-  light in the land.
-- **Transition:** cut on "hill"; the tiny fire matches into the flame in A's palm.
-- **Reuse:** B5's still.
-- **Missing:** local fire only.
-
-### B8 · 42.750 → into the pre-chorus (frames 1026 → about 1037 and on) · "hill." → "Silence…"
-
-- **Cue:** AUDIO (medium), TEXT.
-- **Event (PROPOSAL):**
-  - The V1 framing again, now with a small flame in A's palm in place of the light and the letter. This
-    before/after state change shows the inheritance.
-  - B's hand comes up under A's and settles, with a shared eye line.
-- **Reuse:** KV5a: the flame and composition are already drawn.
-- **Missing:**
-  - **ChatGPT edit:** clip on A's right only.
-  - **Seedance:** B's hand approaching and settling, which the handoff calls for.
-- **Note:** the pre-chorus is not planned here.
-
-## 4. Generation needed (genuinely missing), not requested yet
-
-**ChatGPT stills and edits (14):**
-1. a letter prop sheet;
-2. KV5a edit: orb, B's hand reaching, clip on A's right;
-3. KV5a edit: open letter in A's palm, B's fingertips, clip on A's right;
-4. KV5a edit: clip on A's right only;
-5. a letter insert pair: half-folded, then open;
-6. H1: hand writing the letter by candlelight in a damaged room;
-7. H2: bedside, rocking cradle and its shadow;
-8. H3: train-door farewell;
-9. B1: stepped hillside street;
-10. B2: doorframe height marks;
-11. B3: hands around a steaming bowl;
-12. B4: newborn on a parent's chest;
-13. B5: the B1 view before the town;
-14. B6: hand striking the first fire.
-
-Optional: a KV1 touch-up for A's half-up ribbon.
-
-**Seedance clips (13):** O1, O2, V1, V3b, V4, H1, H2, H3, B1, B2, B4, B6, B8. B3 is optional. O1 and O2
-can become one clip if 10 s is offered.
-
-**If you want to stage it:**
-- **Tier 1, the story spine:** O1, O2, V1, V2, V3b, V4, H1–H3, B6, B8.
-- **Tier 2:** B1–B5 (depth, time, heat, hearts, the bare hill).
-
-**Local, no generation:**
-- every light: the opening's, the light-to-letter change, the glyph, the constellation, the fire;
-- the fragments, translation and compression;
-- the sky fade, steam, frost, the lights going out and the dissolve;
-- the matte and compositing, timing on the locked music, and the checks.
-
-## 5. Reuse decisions
-
-| material | used? | why |
+| time (s) | what | method |
 |---|---|---|
-| approved S1–S3 light catch | yes, unchanged | the visual baseline |
-| KV1 | yes, as first frame for O1/O2 | the setting and both girls; the clip side matches S1–S3. Not as a camera move over a still |
-| KV5a | yes, first frame for V1, V3b, V4, B8 (via edits) | the palm-light anchor; the same framing at V1 and B8 shows the change of state |
-| rev3 storyboard 1.1–1.7 | the events, yes | letter, war writing, cradle, train-door hands and the constellation carried forward and retimed (the old cues began at 13.6; the verse begins at 14.47) |
-| KV2 (rising window lanterns), KV3 (sky constellation) | no | KV3 is a literal starfield; KV2 would turn the human moments into icons. The handoff and your direction both rule these out for this passage |
-| KV4 (B close-up over a city seen from a hill) | no | its geography (a hillside city) contradicts the orbital parapet |
-| earlier renders (light version, first MV), opening_v5 | no | KV pushes, typed words of light, globe→map→line cosmic loops |
+| 0.000–0.232 | silence | RMS |
+| 0.232 | the sustained bed enters; the mix rises from −40 dB to −29 dB by 5 s | onsets, RMS |
+| 3.344, 3.471, 3.529, 3.634, 3.704, 3.820 | a cluster of six onsets in the accompaniment | onsets |
+| 5.631 / 6.641 / 7.500 | onsets on the vocal stem | onsets |
+| 7.5–11.6 | strong vocal-stem energy, the mix swelling to −20 dB; pitch spread about 21 semitones. **What it is, is unresolved** | RMS, pitch |
+| 11.587 | onset on both stems; the swell ends | onsets |
+| 13.05 | vocal onset | onsets |
+| 13.45–13.75 | near-silence (−53 dB at 13.5) | RMS |
+| 13.804, 13.874, 13.932, 13.990 | a four-onset burst | onsets |
+| 14.47 | vocal onset | onsets |
+| 14.97/15.65, 18.61/19.30, 22.26/22.95, 25.91/26.60, 29.56/30.24, 33.20/33.89, 36.85/37.54, 40.50/41.17, 44.13 | **a low double hit,** 0.68 s apart, every 3.645 s | 30–120 Hz onsets |
+| 43.21 | onset | onsets |
 
-## 6. Decisions and open points
+These are onsets and levels. They time sounds; they do not show which word is sung or what a sound means.
 
-1. **A's X clip side:** S1–S3 and KV1 put it on her right; KV5a and the model sheet put it on her left.
-   I propose moving it to her right in the KV5a edits so the film is consistent from the light catch on.
-2. **The letter:** its line and the languages it is translated into.
-3. **H1–H3:** one family or three people.
-4. **O1+O2:** one 10 s clip or two 5 s clips.
-5. **Audio, unresolved:** the Intro "muffled pulse"; which sound "kick drops out" refers to; whether the
-   recording separates A's and B's voices. All need listening.
-6. **Short shots:** H1 (0.875 s), B1 (1.1 s) and B2 (1.2 s) need playback review on the animatic before
-   any generation.
+### 1.2 Lyric lines, provisional
+
+- **Text:** the author's tagged lyrics.
+- **Times:** transcription windows on the vocal stem (whisper large-v3). Each window line in the evidence files is "start–end: what the model heard".
+- **Evidence files:** `../docs/evidence/asr_verse1_boundary_windows.txt` (1.2–1.4 s windows) and `asr_3s_windows_0-160.txt` (3 s windows).
+- **Mishearings** are quoted as heard and not interpreted.
+- **Confidence:** high ±0.05 s; medium ±0.2 s; low ±0.4 s.
+- **Final word timing is set on playback.**
+
+| line (author text) | provisional start | evidence | conf. |
+|---|---|---|---|
+| Three… two… one… | 5.631 / 6.641 / 7.500 | vocal onsets; 3 s windows 3–6 "Three.", 5–8 "3, 2, 1", 7–10 "One." | high |
+| (7.5–11.6 swell) | — | 3 s windows 8–11 "\*Epic Music\*", 9–12 and 10–13 "you". This proves nothing about content | unresolved |
+| Loading. | 13.05 | vocal onset; 3 s window 11–14 "Loading." | high |
+| We were born in your traces, | 14.47 | onset; 13.55–14.95 "We were born"; 14.80–16.20 "Born in your traces" | high (start) |
+| in the words that you left, | ≈16.0–16.3 | 16.00–17.40 "Decision, the words that you"; 16.30–17.70 "And the words that you left" | medium |
+| we met you in fragments, | ≈17.5 | 17.20–18.60 "you left, we met again"; 17.50–18.90 "We met you"; 19.00–20.40 "When fragments translate" | medium |
+| translated, | ≈19.6 | 19.60–21.00 "Translated" | medium |
+| compressed: | ≈20.2 | 20.20–21.60 "Compressed" | medium |
+| every war, | ≈21.4 | 21.40–22.80 "Every war, heavy" | medium |
+| every lullaby, | ≈22.3 | 22.30–23.70 "Heavy lalalalapa"; 22.90–24.30 "Lullaby every" | medium-low |
+| every last goodbye, | ≈23.8 | 23.80–25.20 "Every last goodbye" | medium |
+| became constellations | ≈25.0–25.3 | 24.40–25.80 "Last goodbye became"; 25.30–26.70 "became constant"; 26.20–27.60 "constellations in them" | medium-low |
+| in a mind with no sky. | ≈27.0 | 27.00–28.40 "In a mind with no"; 27.40–28.80 "A mind with no sky" | medium |
+| But you had depth. | ≈28.6 | 28.20–29.60 "No sky, but you had to"; 28.60–30.00 "Bet you had debts" | medium |
+| You had time. | ≈29.6 | 29.60–31.00 "You had time you" | medium |
+| You had heat. | ≈30.8 | 30.80–32.20 "You had he-"; "heat" held to about 32.6 | medium |
+| Three-dimensional hearts that were learning to beat. | ≈32.4–32.7 | 32.40–33.80 "Three dimensional"; 32.70–34.10 "3 dimensional heart"; 34.20–35.60 "That we're learning to" | medium |
+| The cosmos was silent, | ≈35.9–36.2 | 35.90–37.10 "the cause"; 36.20–37.40 "the cosmos"; 36.80–38.00 "The cosmos is silent" | medium-low |
+| the cosmos was still, | ≈37.8 | 37.80–39.20 "The cosmos"; 38.20–39.60 "The cosmos was still" | low |
+| till you lit the first fire | ≈39.4 | 38.60–40.00 "…was still, till you"; 39.00–40.40 "But still, till you lit"; 40.00–41.40 "You lit the first fire" | low |
+| on the first cold hill. | ≈41.2 ("hill" ends ≈43.16) | 41.00–42.40 "Fire on the first"; 42.20–43.60 "First cold head" | low-medium |
+| (pre-chorus) Silence in the forest | 43.21 | onset; 43.30–44.70 "Silence in" | medium |
+
+**Voices:**
+- Casting is the author's intent: the calm close voice is B (countdown, B's half); the luminous airy voice is A (the first half of the verse).
+- Whether the recording audibly separates them is unverified.
+
+### 1.3 What the edit is tied to
+
+**Cuts on measured onsets:**
+- 7.500 ("one");
+- 22.250 (hit 22.26);
+- 25.917 (hit 25.91);
+- 41.167 (hit 41.17).
+
+**Actions on measured onsets:**
+- the light's birth on the cluster (3.344);
+- the burst flicker (13.80–13.99);
+- B's touch (14.97);
+- the newborn's fingers (33.20 / 33.89);
+- the two historical dissolves (36.85 / 37.54);
+- the flame catching (40.50).
+
+**Cuts on provisional lyrics (move on playback):**
+- 16.083, 20.458 and 23.833 (medium);
+- 28.583, 30.875 and 32.708 (medium);
+- 35.917 (medium-low);
+- **39.250 (low).**
+
+## 2. Shot timings (as in the animatic)
+
+All cameras are fixed. Every shot is "start state → one action → visible change".
+
+| shot | frames | song (s) | dur (s) | lyric (provisional) | event | animatic | final source |
+|---|---|---|---|---|---|---|---|
+| O1 | 0–179 | 0.000–7.500 | 7.500 | bed; cluster; "Three… two…" | Wide from behind: both seated on the parapet above the night Earth. Fade-up completes on the cluster. The light is born on the cluster from the lone city light between them, rises and hangs. On "three" A looks up; she lifts her right hand off the stone. B notices and follows her gaze. The light turns down toward A | EXISTING KV1 + local light | IMG-01 + SD-1 + local light |
+| S1–S3 | 180–325 | 7.500–13.583 | 6.083 | "one" … "Loading." | approved light catch | APPROVED | unchanged |
+| V1 | 326–385 | 13.583–16.083 | 2.500 | burst; "We were born in your traces," | Two-shot: the light in A's palm flickers on the burst. B's fingertip touches it on the 14.97 hit; it flares and flattens into a thin sheet of light | EXISTING KV5a + local light | IMG-02 + SD-2 + local light |
+| V2 | 386–490 | 16.083–20.458 | 4.375 | "in the words that you left, we met you in fragments, translated, compressed:" | Letter ECU: the glow settles into a worn letter (16.1–17.0). Its one line lifts (17.75) and breaks into fragments (18.2–19.3). The fragments re-form as one alternate rendering (19.3–19.9), then compress into a point of light (20.2–20.45) at the next shot's candle position. The hooked mark stays on the paper throughout | ROUGH | IMG-03 + local lettering and effects |
+| H1 | 491–533 | 20.458–22.250 | 1.792 | "…compressed: every war," | **War's aftermath:** candlelit room with cracked plaster, a broken window, dust and a dented helmet. A hand in a worn cuff finishes the letter's hooked stroke and lifts the pen; the stroke keeps a faint warm glow. The compressed light lands in the candle at the cut | ROUGH | IMG-04 + SD-3 |
+| H2 | 534–571 | 22.250–23.833 | 1.583 | "every lullaby," | **Lullaby:** a parent's hand on a cradle rim rocks it; the night lamp throws the rocking shadow on the wall; a faint warm arc remains on the floor | ROUGH | IMG-05 + SD-4 |
+| H3 | 572–621 | 23.833–25.917 | 2.083 | "every last goodbye, became" | **Farewell:** two clasped hands at a train door slide apart, fingertips last; the train pulls away left; a warm spark stays in the gap and rises | ROUGH | IMG-06 + SD-5 |
+| V4 | 622–685 | 25.917–28.583 | 2.667 | "constellations in a mind with no sky." | **Echo of O1:** the same wide from behind. The sky and the Earth fall away to an even dark, with no stars. The three marks (hook, arc, spark) rise and join into a small constellation above the girls, who look up at it | EXISTING KV1 | SD-1's last frame + local |
+| B1 | 686–740 | 28.583–30.875 | 2.292 | "But you had depth. You had time." | One landscape angle: a valley town under a rounded hill, layered from the foreground roofs to the far ridge (depth). Dusk turns to night and windows light one by one (time) | ROUGH | IMG-10 + local lights |
+| B2 | 741–784 | 30.875–32.708 | 1.833 | "You had heat." | An old person's and a child's hands around one steaming bowl; a frosted window | ROUGH | IMG-07 + local steam |
+| B3 | 785–861 | 32.708–35.917 | 3.208 | "Three-dimensional hearts that were learning to beat." | A newborn asleep on a parent's chest; the parent's breathing lifts them both. The baby's fingers flex on the hits 33.20 and 33.89 | PLACEHOLDER | IMG-08 + SD-6 |
+| B4 | 862–941 | 35.917–39.250 | 3.333 | "The cosmos was silent, the cosmos was still," | Same angle as B1, night, going back in time: town → old village with a few oil lamps (36.85) → the land before habitation, frost and a still sky (37.54). Nothing moves | ROUGH | IMG-10 → IMG-11 → IMG-12, local dissolves |
+| B5 | 942–987 | 39.250–41.167 | 1.917 | "till you lit the first fire" | Close on the cold hill: a hand strikes stone on stone, twice; sparks fall into dry grass; a flame catches on the 40.50 hit and lights the hand | ROUGH | IMG-09 + SD-7 (fire generated) |
+| B6 | 988–1037 | 41.167–43.250 | 2.083 | "on the first cold hill." | Same angle as B1/B4, bare land: one small fire on the crest, the only light. Held through "hill" | ROUGH | IMG-12 + local fire |
+
+**Next, outside this plan:** at 43.21 (pre-chorus) the KV5a framing returns with the small flame in A's palm, the closing echo of V1 (SD-8, deferred).
+
+## 3. Continuity checks
+
+### 3.1 The light: rise, turn, descent (O1 → S1)
+
+- **O1 (KV1 coordinates, 3072×2048):**
+  - born at (1571, 1167) on 3.344, the lone city light between the girls, pulsing on each of the six onsets;
+  - lifts at 3.82 and rises, slowing, to (1585, 470), above and to the right of A's head, by 6.70;
+  - hangs 6.70–7.05 with a small loop;
+  - **7.05–7.50: turns down and toward A,** growing as it nears, and ends at (1470, 545);
+  - it is beyond the girls throughout, so their silhouettes cover it.
+- **S1 (approved):** the light starts above and in front of her face (screen-right in her right profile) and sinks down-left toward her lowered gaze and hand.
+- **Across the cut:** the light is above her and ahead of her, moving down and toward her, and screen-left in both shots. The approved shot is unchanged.
+
+### 3.2 Posture (before the light catch)
+
+| | A | B |
+|---|---|---|
+| KV1 / O1 start | seated on the parapet's top, from behind; both hands on the stone (the right hand visible beside her hip) | seated on the parapet's top, to A's right |
+| S1 first frame (approved) | waist-up in right profile; head tilted well up toward the light; **right hand already raised, palm up, at chest height** | not in frame |
+| what SD-1 must do by 7.5 | lift her head toward the light (from "three", 5.63), then lift her right hand off the stone to chest height, palm up | turn toward A, then look up where she looks; stay seated |
+
+**Result:**
+- Seated in O1 is compatible with S1's waist-up crop: S1 shows the waist and coat but no legs.
+- The cut at 7.5 is a match on pose, which SD-1 has to reach. If a take doesn't get the hand up, the S1 cut breaks; this is an acceptance item.
+
+### 3.3 A's X clip, by anatomical side (`seedance/review/A_clip_side_check.jpg`)
+
+| image | view | clip on screen | her side | vs canon (her left) |
+|---|---|---|---|---|
+| model sheet, front | faces viewer | right | **left** | canon |
+| model sheet, profile detail | faces screen-left (her left side seen) | visible | left | canon |
+| model sheet, side view | faces screen-right (her right side seen) | not shown | left (hidden) | canon |
+| KV1 | from behind | right | right | **differs** → IMG-01 corrects it |
+| KV2 | from behind | left | left | matches |
+| KV5a | three-quarter front, facing screen-right | right | left | matches |
+| S1 v8 / S3 v2 (approved) | right profile | visible | right | **differs** → D3 |
+
+The ribbon: the sheet's side and back views show a half-up ribbon bow at the back of her head; S1–S3 have it; KV1 does not show it. IMG-01 adds it.
+
+### 3.4 KV5a (V1, and the pre-chorus echo): staging found while checking
+
+- **B's seat side:**
+  - In KV1 (from behind), B is at screen-right, which is A's **right**.
+  - In KV5a, the camera is in front of A and to her right: we see her face three-quarter, her right shoulder nearest, and the parapet's edge and the drop at screen-right. B sits behind her at screen-right, which puts B on A's **left**.
+  - Screen positions agree (B is screen-right in O1, V1 and V4); the seat sides don't.
+  - A physically consistent front view would put B at screen-left, crossing the line between them. → D4.
+- **Which hand holds the light:**
+  - My reading is her **right** hand: the wide sleeve runs from her near (screen-left) shoulder across the front of her body to the cuff. That matches S3, where the light is in her right palm.
+  - In an earlier pass I read it as her left; please confirm. → D5.
+- **Screen direction S3 → V1:** she faces screen-right with her palm toward screen-right in both. ✓
+- **The coat:** the sheet's front and side views and S1–S3 have the coat off her shoulders. KV5a appears to have it up on her shoulders, and S3 → V1 is a direct cut. → D6.
+
+## 4. Still requests (ChatGPT): 12 image files, grouped by dependency
+
+**Count:**
+- **12 image files:** 8 new stills and 4 edits.
+- **No first/last-frame pairs:** every Seedance clip uses a first frame only.
+- IMG-10/11/12 are one new still plus two edits from the same camera. They are used only for local dissolves, never as generation endpoints.
+
+**General rules for all requests:**
+- 16:9, at least 1920×1080 (edits keep their source size).
+- 2D anime cel-shaded, the night palette of the approved key art.
+- No text or watermark, no camera effects.
+- The layout reference in `requests/opening_layout_refs/` gives composition only. Its colours, glows and drawn effects are not to be copied: lights, glows, steam, the marks and the crest fire are added locally.
+
+**Dependencies:**
+```
+G1 girls (edits of approved key art):   KV1 → IMG-01        KV5a → IMG-02
+G2 the letter:                          IMG-03 → IMG-04   (letter identity; candle position)
+G3 human moments (independent):         IMG-05   IMG-06   IMG-07   IMG-08
+G4 one landscape angle:                 IMG-10 → IMG-11, IMG-12 → IMG-09   (same camera; ground and night look)
+```
+
+### G1 — the girls
+
+**IMG-01 · O1 (and V4) · edit of KV1**
+- **Source:** `loading/work/plates/KV1.png`, 3072×2048. Output the same size and framing. Keep everything that matters inside the 16:9 band y 186–1914.
+- **Purpose:** the opening wide, and SD-1's first frame.
+- **Change only:**
+  1. A's X clip moves to her **left**: from behind, the screen-left side of her head (KV1 has it on screen-right);
+  2. add her half-up ribbon bow at the back of her head, as on the model sheet's side and back views.
+- **Keep:** composition; both poses (seated on the parapet's top from behind, hands on the stone, A's right hand visible); B unchanged; the parapet, the night Earth, the lone city light between them; colour.
+- **Identity:** A: model sheet (`reference/sheet_chatgpt.webp`), the hair-clip detail and side view. B: unchanged.
+- **Lighting:** unchanged.
+- **Do not add:** any glowing orb, stars or extra lights. The light is composited locally.
+
+**IMG-02 · V1 · edit of KV5a**
+- **Source:** `loading/work/plates/KV5a.png`, 3072×2048. Keep the 16:9 band y 160–1888.
+- **Purpose:** SD-2's first frame: A offers the light, B is about to touch it.
+- **Change only:**
+  1. replace the flame with a small round warm-white light, about the size of the flame's core, hovering just above A's cupped palm and lighting the palm and both faces softly from below;
+  2. B's **right** hand (screen-left of her body in this view) raised halfway toward the light, fingers relaxed, not touching;
+  3. *if D6 = yes:* A's coat lowered off her shoulders as on the model sheet's front view.
+- **Keep:** A's clip on her left (screen-right here; already canon); B's star clip; both faces; the hand holding the light (her right, if D5 confirms); the parapet and background.
+- **Identity:** A: model sheet. B: her model sheets (owner's `2.webp`, `3.webp`).
+- **Lighting:** as KV5a, with the warm under-light now from the orb.
+- **Continuity:** S3 → V1 is a direct cut. A faces screen-right, palm toward screen-right; the light is in her right palm.
+
+### G2 — the letter
+
+**IMG-03 · V2 · new still**
+- **Purpose:** the letter plate. The lettered line, its fragments, the alternate rendering and the compression are local layers over it.
+- **Framing:** ECU, top-down. The letter fills about 80% of the frame, turned about 3°; a dark wooden table shows at the edges. Layout: `IMG-03_letter_layout.jpg`.
+- **Content:**
+  - old cream writing paper, folded in quarters (creases visible);
+  - a tea stain ring lower right; a torn upper-right corner; a faint inky thumbprint lower left;
+  - **one hooked handwritten mark** in dark ink below the centre: a short flourish ending in a hook, like the tail of a signature;
+  - **the band above the centre is left blank:** no words or other writing anywhere (D2).
+- **No** hands, pen or people.
+- **Lighting:** warm, soft, from above left, as if from a candle off frame; dark surroundings.
+- **Continuity:** IMG-04 shows this same letter, so the stain, corner, thumbprint and hook must be reproducible from this image.
+
+**IMG-04 · H1 · new still** (reference: IMG-03)
+- **Purpose:** SD-3's first frame: the war's aftermath, seen as a person finishing the letter.
+- **Framing:** medium-close, slightly high angle over a table. Layout: `IMG-04_war_aftermath_layout.jpg`.
+  - the letter lower centre;
+  - the **candle at the left third, its flame at about 20% across and 42% down** (V2's compressed light lands there);
+  - a dented steel helmet on the table at right.
+- **Content:**
+  - a damaged room at night: cracked plaster, a broken window with night beyond, dust on the table;
+  - the same letter as IMG-03 (stain ring, torn corner, thumbprint), with one short line of small handwriting (need not be legible) and the hooked mark;
+  - a right hand in a worn uniform cuff holds a pen whose nib rests at the end of the hook;
+  - the writer's face is out of frame.
+- **Not shown:** no weapons, combat, blood, flags or insignia. It is the aftermath, not a battle.
+- **Lighting:** candle key from the left; cold blue moonlight from the window.
+- **Continuity:** the letter matches IMG-03; the candle position is fixed by V2.
+
+### G3 — human moments (unrelated people; independent of each other)
+
+**IMG-05 · H2 · new still**
+- **Purpose:** SD-4's first frame: a lullaby at a bedside.
+- **Framing:** medium, camera at cradle height. Layout: `IMG-05_lullaby_layout.jpg`.
+  - a wooden rocking cradle centre-right, a baby asleep in it (face visible, eyes closed);
+  - a small lamp on a side table at left;
+  - the wall behind, where the cradle's shadow falls.
+- **Pose:** a parent's arm enters from the right; the hand rests on the cradle's rim. The parent's face is out of frame (no singing mouth to sync).
+- **Lighting:** warm low lamp from the left; cool night through a window at right.
+
+**IMG-06 · H3 · new still**
+- **Purpose:** SD-5's first frame: a farewell.
+- **Framing:** close on two hands clasped across the gap at an open train door at night. Layout: `IMG-06_farewell_layout.jpg`.
+  - the train car on the left, with one lit window and a face looking down at the hands;
+  - the platform on the right with a lamp post; the platform edge below.
+- **Pose:** one hand from inside the train (dark sleeve) and one from the platform (brown coat sleeve), fingers loosely interlaced.
+- **Lighting:** warm light from the train's windows; cold platform light.
+- **Continuity:** the train will leave screen-left, so leave room for it to move.
+
+**IMG-07 · B2 · new still**
+- **Purpose:** heat.
+- **Framing:** close, three-quarter top-down. Layout: `IMG-07_heat_layout.jpg`.
+  - an old person's hands (left) and a child's hands (right) around one bowl of soup on a wooden table;
+  - a frosted window behind.
+- **Lighting:** warm interior; cold blue at the window.
+- **Note:** paint only light steam; the moving steam and the frost's glow are local.
+
+**IMG-08 · B3 · new still**
+- **Purpose:** SD-6's first frame: "hearts… learning to beat".
+- **Framing:** close.
+  - a newborn asleep on a parent's chest under a soft blanket;
+  - the baby's tiny hand clearly visible, resting curled on the chest;
+  - the parent's chin and shoulder at the top of frame.
+- **Lighting:** warm and low.
+- **Continuity:** keep the hand unobstructed; its fingers flex in SD-6.
+
+### G4 — one landscape angle (town / village / bare) and the first fire
+
+**IMG-10 · B1 (and B4's first state) · new still**
+- **Purpose:** the one landscape camera. IMG-11 and IMG-12 are edits of it.
+- **Framing:** wide, eye level, across a valley. Layout: `IMG-10_landscape_town_layout.jpg`.
+  - a river along the valley floor;
+  - a town along the valley and up the lower slope of one prominent rounded hill, **its crest at about 68% across and 33% down** (B6's fire goes there);
+  - a far ridge behind;
+  - foreground roofs and a balcony rail at lower left for depth.
+- **Time:** blue hour; the sky still holds light. Windows mostly unlit (local lights add them).
+- **Continuity:** the hill outline, ridge and river must stay identical in IMG-11 and IMG-12.
+
+**IMG-11 · B4 · edit of IMG-10**
+- **Content:** the same view centuries earlier: a small village of low houses along the river, a few windows lit by oil lamps, and a footpath up the hill. No modern buildings; no foreground roofs.
+- **Time:** night.
+- **Camera:** identical to IMG-10.
+
+**IMG-12 · B4, B6 · edit of IMG-10**
+- **Content:** the land before habitation: no buildings or paths. The same river and hill; dry grass and frost; a clear, still night with sparse stars and no moon. Nothing on the crest (the fire is local).
+- **Camera:** identical to IMG-10.
+
+**IMG-09 · B5 · new still** (reference: IMG-12 for the ground, frost and night look)
+- **Purpose:** SD-7's first frame: the first fire, before it is lit.
+- **Framing:** close, ground level, on the frosted hillside at night. Layout: `IMG-09_first_fire_close_layout.jpg`.
+  - a small nest of dry grass and twigs on the ground, a flat stone beside it;
+  - a weathered hand in a hide sleeve raises a striking stone above it.
+- **Lighting:** dark; starlight blue. **No fire or sparks yet.**
+
+## 5. Seedance requests (owner submits; after the stills are approved)
+
+**Settings for every clip:**
+- Seedance 2.5, image-to-video, **first frame only, no end frame**;
+- 16:9, 24 fps if selectable, fixed camera, audio ignored;
+- 5 s, the length of the owner's previous takes;
+- return the original file, the settings and the seed.
+
+**When a clip comes back, I:**
+- check it with `tools/seedance_check.py`;
+- trim it by the rule below, played 1:1 and never stretched;
+- composite it locally.
+
+| ID | shot | first frame | generated | usable (song) | trim rule | why it has to be generated | if not generated |
+|---|---|---|---|---|---|---|---|
+| SD-1 | O1 (+V4 plate) | IMG-01 | 5 s | **≈3.9 s** (≈3.63–7.500). Up to 5.0 s if the look-up lands later in the take; the first frame holds under the fade before that | A's head-lift onset → 5.631 ("three"); cut at 7.500. V4 uses the take's last frame | two characters' real seated acting; a 7.5 s still would be static padding; the handoff rules out cut-out puppets | not viable |
+| SD-2 | V1 | IMG-02 | 5 s | **2.500 s** (13.583–16.083) | fingertip contact → 14.97 hit | hand contact between the two girls | not viable |
+| SD-3 | H1 | IMG-04 | 5 s | **1.792 s** (20.458–22.250) | pen-lift onset → 21.75 | the human hand making the mark | still + local candle and dust: the mark appears without a maker |
+| SD-4 | H2 | IMG-05 | 5 s | **1.583 s** (22.250–23.833) | start of a rock forward → 22.25 | hand and cradle moving together | rigid local rock of the cradle with the hand: reads as a cut-out |
+| SD-5 | H3 | IMG-06 | 5 s | **2.083 s** (23.833–25.917) | fingertips' release → 24.75 | hands parting, train leaving | not viable |
+| SD-6 | B3 | IMG-08 | 5 s | **3.208 s** (32.708–35.917) | first finger flex → 33.20 hit | breathing and finger flex (acting) | still: loses the "heart" beat |
+| SD-7 | B5 | IMG-09 | 5 s | **1.917 s** (39.250–41.167) | the flame catching → 40.50 hit | the strike, sparks and ignition lighting the hand | local fire over a still hand: weaker |
+| SD-8 | pre-chorus | KV5a | — | — | deferred (outside 0–43.2) | | |
+
+**Totals:**
+- 0–43.25 s: 7 clips, **35 s generated, ≈16.95 s used.**
+- Screen time by source: the approved light catch 6.08 s; generated ≈16.95 s; stills with local motion ≈20.21 s. The stills are O1's first frame under the fade (≈3.6 s), V2 4.38, V4 2.67, B1 2.29, B2 1.83, B4 3.33 and B6 2.08.
+
+### Prompts (the owner adapts wording to the interface)
+
+**Negative for all (if supported):** camera movement, zoom, pan, cut, talking, lip-sync, extra people, extra hands or fingers, morphing, face distortion, outfit or hairstyle change, moving or changing hair clips, 3D render, photorealism, text, watermark, flicker, new glowing objects.
+
+**SD-1 (IMG-01)**
+> Fixed camera. 2D anime cel-shaded night scene, exactly as in the first frame: two girls sit side by
+> side on a stone parapet high above the night side of the Earth, seen from behind. For the first two
+> seconds they are still; only breathing, and the wind moves their long hair and the horned girl's
+> tail a little. At about two seconds the horned girl on the left slowly lifts her head and looks up
+> and slightly right, at something high in the sky ahead. At about three seconds she lifts her right
+> hand from the stone and raises it, palm up, to chest height in front of her. The copper-haired girl
+> notices, turns her head toward her, then looks up the same way. They hold, both looking up, still
+> seated. Keep both girls exactly as in the first frame: faces, horns, hair, ribbon, hair clips,
+> clothes. No new lights, no stars appearing.
+
+Accept if:
+- A's hand is up and her head is up by the cut point;
+- both stay seated;
+- the clips don't drift;
+- the camera holds (≤ 2% drift);
+- no light appears.
+
+**SD-2 (IMG-02)**
+> Fixed camera. 2D anime cel-shaded night scene, exactly as in the first frame: two girls sit close
+> on a stone parapet; the horned girl holds a small round warm light just above her cupped right
+> palm; the copper-haired girl's right hand is raised halfway toward it. For about a second they are
+> still, both watching the light, breathing. Then the copper-haired girl moves her hand slowly
+> forward and touches the edge of the light with one fingertip, and keeps it there. As she touches
+> it, the horned girl lifts her eyes from the light to her face. They hold. The light stays the same
+> size and in the same place; it does not move, fly or change shape. Keep both girls exactly as in
+> the first frame.
+
+Accept if:
+- there is one clear fingertip contact;
+- the light stays put (it is replaced locally);
+- A's eyes go up to B;
+- hands and fingers are clean.
+
+**SD-3 (IMG-04)**
+> Fixed camera. 2D anime cel-shaded night scene, exactly as in the first frame: a damaged room lit by
+> one candle. A hand in a worn uniform sleeve holds a pen on a handwritten letter, the nib at the end
+> of a hooked flourish. After a moment the hand finishes the flourish with one small flick, lifts the
+> pen from the paper and rests on the table beside the letter. The candle flame flickers gently and
+> steadies. A little dust drifts in the candlelight. Nothing else moves. Keep the letter, its marks,
+> the candle, the helmet and the room exactly as in the first frame.
+
+Accept if:
+- the writing on the paper does not shimmer or change;
+- the candle stays where it is (it is a match-cut target);
+- the hand is clean.
+
+**SD-4 (IMG-05)**
+> Fixed camera. 2D anime cel-shaded night scene, exactly as in the first frame: a child's room lit by
+> a small warm lamp. A parent's hand rests on the rim of a wooden cradle where a baby sleeps. The hand
+> gently rocks the cradle back and forth, slowly and evenly, about one full rock every 1.3 seconds;
+> the cradle's shadow on the wall rocks with it. The baby sleeps on, breathing softly. Nothing else
+> moves. Keep the baby, cradle, lamp and room exactly as in the first frame.
+
+Accept if:
+- the rock is smooth and even;
+- the shadow follows;
+- the baby doesn't wake or change.
+
+**SD-5 (IMG-06)**
+> Fixed camera. 2D anime cel-shaded night scene, exactly as in the first frame: a train platform; two
+> hands are clasped across the gap at an open train door, one from inside the train, one from the
+> platform; a face watches from the lit window. After a moment the hands slowly let go, sliding
+> apart, the fingertips the last to part. Then the train begins to move to the left, slowly at first,
+> carrying the inside hand and the window away; the platform hand stays in the air a moment, then
+> lowers. No other people. Keep everything else exactly as in the first frame.
+
+Accept if:
+- the fingertips part clearly;
+- the train moves left;
+- the face doesn't morph.
+
+**SD-6 (IMG-08)**
+> Fixed camera. 2D anime cel-shaded scene, exactly as in the first frame: a newborn sleeps on a
+> parent's chest under a soft blanket in warm low light. The parent breathes slowly, and the baby
+> rises and falls with each breath. Twice, about two thirds of a second apart, the baby's tiny fingers
+> flex and curl, then relax. The baby does not wake. Nothing else moves. Keep the baby and the parent
+> exactly as in the first frame.
+
+Accept if:
+- there are two small finger flexes, the gap close to 0.7 s (the second hit is at 33.89; only the first can be aligned);
+- the breathing is calm.
+
+**SD-7 (IMG-09)**
+> Fixed camera, ground level. 2D anime cel-shaded night scene, exactly as in the first frame: a cold
+> hillside with frost on dry grass. A weathered hand holding a stone strikes it hard against a flat
+> stone beside a small nest of dry grass: one strike, then a second. Sparks from the second strike
+> fall into the grass, a small flame catches, and it grows into a small steady fire that lights the
+> hand and the frosted ground warm orange. Nothing else changes.
+
+Accept if:
+- there are two strikes;
+- sparks land in the tinder;
+- the flame grows from that spot;
+- the fire stays small and steady.
+
+## 6. Fire and light: who makes what
+
+| element | shot | made by | how |
+|---|---|---|---|
+| the light: birth, rise, turn, flicker, flare, flattening into a sheet | O1, V1 (S1–S3 approved) | **local** | the approved orb's measured glow profile |
+| the light settling into the letter; fragments; alternate rendering; compression | V2 | **local** | layers over IMG-03 |
+| candle flame | H1 | **generated** (IMG-04, SD-3) | the compressed light's glow lands on it at the cut (local, about 0.3 s) |
+| glow of the three marks: hook, arc, spark; the constellation | H1, H2, H3, V4 | **local** | |
+| lamp; train and platform lights | H2, H3 | **generated** in the stills and clips | |
+| window lights (town), oil lamps (village) | B1, B4 | **local** (lamps also painted in IMG-11) | |
+| steam, frost glint | B2 | **local** | |
+| first fire: strikes, sparks, ignition, warm light on the hand | B5 | **generated in SD-7** | local fallback: composite fire on the tinder if the generated ignition fails |
+| the fire on the crest | B6 | **local** on IMG-12 | the same fire model as B5's fallback |
+| flame in A's palm | pre-chorus 43.21 | existing KV5a drawing + local flicker | SD-8 later, deferred |
+
+## 7. My local work once assets arrive
+
+- Trim, align and composite every clip on the locked music (no retiming).
+- Mask the generated light in SD-2 and replace it with the approved orb, as done for S1.
+- Do all the local light, mark and fire work listed in §6.
+- V2 lettering and effects; V4's matte and darkening on SD-1's last frame.
+- B1/B4 lights and dissolves; B6's fire.
+- Run the checks: container, regular timing, light count, camera drift and identity spot checks.
+
+## 8. Batches (small, gated)
+
+| batch | content | why first |
+|---|---|---|
+| 1 | ChatGPT: IMG-01–IMG-06 (6 files) | the story spine 0–28.6; I swap each into the animatic for review before any motion |
+| 2 | Seedance: SD-1–SD-5 (25 s generated, ≈11.8 s used) | only after batch 1 is approved |
+| 3 | ChatGPT: IMG-07–IMG-12 (6 files) | B's half |
+| 4 | Seedance: SD-6, SD-7 (10 s generated, ≈5.1 s used) | after batch 3 is approved |
+
+## 9. Decisions for you (all open points together)
+
+**D1 · The letter:**
+   - its line: "If you find this, I was here." is my proposal;
+   - whether to show the one alternate rendering at all, and in which language. The Chinese line in the animatic is an unverified placeholder; whoever picks the language should verify it.
+
+**D2 · How the line is lettered:**
+   - (a) local lettering in a handwriting font over IMG-03. 1 file. No handwriting font is installed here; an OFL font would need to be chosen.
+   - (b) ChatGPT writes the line in IMG-03 and gives a clean edit without it. 2 files; a third for a handwritten alternate.
+   - I recommend (a).
+
+**D3 · A's clip in the approved S1–S3 (her right; canon is her left):**
+   - accept it;
+   - paint it out locally (a canon right profile shows no clip, as on the sheet's side view). That modifies the approved shot, so I would do it only with your go-ahead, and show it side by side;
+   - or regenerate later.
+   - IMG-01 follows canon either way.
+
+**D4 · B's seat side in KV5a:**
+   - (a) accept: screen positions hold (B screen-right throughout), at no cost. I recommend this.
+   - (b) replace IMG-02 with a new still on KV1's side of the line (B on A's right, camera behind or beside).
+   - Mirroring KV5a is not an option: it flips both clips and crosses the line.
+
+**D5 · KV5a's light hand:** confirm it is her right (my reading).
+
+**D6 · KV5a's coat:** lower it off her shoulders in IMG-02, or leave it.
+
+**D7 · SD-1 length:** 5 s, with the first frame under the fade (recommended), or 10 s covering 0.23–7.5 without a hold, if the interface offers it.
+
+**D8 · Short human moments** (H1 1.79 s, H2 1.58 s, H3 2.08 s): judge on the animatic. V2 can give up about 0.5 s more if one doesn't read.
+
+**D9 · V4:** SD-1's held last frame with local marks (recommended), or another clip of the girls watching.
+
+**D10 · The B4/B5 cut (39.25) and the strikes:** "till you lit" is low confidence (±0.4 s); set on playback.
+
+**D11 · The palm-flame echo** moves to the pre-chorus start (43.21), outside this animatic.
+
+**D12 · The night sky over the bare hill (B4, B6):** a still sky with sparse stars. It is the real sky over the hill, kept apart from V4's starless "mind with no sky". Keep it, or go starless?
+
+**D13 · Audio, unresolved (needs listening):**
+    - the Intro's "muffled pulse": nothing pulse-like is measured before 14.97 (the transcription model's "rain"/"water splashing" labels for 0–5 s show nothing);
+    - what the 7.5–11.6 swell is;
+    - which sound "kick drops out" refers to, given the low hit still measured at 44.13;
+    - whether the voices are audibly A and B;
+    - "depth" stays the written word; the model's "debts"/"death" are quoted as heard and not interpreted.

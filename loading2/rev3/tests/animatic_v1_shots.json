@@ -1,0 +1,212 @@
+[
+ {
+  "id": "O1",
+  "frames": [
+   0,
+   179
+  ],
+  "song": [
+   0.0,
+   7.5
+  ],
+  "duration": 7.5,
+  "tag": "EXISTING",
+  "picture": "KV1 wide, both seated from behind. Light born on the six-onset cluster, rises, hangs, turns toward A",
+  "final": "final: IMG-01 (KV1 edit: clip to her left, ribbon tie) + SD-1 (A looks up, lifts her right hand off the stone; B follows)"
+ },
+ {
+  "id": "S1–S3",
+  "frames": [
+   180,
+   325
+  ],
+  "song": [
+   7.5,
+   13.583
+  ],
+  "duration": 6.083,
+  "tag": "APPROVED",
+  "picture": "approved light catch, unchanged",
+  "final": "none"
+ },
+ {
+  "id": "V1",
+  "frames": [
+   326,
+   385
+  ],
+  "song": [
+   13.583,
+   16.083
+  ],
+  "duration": 2.5,
+  "tag": "EXISTING",
+  "picture": "KV5a two-shot; light in A's palm (local); flickers on the burst; flares at B's touch (14.97 hit)",
+  "final": "final: IMG-02 (KV5a edit: orb, B's hand halfway) + SD-2 (B touches it, A looks up to her); light local"
+ },
+ {
+  "id": "V2",
+  "frames": [
+   386,
+   490
+  ],
+  "song": [
+   16.083,
+   20.458
+  ],
+  "duration": 4.375,
+  "tag": "ROUGH",
+  "picture": "letter ECU: light settles into the paper; the line lifts into fragments; one alternate rendering; it compresses to a point. The hooked mark stays on the paper",
+  "final": "final: IMG-03 (letter still) + local effects. Wording and translation need your approval"
+ },
+ {
+  "id": "H1",
+  "frames": [
+   491,
+   533
+  ],
+  "song": [
+   20.458,
+   22.25
+  ],
+  "duration": 1.792,
+  "tag": "ROUGH",
+  "picture": "war aftermath: damaged room, candle, helmet; a hand finishes the letter with the hooked stroke",
+  "final": "final: IMG-04 + SD-3 (the pen's last flick and lift); glow on the stroke local"
+ },
+ {
+  "id": "H2",
+  "frames": [
+   534,
+   571
+  ],
+  "song": [
+   22.25,
+   23.833
+  ],
+  "duration": 1.583,
+  "tag": "ROUGH",
+  "picture": "lullaby: a parent's hand rocks a cradle; the lamp throws its rocking shadow; a warm arc remains",
+  "final": "final: IMG-05 + SD-4 (rocking); arc local"
+ },
+ {
+  "id": "H3",
+  "frames": [
+   572,
+   621
+  ],
+  "song": [
+   23.833,
+   25.917
+  ],
+  "duration": 2.083,
+  "tag": "ROUGH",
+  "picture": "farewell: clasped hands at a train door slide apart; the train moves; a spark stays and rises",
+  "final": "final: IMG-06 + SD-5 (hands part, train moves); spark local"
+ },
+ {
+  "id": "V4",
+  "frames": [
+   622,
+   685
+  ],
+  "song": [
+   25.917,
+   28.583
+  ],
+  "duration": 2.667,
+  "tag": "EXISTING",
+  "picture": "KV1 again (echo of the opening): sky and Earth fall away; the three marks join into a small constellation above them",
+  "final": "final: SD-1's last frame + local matte, darkening and marks (no new image)"
+ },
+ {
+  "id": "B1",
+  "frames": [
+   686,
+   740
+  ],
+  "song": [
+   28.583,
+   30.875
+  ],
+  "duration": 2.292,
+  "tag": "ROUGH",
+  "picture": "one landscape angle, town: depth by layers; dusk to night, windows light up (time)",
+  "final": "final: IMG-10 + local lights"
+ },
+ {
+  "id": "B2",
+  "frames": [
+   741,
+   784
+  ],
+  "song": [
+   30.875,
+   32.708
+  ],
+  "duration": 1.833,
+  "tag": "ROUGH",
+  "picture": "heat: an old person's and a child's hands around a steaming bowl; frosted window",
+  "final": "final: IMG-07; steam and frost local"
+ },
+ {
+  "id": "B3",
+  "frames": [
+   785,
+   861
+  ],
+  "song": [
+   32.708,
+   35.917
+  ],
+  "duration": 3.208,
+  "tag": "PLACEHOLDER",
+  "picture": "hearts: newborn asleep on a parent's chest; rings mark the measured double hits 33.20 / 33.89",
+  "final": "final: IMG-08 + SD-6 (breathing, fingers flex on the hits)"
+ },
+ {
+  "id": "B4",
+  "frames": [
+   862,
+   941
+  ],
+  "song": [
+   35.917,
+   39.25
+  ],
+  "duration": 3.333,
+  "tag": "ROUGH",
+  "picture": "same landscape angle, going back in time: town -> village with oil lamps (36.85 hit) -> land before habitation (37.54 hit)",
+  "final": "final: IMG-10 -> IMG-11 -> IMG-12, local dissolves"
+ },
+ {
+  "id": "B5",
+  "frames": [
+   942,
+   987
+  ],
+  "song": [
+   39.25,
+   41.167
+  ],
+  "duration": 1.917,
+  "tag": "ROUGH",
+  "picture": "first fire: a hand strikes stone on stone; sparks; the flame catches on the 40.50 hit",
+  "final": "final: IMG-09 + SD-7 (strikes and fire generated in this clip)"
+ },
+ {
+  "id": "B6",
+  "frames": [
+   988,
+   1037
+  ],
+  "song": [
+   41.167,
+   43.25
+  ],
+  "duration": 2.083,
+  "tag": "ROUGH",
+  "picture": "same landscape angle, bare: one small fire on the hill crest, held through \"hill\"",
+  "final": "final: IMG-12 + local fire. The KV5a flame echo opens the pre-chorus at 43.21 (not in this animatic)"
+ }
+]
