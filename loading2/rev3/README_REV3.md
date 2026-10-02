@@ -196,3 +196,12 @@ Reels and comparison: frame counts and durations were checked with ffprobe.
   Each pose needs a start and an end key.
 
 **Not attempted in this package:** the rest of the film, any other shot, and any audio edit.
+
+## Production route update: Seedance 2.5 (owner-generated)
+
+Shots that need genuine character motion move to Seedance 2.5 clips, which the owner generates.
+The pilot is the light catch at 0:07.5–0:12.5. The request list, reference-image briefs and prompts
+are in `seedance/SEEDANCE_PLAN_AND_PILOT.md`, with composition boards in `seedance/composition/`.
+
+`tests/REV3b_light_catch.mp4` (`tools/body2.py`) is the local three-shot re-cut of the light catch.
+It removes the in-shot pose switch and is the pilot's layout and timing reference.
