@@ -52,9 +52,9 @@
 
 | check | result |
 |---|---|
-| container | CONTAINER |
-| approved light catch (frames 180–325) vs `P1_light_catch_720p.mp4` | APPROVED |
-| frame-to-frame change | JUMPS |
+| container | 1280×720 H.264, 24 fps, 1038 frames, 43.250 s; AAC 43.250 s from the locked master; 0 irregular frame steps; sha256/16 4627bb82bf5a7d81 |
+| approved light catch (frames 180–325) vs `P1_light_catch_720p.mp4` | mean difference 1.85, max 1.94 (0–255, at 320×180): re-encoding only |
+| frame-to-frame change | median 0.72. Every change over 19 outside a cut is accounted for: the fold into the point (20.25–20.38, intended); paper wipes leaving the frame (22.33, 23.92, 30.54); the fade up from black (0.33–0.5); the fire card's drawing appearing (39.29); the S2 hand (10.67) |
 | match cuts | P1b's last point and M1's candle sit at the same pixel (about 400, 290). D6's fire is at (567, 443) and KV5's painted flame in E1 at (566, 445) |
 
 **Fixed after the first full render:**

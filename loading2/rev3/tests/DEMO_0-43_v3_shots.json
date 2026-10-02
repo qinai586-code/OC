@@ -1,0 +1,230 @@
+[
+ {
+  "id": "O",
+  "frames": [
+   0,
+   179
+  ],
+  "song": [
+   0.0,
+   7.5
+  ],
+  "picture": "opening: the stroke becomes the lived world (tools/opening_ink.py)"
+ },
+ {
+  "id": "S1-S3",
+  "frames": [
+   180,
+   325
+  ],
+  "song": [
+   7.5,
+   13.583
+  ],
+  "picture": "approved light catch (S2 hand fixed)"
+ },
+ {
+  "id": "V1a",
+  "frames": [
+   326,
+   358
+  ],
+  "song": [
+   13.583,
+   14.958
+  ],
+  "picture": "KV5a: the light in her palm flickers on the burst; \"We were born\""
+ },
+ {
+  "id": "V1b",
+  "frames": [
+   359,
+   380
+  ],
+  "song": [
+   14.958,
+   15.875
+  ],
+  "picture": "A3: on the hit the light opens into a sheet of paper and comes toward us"
+ },
+ {
+  "id": "P1a",
+  "frames": [
+   381,
+   446
+  ],
+  "song": [
+   15.875,
+   18.625
+  ],
+  "picture": "the letter (same page, same hand, same hook); \"in the words that you left\"; it tears into fragments"
+ },
+ {
+  "id": "A1",
+  "frames": [
+   447,
+   468
+  ],
+  "song": [
+   18.625,
+   19.542
+  ],
+  "picture": "A1: she looks up into the fragments; some pass in front of her"
+ },
+ {
+  "id": "P1b",
+  "frames": [
+   469,
+   490
+  ],
+  "song": [
+   19.542,
+   20.458
+  ],
+  "picture": "\"translated\": the writing becomes another script; \"compressed\": the fragments fold into one point"
+ },
+ {
+  "id": "M1",
+  "frames": [
+   491,
+   533
+  ],
+  "song": [
+   20.458,
+   22.25
+  ],
+  "picture": "\"every war\": the point is a candle; a hand-drawn room after a war, a helmet, the letter with the hook"
+ },
+ {
+  "id": "M2",
+  "frames": [
+   534,
+   571
+  ],
+  "song": [
+   22.25,
+   23.833
+  ],
+  "picture": "\"every lullaby\": a cradle rocking by lamplight"
+ },
+ {
+  "id": "M3",
+  "frames": [
+   572,
+   599
+  ],
+  "song": [
+   23.833,
+   25.0
+  ],
+  "picture": "\"every last goodbye\": hands part at a train door; a spark stays"
+ },
+ {
+  "id": "C1",
+  "frames": [
+   600,
+   685
+  ],
+  "song": [
+   25.0,
+   28.583
+  ],
+  "picture": "KV1 again: the sky falls away; the three memories rise as constellations; they look up"
+ },
+ {
+  "id": "D1",
+  "frames": [
+   686,
+   730
+  ],
+  "song": [
+   28.583,
+   30.458
+  ],
+  "picture": "KV4: B looks down; the town pops up from the page (depth); a day passes over it (time)"
+ },
+ {
+  "id": "D2",
+  "frames": [
+   731,
+   774
+  ],
+  "song": [
+   30.458,
+   32.292
+  ],
+  "picture": "\"heat\": hands around a bowl, steam, a frosted window"
+ },
+ {
+  "id": "D3",
+  "frames": [
+   775,
+   818
+  ],
+  "song": [
+   32.292,
+   34.125
+  ],
+  "picture": "\"hearts\": a newborn on a chest, two layers in depth; the fist flexes on the two hits"
+ },
+ {
+  "id": "D3b",
+  "frames": [
+   819,
+   861
+  ],
+  "song": [
+   34.125,
+   35.917
+  ],
+  "picture": "B3: B, eyes closed, as if listening to a heartbeat"
+ },
+ {
+  "id": "D4",
+  "frames": [
+   862,
+   941
+  ],
+  "song": [
+   35.917,
+   39.25
+  ],
+  "picture": "\"silent, still\": the town folds back into the page (36.85), then the village (37.54); only the hill"
+ },
+ {
+  "id": "D5",
+  "frames": [
+   942,
+   987
+  ],
+  "song": [
+   39.25,
+   41.167
+  ],
+  "picture": "\"the first fire\": a hand strikes stone on stone; it catches on the 40.50 hit"
+ },
+ {
+  "id": "D6",
+  "frames": [
+   988,
+   1025
+  ],
+  "song": [
+   41.167,
+   42.75
+  ],
+  "picture": "\"on the first cold hill\": one fire on the crest"
+ },
+ {
+  "id": "E1",
+  "frames": [
+   1026,
+   1037
+  ],
+  "song": [
+   42.75,
+   43.25
+  ],
+  "picture": "KV5: the fire is in A's palm (the palm-light composition returns, now warm)"
+ }
+]
