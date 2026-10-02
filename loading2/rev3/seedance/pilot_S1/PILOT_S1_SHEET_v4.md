@@ -1,4 +1,4 @@
-# P1-S1 v4: footage spec, resolved timing, one minimal request. Not submitted; no credits used.
+# P1-S1 v4: superseded by `PILOT_S1_SHEET_v5.md` (owner generates S1 only; S2 and S3 are local)
 
 Replaces `PILOT_S1_SHEET_v3.md`. Inspection of the rejected try 1: `../P1-S1_try1_REVIEW.md`.
 Timing animatic: `P1-S1_v4_timing_animatic.mp4`. Review board: `../review/P1-S1_try1_review_board.jpg`.
