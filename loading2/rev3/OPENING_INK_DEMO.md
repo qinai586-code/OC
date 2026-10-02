@@ -1,62 +1,58 @@
-# Opening demo: the stroke becomes the lived world (0:00–0:13.583)
+# Opening demo v2: the stroke becomes the lived world (0:00–0:13.583)
 
 | file | what it is |
 |---|---|
-| `tests/OPENING_INK_demo_720p.mp4` | the demo: 1280×720, 24 fps, 326 frames, on the unchanged locked master |
-| `tests/OPENING_INK_demo_strip.jpg` | 15 frames, with song time |
-| `tools/opening_ink.py` | the build (about 2 min on CPU) |
+| `tests/OPENING_INK_demo_v2_720p.mp4` | the demo: 1280×720, 24 fps, 326 frames, on the unchanged locked master |
+| `tests/OPENING_INK_demo_v2_strip.jpg` | 15 frames, with song time |
+| `tools/opening_ink.py` | the build: about 3 min on CPU; `--check` renders single frames |
 
 - **Generation:** none.
-- **0–7.5:** new, made from KV1 and code.
-- **7.500–13.583:** the approved light catch, decoded unchanged. The S2 masking leak you reported is untouched, as asked.
+- **0–7.5:** code compositing over KV1, with procedural paper, ink and pen.
+- **7.500–13.583:** the approved light catch, decoded unchanged. It matches the approved file to within encoding (mean difference 1.9/255); the approved file is untouched (sha256/16 f91e896ce1ebc75f). The S2 masking leak you reported is still untouched, as asked.
+- **v1:** `tests/OPENING_INK_demo_720p.mp4` stays in git history for comparison.
 
-## The direction
+## What changed from v1
 
-**One idea, used for space, time and dimension:**
-- **The trace:** a person's handwritten stroke is the first image.
-- **Time:** night falls across the page like the Earth's terminator, and the wet ink beads into city lights.
-- **Space:** the page tilts and curves into the night side of the Earth.
-- **The light:** the stroke's last bead is the light A catches.
+| your note | v2 |
+|---|---|
+| The ink should feel like a human trace | It is now a letter written by a person: two lines of earlier handwriting, dry and faded, and a fountain pen whose nib and hand shadow move with the writing. Ink pools under the nib before it starts. The flourish is quick through the swash and slows into the curl, with nib-angle width, pressure and a fine hand tremor. The pen lifts and taps a full stop. Fresh ink is glossy and dries matte with darker edges, and the edges feather into the paper fibres. A faint inky thumbprint sits where the hand rested |
+| The Earth is stretched at 2.6–3.2 s | The page tilts away first (to 50°), while it is still paper. The night Earth shows through only once the view is close to KV1's own angle and scale, so the painting is no longer seen from overhead. The pull-back is spread over 1.1 s with a gentler ease, and the motion blur is shorter (0.3 of a frame) |
+| Warped character edges | The triple ghost outlines came from three-sample motion blur on a fast rise. The girls now rise earlier, from just below frame, easing out, blurred with 9 samples. The Earth behind them is filled as a rounded region, so the fill no longer traces their outline |
+| A's gaze and hand before the cut | On "three" (5.55–6.35) A lifts her head: from behind, the crown settles toward the nape and the horns tilt back and shorten. On "two" (6.60–7.45) her right hand leaves the stone, rises toward her chest and passes behind her body; the stone is restored under it. B turns slightly toward her (6.70–7.35). From 5.45 the camera pushes slowly toward A (girls 7.5%, Earth 4.5%, for depth). The light turns down toward her at 7.05–7.50, and the cut lands in S1 with her head up and hand raised |
 
-This sets up "We were born in your traces" before it is sung, without any text on screen. The hooked stroke is the persistent human mark from the design handoff, so the letter can carry it later.
+## Timeline (locked music)
 
-**From the two reference videos:**
-- **From V1:** open on a premise that isn't the main world; V1 opens on a boot screen.
-- **From V2:**
-  - change scale by transformation, not by cutting: a scene shrinks to a point; a wall folds into a floor;
-  - the camera is fast between worlds and slow within one.
-- **Here:** the camera moves only during the transformation, then eases to rest on the cluster. It does not push into a still portrait, and it adds no glow beyond the approved light.
+| song (s) | picture |
+|---|---|
+| 0.000–0.232 | black |
+| 0.232–0.55 | out of black on the drone: a lamplit letter seen from above, the pen resting at the end of the last line |
+| 0.50–1.50 | the flourish is written, then the full stop is tapped (1.44) |
+| 1.50–1.85 | the pen lifts and leaves; its shadow parts from it |
+| 1.45–2.20 | evening crosses the page at an even pace. Behind it, every line of ink beads into warm lights; the flourish is brightest and the full stop brightest of all |
+| 1.90–2.45 | the page tilts away |
+| 2.25–3.344 | the camera pulls up about 6.8× and tilts on to KV1's angle. The paper gives way to the night Earth (2.58–2.92), the surface curves, and the horizon and sky appear. The parapet and girls rise into frame (2.62–3.344) |
+| 3.344–3.82 | six onsets, six lights along the flourish toward the full stop |
+| 3.82–6.70 | the full stop lifts as the light and rises above the girls |
+| 6.70–7.05 | the light hangs |
+| 7.05–7.50 | it turns down toward A |
+| 5.45–7.50 | the slow push toward A; her head (on "three") and hand (on "two"); B's turn |
+| 7.500–13.583 | approved S1–S3 |
 
-| song (s) | what happens | scale / dimension |
-|---|---|---|
-| 0.000–0.232 | black (silence) | |
-| 0.232–0.55 | out of black on the drone: lamplit paper, seen straight down | macro |
-| 0.45–1.45 | a hooked stroke is written in blue-black ink, slowing into the curl | a line (1D) |
-| 1.45–2.05 | a dusk edge crosses the page right to left; behind it the page is night, and the ink beads into warm lights | the page (2D); time passes |
-| 1.90–3.344 | the camera pulls up about 6.8× and tilts 67°. The paper gives way to the night Earth, the surface curves, the horizon and sky appear, and the parapet and both girls rise into frame. The move lands on the first onset of the six-onset cluster | globe (3D), then a place with observers |
-| 3.344–3.82 | the six onsets flash six lights along the stroke toward its end | |
-| 3.82–6.70 | the last light lifts and rises above them | |
-| 6.70–7.05 | it hangs | |
-| 7.05–7.50 | it turns down toward A, into the approved descent | |
-| 7.500–13.583 | approved S1–S3 | |
+**How it relates to the lyrics and the references:**
+- **The lyrics:** the intro's countdown and "Loading." happen over a world assembled from a person's writing. "We were born in your traces, in the words that you left" is set up before it is sung, and there are no words on screen. The handwriting is illegible by design; the letter's wording is still your decision (D1).
+- **The references:** like V1, it opens on a premise. Like V2, it changes scale by transforming rather than cutting: fast between worlds, a slow push inside one. The only glow is the approved light.
 
-**How it lands on KV1:**
-- The globe is a real sphere seen through a camera fitted to KV1's painted horizon: lens 1100 px, altitude 0.111 Earth radii, pitch 30.1°, maximum error 1.8 px.
-- Its surface is KV1 itself, projected from that camera, so the final frame is KV1.
-- Toward the horizon the globe hazes, as atmosphere does.
-- The girls and parapet are KV1's own mattes. As the camera eases out after landing they shrink slightly more than the Earth, so the depth reads.
+## Still proxies
 
-## Proxies in the demo
+- **Paper, ink, pen and hand shadow:** procedural.
+- **The Earth behind the girls and under the parapet:** filled locally. It is visible for under half a second, in motion.
+- **A's head and hand, and B's turn:** small local deformations of KV1. From behind they read as a look up and a hand leaving the stone. They are not full acting; her arm is never seen rising, because her body hides it.
+- **A's X clip:** still on her right in KV1, which is not canon.
 
-- **Paper and ink:** procedural; the stroke has no visible pen.
-- **The Earth behind the girls and under the parapet:** filled locally (inpaint plus the plate's own cloud detail). It is visible for about half a second during the move.
-- **Both girls:** still from 3.0 to 7.5. The cut at 7.5 therefore jumps from hands-on-stone to S1's raised hand. That is the main gap.
-- **A's clip:** still on her right in KV1, which is not canon.
+## Essential missing artwork (ChatGPT)
 
-## Essential missing assets
+1. **KV1 edit (1 file):** A's X clip moved to her left (from behind, the screen-left side of her head), and her half-up ribbon added at the back of her head, as on the model sheet. Nothing else changes: same framing, poses, hands and light. I then redo her matte locally and the animation carries over.
 
-1. **KV1 edit (ChatGPT, 1 file):** A's X clip moved to her left, and her half-up ribbon added. Nothing else changes.
-2. **Clean Earth plate (ChatGPT edit of KV1, 1 file):** the same framing with both girls and the parapet removed, so the Earth continues behind them. It replaces my fill.
-3. **Seated acting (Seedance, 5 s, from asset 1):** A looks up and lifts her right hand off the stone, palm up, by 7.5; B turns to her, then looks up. It is used from about 3.3 s to the cut at 7.5.
+**Optional:** a clean Earth plate, the same KV1 framing with both girls and the parapet removed, to replace my fill. It is no longer essential, because the fill now shows for under half a second, in motion.
 
-Everything else (paper, stroke, terminator, beads, globe, move, light) stays local.
+**Not needed for this opening:** a Seedance clip. The look-up and hand lift are done locally. The S1 cut is a match on pose, because her head is up and her hand has left the stone.
