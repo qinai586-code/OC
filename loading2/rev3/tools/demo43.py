@@ -40,7 +40,7 @@ AUDIO = OI.AUDIO
 OUT = os.path.join(R, 'tests', 'DEMO_0-43_v7_720p.mp4')                      # v6, v5, v4, v3 stay in tests/ for comparison
 STRIP = os.path.join(R, 'tests', 'DEMO_0-43_v7_strip.jpg')
 LOG = os.path.join(R, 'tests', 'DEMO_0-43_v7_shots.json')
-CACHE = os.environ.get('DEMO_CACHE') or '/tmp/claude-0/-home-user-OC/c9b74a57-085e-5ad1-8a57-5167fd743993/scratchpad/v6/cache'
+CACHE = os.environ.get('DEMO_CACHE') or '/tmp/claude-0/-home-user-OC/c9b74a57-085e-5ad1-8a57-5167fd743993/scratchpad/v7/cache'
 S3_V5 = os.path.join(R, 'work', 'p1', 'S3_v5_frames.npy')   # the approved S3 with the v5 settle (tools/p1_local.build_s3)
 W, H, FPS, N = 1280, 720, 24, 1038
 F = 1100.0
@@ -2018,13 +2018,17 @@ class Verse:
                        for q in [c - c0 for c in cc]]
                 far.append(dict(loc=loc, r=r, t0=26.15 + 1.75 * (r / 150.0) ** 0.8))
                 th += (size * 1.25) / (r * np.sqrt(1 + bsp * bsp))
-        # near: torn shards of the letter, dark against the light, between the memories and the camera's end position
+        # near (m27): three torn pieces of the letter itself fly out of the constellation and past the lens, to the side,
+        # while the camera pulls back; each leaves the frame by 27.4 s, so the reveal of the observers is clean
         near = []
-        cand = [f_ for f_ in self.frags if not f_['hero'] and 140 < f_['box'][2] - f_['box'][0] < 420]
-        for j, (sx, sy, d) in enumerate(((250.0, 420.0, 3.0), (1060.0, 190.0, 4.2), (1180.0, 520.0, 5.0), (90.0, 180.0, 6.0))):
-            fr = cand[(j * 7) % len(cand)]
-            pos = cf.p + d * (cf.fw + (sx - 640.0) / F * cf.rt - (sy - 360.0) / F * cf.up)
-            near.append(dict(fr=fr, pos=pos, axis=rng.normal(0, 1, 3), a0=rng.uniform(-0.6, 0.6), w=rng.uniform(0.15, 0.3)))
+        cand = sorted([f_ for f_ in self.frags if not f_['hero'] and 120 < f_['box'][2] - f_['box'][0] < 300],
+                      key=lambda f_: -f_['text'])
+        for j, (t0, sx, sy, d0, vz, vx, vy) in enumerate(((25.70, 470, 300, 6.0, 7.0, -1.2, 0.4), (26.05, 820, 250, 6.5, 7.0, 1.3, 0.5),
+                                                          (26.40, 560, 430, 6.0, 7.5, -0.9, 1.1))):
+            c0 = self.c1_cam(t0)
+            W0 = c0.p + d0 * (c0.fw + (sx - 640.0) / F * c0.rt - (sy - 360.0) / F * c0.up)
+            near.append(dict(fr=cand[j * 3], W0=W0, vel=-c0.fw * vz + c0.rt * vx - c0.up * vy, t0=t0,
+                             axis=rng.normal(0, 1, 3), a0=rng.uniform(-0.4, 0.4), w=rng.uniform(1.2, 2.0) * rng.choice([-1, 1])))
         field = dict(mids=mids, far=far, near=near, C=C, e1=e1, e2=e2)
         self.c1 = dict(figs=figs, field=field)
 
@@ -2183,25 +2187,40 @@ class Verse:
         q = cam.project(P_)[0][0]
         img = glow(img, q, 0.07 + 0.03 * sp, 1.0)
         OI.dot(img, q, 1.7 + 0.8 * sp, 1.0)
-        # near: torn shards of the letter pass the lens as the camera pulls back past them; dark paper against the light,
-        # out of focus (the memories are in focus), they cover what is behind them
+        # near (m27): backlit letter paper, not dark blocks. The constellation is behind the pieces, so the paper glows warm
+        # and translucent with the handwriting dark in it; the torn fibre rim catches the light; a thin darker edge on the
+        # lower side gives the sheet its thickness. Little defocus, so the torn edges stay readable.
         focus = float(np.linalg.norm(fg['hands']['w_ch'][0].mean(0) - cam.p))
         for nr in self.c1['field']['near']:
+            if t < nr['t0']:
+                continue
             fr = nr['fr']
             bx0, by0, bx1, by1 = fr['box']
-            ang = nr['a0'] + nr['w'] * (t - 25.0)
+            pos = nr['W0'] + nr['vel'] * (t - nr['t0'])
+            if (pos - cam.p) @ cam.fw < 0.3:
+                continue
+            ang = nr['a0'] + nr['w'] * (t - nr['t0'])
             u_ = rot_axis(cam.rt, nr['axis'], ang)
             v_ = rot_axis(cam.up, nr['axis'], ang)
-            pos = nr['pos'] + cam.up * 0.05 * (t - 25.0)
-            w_, h_ = (bx1 - bx0) / self.PU * 1.8, (by1 - by0) / self.PU * 1.8
+            w_, h_ = (bx1 - bx0) / self.PU * 0.9, (by1 - by0) / self.PU * 0.9
             corners = card_corners(pos, u_, v_, w_, h_)
-            if (cam.project(corners)[1] < 0.3).any():
+            xy, zc_ = cam.project(corners)
+            if (zc_ < 0.3).any() or xy[:, 0].max() < -40 or xy[:, 0].min() > W + 40 or xy[:, 1].max() < -40 or xy[:, 1].min() > H + 40:
                 continue
-            pa = self.page[by0:by1, bx0:bx1]
-            rim = cv2.morphologyEx((fr['alpha'] > 0.5).astype(np.uint8), cv2.MORPH_GRADIENT, np.ones((5, 5), np.uint8)).astype(np.float32)
-            tex = np.dstack([pa * np.array([0.030, 0.036, 0.045], np.float32) + rim[..., None] * np.array([0.16, 0.30, 0.48], np.float32),
-                             fr['alpha']])
-            img, _ = put_card(img, cam, corners, tex, focus=focus, aperture=0.9)
+            al = fr['alpha']
+            pa = self.page[by0:by1, bx0:bx1]                                             # the letter's own cream paper and ink
+            facing = abs(float(np.cross(u_, v_) @ cam.fw))                                # thin paper seen edge-on lets less light through
+            hh_, ww_ = al.shape
+            grad = np.linspace(1.12, 0.82, hh_, dtype=np.float32)[:, None, None]         # brighter toward the lit side
+            body = pa * np.array([0.40, 0.50, 0.58], np.float32) * grad * (0.70 + 0.30 * facing)
+            hard = (al > 0.5).astype(np.uint8)
+            rim = cv2.morphologyEx(hard, cv2.MORPH_GRADIENT, np.ones((4, 4), np.uint8)).astype(np.float32)
+            low = np.zeros_like(rim)
+            low[3:] = np.clip(hard[3:].astype(np.float32) - hard[:-3], 0, 1)             # the lower edge: the sheet's thickness
+            col = body * (1 - rim[..., None]) + rim[..., None] * np.array([0.80, 0.90, 0.98], np.float32)
+            col = col * (1 - 0.6 * low[..., None])
+            tex = np.dstack([col + fr['fibre'][..., None] * 0.04, al * 0.88])
+            img, _ = put_card(img, cam, corners, tex, focus=focus, aperture=0.12)
         # the two of them, small, from behind, on the parapet (Message 23 rear candidates; they replace KV1's old cut-outs,
         # whose mattes carried KV1's sky around the horns): they enter the bottom of the frame as the view pulls back
         gu = ease(26.85, 27.95, t)
@@ -2696,7 +2715,7 @@ def OI_crop(img, y0):
 
 
 SHOTS = [
-    ('O', 0, 179, 'opening: the stroke becomes the lived world (tools/opening_ink.py, unchanged)'),
+    ('O', 0, 179, 'opening ink (tools/opening_ink.py) to the KV1 landing; 3.625-7.458 the chroma-repaired Seedance rear shot (src f0-92, original speed, registered to KV1), cut as A\'s fingertips leave the ledge'),
     ('S1-S3', 180, 325, 'approved light catch (S2 hand fixed); S3 (10.67-13.54) adds a restrained wrist roll, finger close and gaze after the touch, no new reach'),
     ('V1a', 326, 358, 'KV5a: the light in her palm flickers on the burst; "We were born"'),
     ('V1b', 359, 380, 'A, side-palm candidate in A3\'s framing: the light opens into a sheet beside her; her eyes, then her head, lift to it; it comes to the lens only in the last 6 frames'),
@@ -2706,11 +2725,11 @@ SHOTS = [
     ('M1', 491, 533, '"every war" (war_memory_v1): the point lands on the measured wick and lights it; candlelight finds the letter, helmet and ruins; the view opens, the candle drifts to the lamp\'s place'),
     ('M2', 534, 571, '"every lullaby" (full frame, supplied art): the hand gives the cradle one push; it rolls on its rockers and settles; the lamp answers the candle'),
     ('M3', 572, 599, '"every last goodbye" (full frame, close, supplied art): fingertips nearly touch, part as the carriage moves, it pulls away; a spark stays'),
-    ('C1', 600, 685, 'the parting hands traced in light on their own pixels; pull back: the cradle, the war room, the letter\'s mark as the hub, the handwriting deep behind; A and B (rear candidates) small on the parapet'),
-    ('D1', 686, 730, 'KV4 (solid matte): B looks down; the town (three segments), a cobbled street walled by house cards, braces, near roofs pop up in front of the hill of the first fire (depth); a day passes, windows light (time)'),
+    ('C1', 600, 685, 'the parting hands traced in light; pull back: cradle, war room, the letter\'s mark, the handwriting spiral; three torn pieces of the letter pass the lens (gone by 27.4); A and B small on the parapet'),
+    ('D1', 686, 730, 'Seedance D1 (chroma-repaired, src f20-64): the paper city unfolds; windows light left to right; B, in cool night light at first, is warmed by them'),
     ('D2', 731, 774, '"heat" (full frame, supplied art): thin steam from the rim, warmth near the bowl, the window cold'),
     ('D3', 775, 818, '"hearts" (full frame, supplied art): parent and baby breathe together, one connected layer; no light from the chest'),
-    ('D3b', 819, 861, 'B3 (voice-over, new matte) on the parapet over the Earth (KV5a behind, out of focus): one slow breath; A\'s warmth grows on her face'),
+    ('D3b', 819, 861, 'Seedance B3 (chroma-repaired, src f42-84): eyes open, one slow closure, a quiet closed-eye hold'),
     ('D4', 862, 941, '"silent, still": windows go dark, paper yellows, town and street fold back (36.85), the village (37.54); the gaze lifts to the hill print, which becomes the painted hill of the first fire under its own sky'),
     ('D5', 942, 982, '"the first fire": prepare (fist up, wrist cocked), strike into contact (frames 950-951, 961-962), rebound; the forearm swings about the elbow; sparks, ember, flame at 40.50'),
     ('D6', 983, 1037, '"on the first cold hill" (first_fire_hill_wide_v1): the struck fire on the measured tinder; the view opens to the bare hill and settles; the fire flickers, small in the landscape, to the end of the excerpt'),

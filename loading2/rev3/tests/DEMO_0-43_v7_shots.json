@@ -1,0 +1,218 @@
+[
+ {
+  "id": "O",
+  "frames": [
+   0,
+   179
+  ],
+  "song": [
+   0.0,
+   7.5
+  ],
+  "picture": "opening ink (tools/opening_ink.py) to the KV1 landing; 3.625-7.458 the chroma-repaired Seedance rear shot (src f0-92, original speed, registered to KV1), cut as A's fingertips leave the ledge"
+ },
+ {
+  "id": "S1-S3",
+  "frames": [
+   180,
+   325
+  ],
+  "song": [
+   7.5,
+   13.583
+  ],
+  "picture": "approved light catch (S2 hand fixed); S3 (10.67-13.54) adds a restrained wrist roll, finger close and gaze after the touch, no new reach"
+ },
+ {
+  "id": "V1a",
+  "frames": [
+   326,
+   358
+  ],
+  "song": [
+   13.583,
+   14.958
+  ],
+  "picture": "KV5a: the light in her palm flickers on the burst; \"We were born\""
+ },
+ {
+  "id": "V1b",
+  "frames": [
+   359,
+   380
+  ],
+  "song": [
+   14.958,
+   15.875
+  ],
+  "picture": "A, side-palm candidate in A3's framing: the light opens into a sheet beside her; her eyes, then her head, lift to it; it comes to the lens only in the last 6 frames"
+ },
+ {
+  "id": "P1a",
+  "frames": [
+   381,
+   446
+  ],
+  "song": [
+   15.875,
+   18.625
+  ],
+  "picture": "the letter: the light reads the words, settles in the full stop; the page tears as paper from its left edge, the spiral shard last"
+ },
+ {
+  "id": "A1",
+  "frames": [
+   447,
+   468
+  ],
+  "song": [
+   18.625,
+   19.542
+  ],
+  "picture": "A1 (voice-over, lips closed, new matte from the drawing): she looks up at the rising light; shards pass low in front"
+ },
+ {
+  "id": "P1b",
+  "frames": [
+   469,
+   490
+  ],
+  "song": [
+   19.542,
+   20.458
+  ],
+  "picture": "\"translated\": every shard rewritten in another script, the spiral kept; \"compressed\": the shards gather on the spiral, which folds to a point"
+ },
+ {
+  "id": "M1",
+  "frames": [
+   491,
+   533
+  ],
+  "song": [
+   20.458,
+   22.25
+  ],
+  "picture": "\"every war\" (war_memory_v1): the point lands on the measured wick and lights it; candlelight finds the letter, helmet and ruins; the view opens, the candle drifts to the lamp's place"
+ },
+ {
+  "id": "M2",
+  "frames": [
+   534,
+   571
+  ],
+  "song": [
+   22.25,
+   23.833
+  ],
+  "picture": "\"every lullaby\" (full frame, supplied art): the hand gives the cradle one push; it rolls on its rockers and settles; the lamp answers the candle"
+ },
+ {
+  "id": "M3",
+  "frames": [
+   572,
+   599
+  ],
+  "song": [
+   23.833,
+   25.0
+  ],
+  "picture": "\"every last goodbye\" (full frame, close, supplied art): fingertips nearly touch, part as the carriage moves, it pulls away; a spark stays"
+ },
+ {
+  "id": "C1",
+  "frames": [
+   600,
+   685
+  ],
+  "song": [
+   25.0,
+   28.583
+  ],
+  "picture": "the parting hands traced in light; pull back: cradle, war room, the letter's mark, the handwriting spiral; three torn pieces of the letter pass the lens (gone by 27.4); A and B small on the parapet"
+ },
+ {
+  "id": "D1",
+  "frames": [
+   686,
+   730
+  ],
+  "song": [
+   28.583,
+   30.458
+  ],
+  "picture": "Seedance D1 (chroma-repaired, src f20-64): the paper city unfolds; windows light left to right; B, in cool night light at first, is warmed by them"
+ },
+ {
+  "id": "D2",
+  "frames": [
+   731,
+   774
+  ],
+  "song": [
+   30.458,
+   32.292
+  ],
+  "picture": "\"heat\" (full frame, supplied art): thin steam from the rim, warmth near the bowl, the window cold"
+ },
+ {
+  "id": "D3",
+  "frames": [
+   775,
+   818
+  ],
+  "song": [
+   32.292,
+   34.125
+  ],
+  "picture": "\"hearts\" (full frame, supplied art): parent and baby breathe together, one connected layer; no light from the chest"
+ },
+ {
+  "id": "D3b",
+  "frames": [
+   819,
+   861
+  ],
+  "song": [
+   34.125,
+   35.917
+  ],
+  "picture": "Seedance B3 (chroma-repaired, src f42-84): eyes open, one slow closure, a quiet closed-eye hold"
+ },
+ {
+  "id": "D4",
+  "frames": [
+   862,
+   941
+  ],
+  "song": [
+   35.917,
+   39.25
+  ],
+  "picture": "\"silent, still\": windows go dark, paper yellows, town and street fold back (36.85), the village (37.54); the gaze lifts to the hill print, which becomes the painted hill of the first fire under its own sky"
+ },
+ {
+  "id": "D5",
+  "frames": [
+   942,
+   982
+  ],
+  "song": [
+   39.25,
+   40.958
+  ],
+  "picture": "\"the first fire\": prepare (fist up, wrist cocked), strike into contact (frames 950-951, 961-962), rebound; the forearm swings about the elbow; sparks, ember, flame at 40.50"
+ },
+ {
+  "id": "D6",
+  "frames": [
+   983,
+   1037
+  ],
+  "song": [
+   40.958,
+   43.25
+  ],
+  "picture": "\"on the first cold hill\" (first_fire_hill_wide_v1): the struck fire on the measured tinder; the view opens to the bare hill and settles; the fire flickers, small in the landscape, to the end of the excerpt"
+ }
+]
