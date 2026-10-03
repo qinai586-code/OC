@@ -47,6 +47,11 @@ S1_LIGHT_END = (895.0, 240.0)   # on her gaze line after the nod (~13 deg above 
 ARM_DEG, WRIST_DEG = 2.0, 5.0   # S2 lift [1.2, 3.0]
 DIP_PX, BOB_PX = 7.0, 4.0       # S3 palm give and hover bob [4.5, 2.5]
 SWAY_PX, BREATH_PX = 3.5, 1.4   # S3 hair sway and breathing [2.5, 0.9]
+# v5 (owner, Message 23): S3 was frozen apart from the light. Restrained settling only, no new reach or catch:
+WRIST_SETTLE_DEG = 2.2          # after the touch the hand rolls a little toward her and settles (about the wrist)
+FINGER_CURL_PX = 3.0            # the fingertips close slightly around the light, then relax by a third
+GAZE_PX = (1.6, 1.4)            # her irises follow the light down to the palm (x, y px), before the touch
+EYE_S3 = [(589.0, 434.0)]   # the visible iris in P1_S3_HOVER_START_v2 (measured; the far eye is hidden by hair)
 
 
 # ---------------------------------------------------------------- helpers
@@ -332,6 +337,10 @@ def build_s3():
     face = gauss(src.shape, 690, 430, 110) * np.clip(m, 0, 1)
     palm = gauss(src.shape, 1050, 650, 70) * cv2.GaussianBlur(hb.astype(np.float32), (0, 0), 2)
     rest = np.array([1040.0, 634.0])
+    WRIST = (900.0, 745.0)                                                       # the wrist, where the hand meets the sleeve
+    w_hand = cv2.GaussianBlur(hb.astype(np.float32), (0, 0), 3) * np.clip((xx - 880) / 60.0, 0, 1)
+    tips = w_hand * np.clip((xx - 1080) / 60.0, 0, 1) * np.clip((640 - yy) / 40.0, 0, 1)   # the four fingertips, up right
+    irises = sum(gauss(src.shape, ex, ey, 9.0) for ex, ey in EYE_S3)
     frames, log = [], []
     for k in range(N3):
         t = k / 24.0
@@ -341,7 +350,15 @@ def build_s3():
         dip = DIP_PX * (np.exp(-((k - K_TOUCH - 2.5) / 2.6) ** 2) - 0.27 * np.exp(-((k - K_TOUCH - 8) / 3.0) ** 2)) if k >= K_TOUCH else 0.0
         breath = BREATH_PX * np.sin(2 * np.pi * t / 2.8)
         sway = SWAY_PX * (np.sin(2 * np.pi * t / 1.9 - yy / 120.0) - np.sin(-yy / 120.0))   # zero at frame 0
-        fr = warp(img, hair * sway, torso * breath + w_dip * dip)
+        # wrist settle: a small rotation of the hand about the wrist after the touch, damped; fingertips curl in
+        sk = k - K_TOUCH - 3
+        roll = WRIST_SETTLE_DEG * (1 - np.exp(-max(sk, 0) / 5.0)) * (1 + 0.25 * np.exp(-max(sk, 0) / 7.0) * np.sin(max(sk, 0) / 3.2)) if sk > 0 else 0.0
+        rdx, rdy = rot_disp(xx, yy, WRIST, -roll)
+        curl = FINGER_CURL_PX * (ease(K_TOUCH, K_TOUCH + 6, k) - 0.33 * ease(K_TOUCH + 8, N3 - 1, k))
+        # gaze: the irises lower toward the light as it sinks to the palm (k 30..57), and stay there
+        g_e = ease(26, K_TOUCH - 4, k)
+        IX, IY = GAZE_PX[0] * g_e * irises, GAZE_PX[1] * g_e * irises
+        fr = warp(img, hair * sway + w_hand * rdx + tips * curl * 0.45 + IX, torso * breath + w_dip * dip + w_hand * rdy + tips * curl + IY)
         if k >= K_TOUCH:
             pos = pos + np.array([0.0, dip])
         flare = 1.0 + 0.45 * np.exp(-((k - K_TOUCH - 1.5) / 2.2) ** 2) + 0.22 * ease(K_TOUCH, K_TOUCH + 6, k)
