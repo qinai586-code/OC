@@ -37,9 +37,9 @@ ART = os.environ.get('DEMO_ART') or os.path.join(R, 'art', 'memory_cards')
 CAND = os.path.join(R, 'art', 'candidates_m23')                                  # Message 23 candidates (rear A, rear B, side palm)
 PLATES5 = os.path.join(R, 'art', 'plates_v5')                                     # war_memory_v1, first_fire_hill_wide_v1 (opaque, 1672x941)                  # supplied memory-card artwork (see briefs/MEMORY_CARDS_BRIEF.md)
 AUDIO = OI.AUDIO
-OUT = os.path.join(R, 'tests', 'DEMO_0-43_v6_720p.mp4')                      # v5, v4, v3 stay in tests/ for comparison
-STRIP = os.path.join(R, 'tests', 'DEMO_0-43_v6_strip.jpg')
-LOG = os.path.join(R, 'tests', 'DEMO_0-43_v6_shots.json')
+OUT = os.path.join(R, 'tests', 'DEMO_0-43_v7_720p.mp4')                      # v6, v5, v4, v3 stay in tests/ for comparison
+STRIP = os.path.join(R, 'tests', 'DEMO_0-43_v7_strip.jpg')
+LOG = os.path.join(R, 'tests', 'DEMO_0-43_v7_shots.json')
 CACHE = os.environ.get('DEMO_CACHE') or '/tmp/claude-0/-home-user-OC/c9b74a57-085e-5ad1-8a57-5167fd743993/scratchpad/v6/cache'
 S3_V5 = os.path.join(R, 'work', 'p1', 'S3_v5_frames.npy')   # the approved S3 with the v5 settle (tools/p1_local.build_s3)
 W, H, FPS, N = 1280, 720, 24, 1038
@@ -2444,7 +2444,7 @@ class Verse:
         fills the frame exactly as the plate does in D6's last window."""
         k = ease(38.0, 38.95, t)
         p0, g0 = np.array([0.0, 1.05, -1.25]), np.array([0.05, 0.22, 1.25])
-        x0, y0, w = self.hill_view(self.D6_END)
+        x0, y0, w = self.hill_view(self.HILL_FINAL_T)
         s_ = W / w
         D = F * (self.HILL_UNITS / 1672.0) / s_
         cy = ((941.0 - y0) * s_ - 360.0) * D / F
@@ -2464,7 +2464,7 @@ class Verse:
             row[last + 1:] = row[last]                                                   # below the lowest sky: its colour, held
             fill = np.repeat(row[:, None, :], ww, 1).astype(np.float32)
             self._skyplate = np.where(sky[..., None], pl, fill)
-        x0, y0, w = self.hill_view(self.D6_END)
+        x0, y0, w = self.hill_view(self.HILL_FINAL_T)
         img = self.to_screen(self._skyplate, x0, y0, w)
         pitch = np.arcsin(-cam.fw[1])                                                    # looking down: the sky slides up
         yaw = np.arctan2(cam.fw[0], cam.fw[2])
@@ -2497,10 +2497,11 @@ class Verse:
         fin = ease(38.95, 39.15, t)
         if fin > 0:                                                                       # exactly D6's last window, before the fire
             pl = self.plate5('first_fire_hill_wide_v1') * np.array([0.92, 0.94, 0.96], np.float32)
-            img = img * (1 - fin) + self.to_screen(pl, *self.hill_view(self.D6_END), cubic=True) * fin
+            img = img * (1 - fin) + self.to_screen(pl, *self.hill_view(self.HILL_FINAL_T), cubic=True) * fin
         return img
 
-    D6_END = 1014 / 24                             # v6: E1 starts here (42.25), 1.0 s of return before 43.25
+    HILL_FINAL_T = 1014 / 24                       # the hill's final framing (D4's end and D6's settled view), as in v6
+    D6_END = 1038 / 24                             # m26: D6 runs to the end of the excerpt; the palm-orb return (E1) is removed
     HILL_TINDER = np.array([724.0, 596.0])        # first_fire_hill_wide_v1 (1672x941): the tinder bundle on the crest, measured;
     HILL_STONE = (646.0, 583.0, 708.0, 609.0)      # the flat stone beside it (the hearth stone of D5)
     PALM = np.array([1361 * OI.S, (1205 - 160) * OI.S])                                # the light in A's palm (V1a, E1): (567, 435)
@@ -2526,15 +2527,14 @@ class Verse:
         warm = (1.05 * np.exp(-d2 / 75.0 ** 2) + 0.42 * np.exp(-d2 / 230.0 ** 2)) * fl
         k = np.array([0.92, 0.94, 0.96], np.float32) + warm[..., None] * np.array([0.35, 0.80, 1.25], np.float32)
         x0, y0, w = self.hill_view(t)
+        st = 0.012 * ease(42.02, 43.25, t)                                              # m26: the camera settles, it does not stop dead
+        cx_, cy_ = x0 + w / 2, y0 + w * 9 / 32
+        w = w * (1 + st)
+        x0, y0 = cx_ - w / 2, cy_ - w * 9 / 32
         img = self.to_screen(pl * k, x0, y0, w, cubic=True)
         f = self.c2s(self.HILL_TINDER + np.array([0.0, -3.0]), x0, y0, w)
         self.fire_xy = f
-        img = flame(img, f, 15.5 * W / w, t, k=1.0)
-        hb = ease(self.D6_END - 0.21, self.D6_END, t)                                    # the fire's warmth gathers to the palm light's size
-        if hb > 0:
-            img = glow(img, f, 0.62 * hb, 0.85 * hb, tint=(0.70, 0.90, 1.15))
-            img = glow(img, f, 0.40 * hb, 1.35 * hb)
-        return img
+        return flame(img, f, 15.5 * W / w, t, k=1.0)
 
     def e1(self, t):
         """"hill": the same light, still in A's palm (V1a's frame and light, not a new catch), now warm as the fire; it
@@ -2713,8 +2713,7 @@ SHOTS = [
     ('D3b', 819, 861, 'B3 (voice-over, new matte) on the parapet over the Earth (KV5a behind, out of focus): one slow breath; A\'s warmth grows on her face'),
     ('D4', 862, 941, '"silent, still": windows go dark, paper yellows, town and street fold back (36.85), the village (37.54); the gaze lifts to the hill print, which becomes the painted hill of the first fire under its own sky'),
     ('D5', 942, 982, '"the first fire": prepare (fist up, wrist cocked), strike into contact (frames 950-951, 961-962), rebound; the forearm swings about the elbow; sparks, ember, flame at 40.50'),
-    ('D6', 983, 1013, '"on the first cold hill" (first_fire_hill_wide_v1): the flame on the measured tinder by the flat stone, held on the struck flame\'s screen point while the view opens to the bare hill; it ends on the palm light\'s point'),
-    ('E1', 1014, 1037, 'KV5a: the same light, still in A\'s palm (no new catch); the fire\'s warmth resolves into it; 1.0 s, a slight push in'),
+    ('D6', 983, 1037, '"on the first cold hill" (first_fire_hill_wide_v1): the struck fire on the measured tinder; the view opens to the bare hill and settles; the fire flickers, small in the landscape, to the end of the excerpt'),
 ]
 WIPES = []          # v4: no decorative wipes; the cuts are matches on the light, the hands, the spark and the fire
 
