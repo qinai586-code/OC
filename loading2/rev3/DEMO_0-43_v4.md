@@ -48,13 +48,13 @@
 | 22.25–23.83 | M2 | **Full frame, supplied art.** One push at 22.32: the cradle rolls on its rocker radius about the measured contact, so the feet stay on the floor line. ±1.1°, settling (amplitude decays over ≈1.1 s). The hand rides the rim; the forearm bends toward the sleeve end, which stays at the frame edge (no rigid lever). A restrained contact shadow under the rockers, no wall shadow. The lamp brightens a little on the cut, matching M1's candle on screen | 3, 5 |
 | 23.83–25.00 | M3 | **Full frame, close on the hands.** The carriage starts 60 px right, so the fingertips are ≈11 px apart and never cross. They part at 24.15–24.55, then the carriage pulls away left with slow acceleration. Only the carriage moves; no arm is stretched. A small spark stays at the measured gap and rises | 3, 5 |
 | 25.00–28.58 | C1 | The spark rises from its M3 screen position to the first mark. The constellations take the new art's shapes (candle and helmet; lamp, cradle and rockers; two reaching hands with a gap). They are traced as uneven dashes with unequal stars | 6 |
-| 28.58–30.46 | D1 | **B's transparency fixed:** KV4's matte was 0.6–0.8 inside her hair. Its interior is now solid; real gaps (under her chin) stay open. Ordering is explicit: page, then town, then B. Her soft shadow falls on what lies behind her. The town gains an oblique street of house cards, near roofs in front (out of focus), and fold-root shadows | 1, 4 |
+| 28.58–30.46 | D1 | **B's transparency fixed.** KV4's own matte was 0.6–0.8 inside her hair and 0.05–0.2 on the outer strands, and it also covered the night between the strands. Her body keeps KV4's matte. Her hair edge is re-matted by colour and shape (`kv4_matte`): copper hair is opaque and the navy night is transparent. The city lights and the pink-grey smears beside the strands are dropped, because a strand must be a long run, a bright core or part of a hair mass. Black line art inside the hair stays opaque. Edge pixels take the hair's colour, so no strand has a grey rim. Real gaps stay open (under her chin, and the sky between strands at the right edge). Ordering is explicit: page, then town, then B. Her soft shadow falls on what lies behind her. The town gains an oblique street of house cards, near roofs in front (out of focus), and fold-root shadows | 1, 4 |
 | 30.46–32.29 | D2 | **Full frame, supplied art.** Seven thin steam wisps rise from the measured opening and drift. Warmth stays near the bowl, the window stays cold, and the push is small (2.6%). No glow | 3, 5, 6 |
 | 32.29–34.13 | D3 | **Full frame, supplied art.** The back plate and the whole connected baby layer share one breath transform (the parent's 3.1 s breath, plus the baby's smaller 1.15 s breath on the baby layer). No detached head, no held alternate, no chest light | 5, 6 |
 | 34.13–35.92 | D3b | B3, voice-over. The glow blob and the "heartbeat" pulse are removed | 6, 7 |
 | 35.92–39.25 | D4 | History read backward. Windows go dark one by one (36.2–36.9), the paper yellows, and the town and street fold back away from us like a closing spread (36.85), then the village (37.54). It is not crushed toward the viewer, so it stays distinct from a later destructive flattening. Focus racks to the hill | 4 |
 | 39.25–41.17 | D5 | **Full frame, supplied art.** A down-left arc brings the stone tip to the lower stone's top at 39.59, a small recoil, then a second strike at 40.05. Sparks start at the contact and fall into the tinder, an ember follows, the flame catches on the 40.50 hit, and light rises on the hand. The hand is desaturated to match the cards. The forearm is mirror-extended past the canvas edge, so it is never cut | 4, 5 |
-| 41.17–42.75 | D6 | The same fire on the crest. The camera is re-aimed every frame, so the fire holds the struck flame's screen point (566, 438 → 444) | 4 |
+| 41.17–42.75 | D6 | The same fire on the crest. The camera is re-aimed every frame, so the fire holds the struck flame's screen point (566, 438 → 444). The page is wide enough that its edge never shows | 4 |
 | 42.75 | E1 | Unchanged match to the palm flame (566, 445) | 4 |
 
 **Removed:** the three decorative paper wipes (22.25, 23.83, 30.46) and the central glow blobs (D2, D3, D3b, A1). Each cut is now motivated by a match, for example the point of light that becomes the candle and then the lamp.
@@ -72,9 +72,44 @@
 - **Other characters:** KV4, KV5a, KV5 and B3 already have closed mouths.
 - **No lip sync is used or claimed in this demo.**
 
-## QC
+## QC of the actual render
 
-(see the measured table below, filled from the actual render)
+**Measured** (decoded from `tests/DEMO_0-43_v4_720p.mp4`):
+
+| check | result |
+|---|---|
+| container | 1280×720 H.264, 24 fps, 1038 frames, 43.250 s; AAC 43.250 s from the locked master; 0 irregular frame steps; sha256/16 dfb9446967037fcb |
+| approved light catch, frames 180–325 | mean difference 1.85, max 1.94 (0–255, at 320×180) against `P1_light_catch_720p.mp4`: encoding only |
+| frame-to-frame change | median 0.60. Every change above 16 outside a cut is accounted for: the fade from black and the pen's exit in the unchanged opening (frames 8–13, 41–44); the fold to a point in P1b (frames 486–488, intended); the S2 hand in the approved light catch (220, 256). There are no wipe jumps; the wipes are gone |
+| one light across cuts | P1b's last point lands on M1's wick (candle_xy, same pixel). M1's candle ends where M2's lamp is (168, 241 target). D5's flame is at (566, 438), D6's crest fire at (566, 444), and E1's painted flame is centred at (566, 445) |
+| strike contact | the stone tip is on the lower stone's top on frames 950–951 (39.583–39.625) and 961–962 (40.042–40.083), held for two frames each; the sparks start there |
+| cradle | rolls on the floor: the rocker meets the floor line at both rock extremes (frames 544 and 563, checked in a 2× crop) |
+| farewell | about 11 px between the fingertips at the start; no intersection; the carriage alone moves |
+
+**Verified by looking at the rendered frames:**
+- B solid in D1, with nothing passing through her hair or face. Her outer strands are clean at 2× over the town and over a flat test colour: no grey ticks, flecks or navy rims (`tests/DEMO_0-43_v4_B_edge.jpg`, before and after, frames 707 and 722).
+- The letter tears as paper (creases, not light), and the spiral shard is never cut.
+- A1's mouth is closed, and the near shards stay below her face.
+- The memory shots are full frame from the supplied art, with the contacts above.
+- The newborn is one connected layer; there is no chest light and the held alternate is not used.
+- Thin steam on the bowl.
+- The town folds back away from us, in history order.
+- The fire holds one screen point across three scales.
+
+**Not verified by ear (I cannot listen):**
+- Event timing against the singing uses the plan's word times, which come from machine transcription (confidence medium to low) and onset analysis. That covers "fragments" at about 17.5, "translated" at 19.6, "compressed" at 20.2, and the cut onto "hill" at 42.75.
+- The two strikes (39.58, 40.04) are placed on the grid near the measured onsets, not on heard hits.
+- No lip sync exists to verify: no character sings on screen.
+
+## Remaining, honestly
+
+- **M1 (war) is still the placeholder paper card.** This is by design for this pass: it carries the light hand-off and has no figures. If you want it in the same art as the others, it needs one more drawing.
+- **The memory art is graded from daylight drawings to a warm night,** with lamp, bowl and tinder light kept local. Whether it reads as night enough beside the girls' blue scenes is a judgement for your playback.
+- **The cradle's rock is deliberately small** (±1.1°, settling). It may need to be larger once seen at speed.
+- **A1's closed mouth is a local edit of the model-sheet pose.** It matches A's closed panel, but you should confirm it.
+- **The constellations and the town are still procedural paper.**
+- **B's hair edge is a matte I made from KV4's colours,** not a drawn cel matte. A few 1–2 px hair-coloured flicks remain where the art has strand tips. If you see anything else at full size, a clean KV4 hair matte from the artist would settle it.
+- **No new artwork or paid generation is needed for anything in this demo.**
 
 ## Mouth reference research (anime closed mouth in profile)
 

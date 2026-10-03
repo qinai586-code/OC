@@ -946,13 +946,11 @@ class Verse:
         k4 = cv2.imread(os.path.join(PLATES, 'KV4.png')).astype(np.float32)
         m4 = cv2.imread(os.path.join(PLATES, 'KV4_matte.png'), 0).astype(np.float32) / 255
         self.kv4 = OI_crop(k4, 160)
-        # KV4's matte is partly transparent inside her hair (0.6-0.8), so the page showed through her. Make the inside
-        # solid; only the outer strands keep the soft matte.
-        core = (m4 > 0.18).astype(np.uint8)
-        core = cv2.morphologyEx(core, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (25, 25)))
-        core = cv2.erode(core, np.ones((7, 7), np.uint8)).astype(np.float32)          # real gaps (under the chin) stay open
-        m4 = np.maximum(m4, cv2.GaussianBlur(core, (0, 0), 2.0))
-        self.kv4a = np.clip(OI_crop(np.dstack([m4] * 3), 160)[..., 0], 0, 1)
+        a4, col = kv4_matte(k4, m4)
+        al = cv2.GaussianBlur(a4, (0, 0), 1.0)
+        self.kv4a = np.clip(OI_crop(np.dstack([al] * 3), 160)[..., 0], 0, 1)
+        # premultiplied at full size, colour and alpha blurred alike: a pixel the matte drops brings none of its colour
+        self.kv4_pre = OI_crop(cv2.GaussianBlur(col * a4[..., None], (0, 0), 1.0), 160)
 
     def prep_poses(self):
         self.A1 = load_pose('A1')
@@ -1049,12 +1047,12 @@ class Verse:
         # the near roofs: big, close to the lens, out of focus
         piece(1120, 1500, 'near', [-0.80, 0.0, -0.10], [1.0, 0.0, 0.0], 0.95, 0)
         piece(40, 420, 'near', [-1.15, 0.0, 0.18], [1.0, 0.0, 0.0], 0.95, 1)
-        g = paper(1760, 1148, 9, tone=(0.74, 0.84, 0.90))                                 # the page: 4.4 x 2.87, z -0.47..2.4
+        g = paper(2640, 1148, 9, tone=(0.74, 0.84, 0.90))                                 # the page: 6.6 x 2.87, z -0.47..2.4 (wider than the hill)
         for k in self.TOWN:                                                              # pop-up creases along the folds
             y = int((2.4 - self.TOWN[k][0]) / 2.87 * 1148)
-            cv2.line(g, (0, y), (1759, y), (0.55, 0.62, 0.68), 2, cv2.LINE_AA)
-            cv2.line(g, (0, y + 2), (1759, y + 2), (0.86, 0.94, 0.98), 1, cv2.LINE_AA)
-        self.ground = np.dstack([g, np.ones((1148, 1760), np.float32)])
+            cv2.line(g, (0, y), (2639, y), (0.55, 0.62, 0.68), 2, cv2.LINE_AA)
+            cv2.line(g, (0, y + 2), (2639, y + 2), (0.86, 0.94, 0.98), 1, cv2.LINE_AA)
+        self.ground = np.dstack([g, np.ones((1148, 2640), np.float32)])
         L = self.layers['hill']
         cx_, cy_ = L['crest']
         th, tw = L['tex'].shape[:2]
@@ -1552,12 +1550,12 @@ class Verse:
 
         def arc(s):                                                                     # s 0 (raised) .. 1 (contact)
             return hit * s + np.array([18.0, -30.0]) * 4 * s * (1 - s)
-        keys = [(39.25, 0.0), (39.42, -0.10), (39.59, 1.0), (39.66, 0.97), (39.84, 0.45), (39.94, 0.33), (40.05, 1.0),
-                (40.12, 0.96), (40.40, 0.55), (41.17, 0.45)]
+        keys = [(39.25, 0.0), (39.42, -0.10), (39.583, 1.0), (39.625, 1.0), (39.70, 0.93), (39.84, 0.45), (39.94, 0.33),
+                (40.042, 1.0), (40.083, 1.0), (40.16, 0.95), (40.40, 0.55), (41.17, 0.45)]
         ts, ss = zip(*keys)
         i = max(0, min(len(ts) - 2, int(np.searchsorted(ts, t)) - 1))
         f = np.clip((t - ts[i]) / (ts[i + 1] - ts[i]), 0, 1)
-        f = f * f if ss[i + 1] > ss[i] and ss[i + 1] == 1.0 else smooth(f)              # the strike accelerates into contact
+        f = f * f if ss[i + 1] > ss[i] and ss[i + 1] == 1.0 else (f if ss[i] == ss[i + 1] else smooth(f))   # the strike accelerates into contact
         s_ = ss[i] + (ss[i + 1] - ss[i]) * f
         return arc(s_), s_ >= 0.995
 
@@ -1586,7 +1584,7 @@ class Verse:
         img = self.to_screen(canvas, x0, y0, w)
         sc = W / w
         rng = np.random.default_rng(int(round(t * 48)))
-        for s0 in (39.59, 40.05):                                                       # sparks: from the contact into the tinder
+        for s0 in (39.583, 40.042):                                                     # sparks: from the contact into the tinder
             if s0 <= t < s0 + 0.32:
                 q = (t - s0) / 0.32
                 srng = np.random.default_rng(int(s0 * 100))
@@ -1695,9 +1693,9 @@ class Verse:
         g = self.ground.copy()
         g[..., :3] *= tint * 0.92
         if sun_x is not None:                                                          # the light crossing the page
-            xx = np.linspace(-2.2, 2.2, g.shape[1], dtype=np.float32)[None, :]
+            xx = np.linspace(-3.3, 3.3, g.shape[1], dtype=np.float32)[None, :]
             g[..., :3] *= (1 + 0.45 * np.exp(-((xx - sun_x) / 0.9) ** 2))[..., None]
-        img, _ = put_card(img, cam, card_corners((0, 0, 0.965), (1, 0, 0), (0, 0, 1), 4.4, 2.87), g, focus=focus,
+        img, _ = put_card(img, cam, card_corners((0, 0, 0.965), (1, 0, 0), (0, 0, 1), 6.6, 2.87), g, focus=focus,
                           aperture=0.35, dof_map=True)
         # every standing piece, far to near
         items = []
@@ -1789,7 +1787,7 @@ class Verse:
         # her shadow on what lies behind her: soft, offset away from the warm light at lower left
         sh = cv2.GaussianBlur(cv2.warpAffine(fa, np.float32([[1, 0, 38], [0, 1, -22]]), (W, H)), (0, 0), 22)
         img = img * (1 - 0.32 * sh[..., None])
-        fg = cv2.warpAffine(self.kv4 * self.kv4a[..., None], M, (W, H))
+        fg = cv2.warpAffine(self.kv4_pre, M, (W, H))
         return img * (1 - fa[..., None]) + fg
 
     def d3b(self, t):
@@ -1866,6 +1864,86 @@ CONST = [
      [(1.50, 0.50), (1.24, 0.52), (1.02, 0.535), (0.86, 0.55), (0.76, 0.545)], [(0.95, 0.50), (0.90, 0.46)]],
 ]
 CONST_AT = [(240.0, 185.0), (640.0, 140.0), (1040.0, 185.0)]
+
+
+def line_kernel(theta, n):
+    k = np.zeros((n, n), np.uint8)
+    c = (n - 1) / 2
+    dx, dy = np.cos(theta) * c, np.sin(theta) * c
+    cv2.line(k, (int(round(c - dx)), int(round(c - dy))), (int(round(c + dx)), int(round(c + dy))), 1, 1)
+    return k
+
+
+def open_lines(a, n, steps):
+    """Keep what lies on a straight run at least n px long in some direction (a union of line openings)."""
+    out = np.zeros_like(a)
+    for th in np.linspace(0, np.pi, steps, endpoint=False):
+        out = np.maximum(out, cv2.morphologyEx(a, cv2.MORPH_OPEN, line_kernel(th, n)))
+    return out
+
+
+def kv4_matte(k4, m4):
+    """B's matte for D1, from KV4 (3072x2048) and its own matte. KV4's matte is soft (0.6-0.8 inside her hair, 0.05-0.2
+    on the outer strands, ~0.5 where her hair leaves the right side of the picture) and also covers the night between
+    the strands, so it is used only for her body; her hair edge is matted by colour and shape. Returns alpha (full size,
+    unblurred) and the colour to premultiply, with the night removed from the hair's edge pixels."""
+    xx = np.arange(m4.shape[1], dtype=np.float32)[None, :]
+    m4 = m4 + 0.12 * np.clip((xx - (m4.shape[1] - 96)) / 48.0, 0, 1)       # her hair runs out of the right side
+    bb, gg, rr = k4[..., 0], k4[..., 1], k4[..., 2]
+    lum = 0.11 * bb + 0.59 * gg + 0.30 * rr
+    navy = np.clip((bb - rr + 8) / 25.0, 0, 1) * np.clip((150 - lum) / 60.0, 0, 1)
+    copper = np.clip((rr - bb - 18) / 30.0, 0, 1)
+    solid = cv2.erode((m4 > 0.5).astype(np.uint8), np.ones((5, 5), np.uint8))
+    deep = cv2.erode((m4 > 0.5).astype(np.uint8), np.ones((61, 61), np.uint8))     # her face, body, bow: never re-matted
+    near = cv2.dilate((m4 > 0.03).astype(np.uint8), np.ones((3, 3), np.uint8))           # only where KV4 itself has her
+    # the city lights between the strands: small bright dots and rows (strands are tall)
+    bright = ((((gg / np.maximum(rr, 1) > 0.88) & (lum > 110)) | ((lum > 165) & (rr - bb > 110))) & (deep == 0)).astype(np.uint8)
+    n_b, lab_b, st_b, _ = cv2.connectedComponentsWithStats(bright, connectivity=8)
+    speck = np.zeros(n_b, bool)
+    speck[1:] = (np.maximum(st_b[1:, 2], st_b[1:, 3]) < 25) & (st_b[1:, 3] <= 1.5 * st_b[1:, 2])
+    lights = cv2.dilate(speck[lab_b].astype(np.uint8), np.ones((5, 5), np.uint8)) > 0
+    # copper connected to her body is hair; the navy night is not
+    cand = (((copper > 0.45) & (navy < 0.5) & (near > 0)) | (solid > 0)) & ~lights
+    n_, lab, st, _ = cv2.connectedComponentsWithStats(cand.astype(np.uint8), connectivity=8)
+    keep = (lab == 1 + int(np.argmax(st[1:, 4]))).astype(np.float32)
+    a4 = np.maximum(deep.astype(np.float32), keep * np.maximum(np.clip(copper * 1.6, 0, 1), solid * (1 - navy)))
+    a4 = a4 * (1 - navy * (1 - deep)) * (1 - lights)
+    a_cl = cv2.morphologyEx(a4, cv2.MORPH_CLOSE, np.ones((13, 1), np.uint8))     # strands a light crossed, closed again
+    a4 = np.maximum(a4, a_cl * (near > 0) * (navy < 0.5))
+    warm = np.clip((rr - bb - 2) / 14.0, 0, 1)                                       # outside her body only warm pixels are hair
+    a4 = np.where(deep > 0, a4, a4 * warm)
+    # The night beside the strands has pink-grey smears (r-b 30-60) that touch them and read as ticks. A strand is a
+    # bright copper core (r-b > 95), or a long run, or part of a thick hair mass; keep the hair within 1 px of those.
+    core = ((rr - bb > 95) & (a4 > 0.3)).astype(np.uint8)
+    thick = cv2.morphologyEx(((a4 > 0.5) & (warm > 0.5)).astype(np.uint8), cv2.MORPH_OPEN,
+                             cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (9, 9)))
+    long_ = (open_lines((a4 > 0.3).astype(np.float32), 31, 24) > 0.5).astype(np.uint8)
+    anchor = cv2.dilate(core | thick | long_, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3)))
+    a4 = np.where(deep > 0, a4, a4 * anchor)
+    # inside a hair mass everything is hair, its black line art included; a thin neutral-dark line along a strand or a
+    # mass edge is its outline (the navy night is r-b about -45); a dark patch beside her is not
+    hf = cv2.morphologyEx(thick, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))) * (navy < 0.5)
+    a4 = np.maximum(a4, hf.astype(np.float32))
+    ink = ((lum < 45) & (np.abs(rr - bb) < 30) & (cv2.dilate((a4 > 0.8).astype(np.uint8), np.ones((5, 5), np.uint8)) > 0)).astype(np.uint8)
+    blob = cv2.dilate(cv2.morphologyEx(ink, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))), np.ones((3, 3), np.uint8))
+    a4 = np.where(deep > 0, a4, np.maximum(a4, (ink * (1 - blob)).astype(np.float32)))
+    # what is left of the ticks is short: keep only what lies on a run of 17 px or more
+    a4 = np.where(deep > 0, a4, np.minimum(a4, open_lines(a4, 17, 16)))
+    # the sky seen through a gap in her hair where KV4's matte calls it her: navy regions joined to the background
+    # (her ribbon's dark stripes are enclosed by hair and stay)
+    nv = (navy > 0.6).astype(np.uint8)
+    bg = cv2.dilate(((a4 < 0.05) & (deep == 0)).astype(np.uint8), np.ones((3, 3), np.uint8))
+    n_s, lab_s, _, _ = cv2.connectedComponentsWithStats(nv, connectivity=8)
+    touch = np.zeros(n_s, bool)
+    touch[np.unique(lab_s[(bg > 0) & (nv > 0)])] = True
+    touch[0] = False
+    a4 = a4 * (1 - (touch[lab_s] & (deep > 0)))
+    # an edge pixel half hair, half night takes the colour of the hair beside it, so no strand carries a grey rim
+    w = ((warm > 0.95) & (a4 > 0.5)).astype(np.float32)
+    wb = cv2.GaussianBlur(w, (0, 0), 2.5)
+    fill = cv2.GaussianBlur(k4 * w[..., None], (0, 0), 2.5) / np.maximum(wb, 1e-3)[..., None]
+    f = np.where(deep[..., None] > 0, 0, 1 - warm[..., None]) * (wb[..., None] > 0.02)
+    return a4.astype(np.float32), k4 * (1 - f) + fill * f
 
 
 def OI_crop(img, y0):
