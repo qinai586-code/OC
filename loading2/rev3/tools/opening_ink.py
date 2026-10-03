@@ -706,18 +706,21 @@ class Girls:
         wv = np.clip(1 - (A_SLEEVE['bottom'] - yy) / 160.0, 0, 1) * np.clip(1 - np.abs(yy - A_SLEEVE['bottom']) / 60.0, 0, 1)
         wx = np.exp(-((xx - 1310) / 80.0) ** 2)
         inside = np.clip((A_SLEEVE['bottom'] - 8 - yy) / 30.0, 0, 1)                   # keep the move inside the sleeve
-        sy = yy + 5.0 * k * np.clip(wv + 0.6 * np.clip((yy - (A_SLEEVE['bottom'] - 160)) / 160, 0, 1), 0, 1) * wx * inside
-        col[y0:y1, x0:x1] = cv2.remap(np.ascontiguousarray(col), xx, sy, cv2.INTER_LINEAR)
-        # the hand: up and in, slightly smaller (moving away from us), behind the body
-        hx0, hy0, hx1, hy1 = self.hbox
-        dxy = np.array([-34.0, -58.0]) * k
-        s = 1 - 0.12 * k
-        cx, cy = 1380.0, 1724.0 - Y0
-        M = np.float32([[s, 0, (1 - s) * cx + dxy[0]], [0, s, (1 - s) * cy + dxy[1]]])
-        hl = cv2.warpAffine(self.crop * self.hand_m[..., None], M, (3072, 1728))
-        ha = cv2.warpAffine(self.hand_m, M, (3072, 1728))
+        cuff = 26.0 * float(smooth((k - 0.35) / 0.65))                                       # the cuff rises with the hand (v6)
+        sy = yy + (5.0 * k + cuff) * np.clip(wv + 0.6 * np.clip((yy - (A_SLEEVE['bottom'] - 160)) / 160, 0, 1), 0, 1) * wx * inside
+        col[y0:y1, x0:x1] = cv2.remap(np.ascontiguousarray(col), xx, sy.astype(np.float32), cv2.INTER_LINEAR)
+        # the hand (v6): a release, then the start of a lift, cut on the motion (S1 opens on the raised palm). First the
+        # fingertips come up off the stone, turning about the wrist (k 0..0.45); then hand and cuff rise together, the
+        # wrist staying in the sleeve. No fade.
+        rel = smooth(k / 0.45)
+        lift = smooth((k - 0.35) / 0.65)
+        wr = np.array([1342.0, 1722.0 - Y0])                                           # the wrist, at the sleeve
+        ang = 16.0 * rel + 6.0 * lift                                                  # fingertips up (counter-clockwise)
+        R = cv2.getRotationMatrix2D((float(wr[0]), float(wr[1])), ang, 1.0)
+        R[:, 2] += np.array([-6.0, -26.0]) * lift
+        hl = cv2.warpAffine(self.crop * self.hand_m[..., None], R, (3072, 1728))
+        ha = cv2.warpAffine(self.hand_m, R, (3072, 1728))
         vis = ha * (1 - self.body)                                                    # hidden behind her as it rises
-        vis *= 1 - smooth((k - 0.55) / 0.4)
         col = col * (1 - vis[..., None]) + hl * (vis / np.maximum(ha, 1e-3))[..., None]
         return col, np.maximum(a, vis)
 

@@ -37,10 +37,10 @@ ART = os.environ.get('DEMO_ART') or os.path.join(R, 'art', 'memory_cards')
 CAND = os.path.join(R, 'art', 'candidates_m23')                                  # Message 23 candidates (rear A, rear B, side palm)
 PLATES5 = os.path.join(R, 'art', 'plates_v5')                                     # war_memory_v1, first_fire_hill_wide_v1 (opaque, 1672x941)                  # supplied memory-card artwork (see briefs/MEMORY_CARDS_BRIEF.md)
 AUDIO = OI.AUDIO
-OUT = os.path.join(R, 'tests', 'DEMO_0-43_v5_720p.mp4')                      # v4 (and v3) stay in tests/ for comparison
-STRIP = os.path.join(R, 'tests', 'DEMO_0-43_v5_strip.jpg')
-LOG = os.path.join(R, 'tests', 'DEMO_0-43_v5_shots.json')
-CACHE = os.environ.get('DEMO_CACHE') or '/tmp/claude-0/-home-user-OC/c9b74a57-085e-5ad1-8a57-5167fd743993/scratchpad/v5/cache'
+OUT = os.path.join(R, 'tests', 'DEMO_0-43_v6_720p.mp4')                      # v5, v4, v3 stay in tests/ for comparison
+STRIP = os.path.join(R, 'tests', 'DEMO_0-43_v6_strip.jpg')
+LOG = os.path.join(R, 'tests', 'DEMO_0-43_v6_shots.json')
+CACHE = os.environ.get('DEMO_CACHE') or '/tmp/claude-0/-home-user-OC/c9b74a57-085e-5ad1-8a57-5167fd743993/scratchpad/v6/cache'
 S3_V5 = os.path.join(R, 'work', 'p1', 'S3_v5_frames.npy')   # the approved S3 with the v5 settle (tools/p1_local.build_s3)
 W, H, FPS, N = 1280, 720, 24, 1038
 F = 1100.0
@@ -429,7 +429,7 @@ def close_mouth_a1(img, theta=-5.5):
     return img
 
 
-def pose_matte(img, dark_hair=False):
+def pose_matte(img, dark_hair=False, protect=None):
     """alpha and edge colour for a key pose drawn on white. The background is the white joined to the corners, plus
     any enclosed white that hair surrounds (the gaps between strands, the inside of a looped strand); enclosed white
     bounded by line art (a collar, a ribbon stripe) stays. Edge pixels get alpha from how far they are from paper white
@@ -463,11 +463,19 @@ def pose_matte(img, dark_hair=False):
         if dark_hair and not gap:                                                        # a gap by the horn or the head's outline
             near_out = d_out[y0:y1, x0:x1][comp > 0].min() <= 12
             gap = near_out and (mn[y0:y1, x0:x1][ring] < 150).mean() >= 0.3
+        if gap and protect is not None:
+            outer = (cv2.dilate(comp, np.ones((11, 11), np.uint8)) > 0) & ~(cv2.dilate(comp, np.ones((5, 5), np.uint8)) > 0)
+            sub = img[y0:y1, x0:x1]
+            pale_ring = ((sub.min(2) >= 200) & (np.abs(sub[..., 2] - sub[..., 0]) < 25))[outer].mean() if outer.sum() else 0.0
+            if protect[y0:y1, x0:x1][comp > 0].mean() > 0.3 or pale_ring > 0.2:
+                gap = False                                                              # a highlight on her face, the collar, not a gap
         if gap:
             bg[y0:y1, x0:x1] |= comp > 0
     # pale paper pockets between strands joined to the background through a narrow neck (pale grey 195-240,
     # colourless): the background reaches up to 6 px into such pixels
     pale = (mn > 195) & (np.abs(r_ - b_) < 18) & (np.abs(g_ - b_) < 18)
+    if protect is not None:                                                              # face and body interiors are never paper
+        pale &= ~protect
     for _ in range(6):
         bg = bg | ((cv2.dilate(bg.astype(np.uint8), np.ones((3, 3), np.uint8)) > 0) & pale)
     fg = ~bg
@@ -486,13 +494,33 @@ def pose_matte(img, dark_hair=False):
     return a, col.astype(np.float32)
 
 
+def body_zone(img):
+    """B3's face and body interior, from the drawing: the convex hull of her face skin, extended 90 px up under the
+    bangs (the forehead highlight between them), and of her cardigan, extended 40 px up over the collar. White pockets
+    in it are skin highlights, eye corners or the shirt, never background. (The face is the largest bright skin-toned
+    region in the upper half; the cardigan the largest in the lower half.)"""
+    b, g, r = img[..., 0], img[..., 1], img[..., 2]
+    mn = img.min(2)
+    skin = ((r > 225) & (r - b > 15) & (r - b < 75) & (mn > 150) & (g > 175)).astype(np.uint8)
+    n, lab, st, cen = cv2.connectedComponentsWithStats(skin, connectivity=8)
+    hh = img.shape[0]
+    zone = np.zeros(img.shape[:2], np.uint8)
+    for upper, lift in ((True, 90), (False, 40)):
+        cand = [i for i in range(1, n) if (cen[i][1] < hh * 0.55) == upper]
+        i = max(cand, key=lambda k: st[k, 4])
+        hull = cv2.convexHull(np.argwhere(lab == i)[:, ::-1].astype(np.int32))
+        for dy in range(0, lift + 1, 10):
+            cv2.fillConvexPoly(zone, hull - np.array([0, dy], np.int32), 1)
+    return zone > 0
+
+
 def load_pose(name):
     """key pose on white: its own matte from the drawing (pose_matte), the figure's main silhouette only (drops stray
     marks). Cut sides are framed out by the shots, not faded."""
     img = cv2.imread(os.path.join(POSES, name + '.png')).astype(np.float32)
     if name == 'A1':
         img = close_mouth_a1(img)
-    a, col = pose_matte(img, dark_hair=name.startswith('A'))
+    a, col = pose_matte(img, dark_hair=name.startswith('A'), protect=body_zone(img) if name == 'B3' else None)
     n, lab, st, _ = cv2.connectedComponentsWithStats((a > 0.5).astype(np.uint8))
     big = 1 + int(np.argmax(st[1:, 4]))
     keep = cv2.dilate((lab == big).astype(np.uint8), np.ones((3, 3), np.uint8)).astype(np.float32)
@@ -1290,23 +1318,46 @@ class Verse:
 
         def world(q, z):                                                                 # screen point at depth z
             return np.array([(q[0] - 640) / F * (3.0 + z), -(q[1] - 360) / F * (3.0 + z), z])
-        a1 = ease(14.97, 15.58, t)                                                       # opening beside her
-        b1 = ease(15.625, 15.875, t) ** 1.3                                              # then to the lens (6 frames)
         pw, ph = self.page_wh
+        a1 = ease(14.97, 15.58, t)                                                       # opening beside her
+        b1 = ease(15.60, 15.833, t)                                                      # then onto P1a's page (exact on frame 380)
+        # the float: a sheet of paper beside her, turned a little and gently flexed (not a flat panel)
         A_ctr = world(p, 0.0) * (1 - a1) + world((935.0, 285.0), 0.0) * a1 + np.array([0, 0.04, 0]) * np.sin(np.pi * a1)
         A_sz = 0.10 + 0.40 * a1 ** 1.2
-        A_ang = -np.radians(85) * (1 - smooth(a1 / 0.85))
-        B_ctr, B_sz, B_ang = np.array([0.0, 0.10, -1.55]), 0.96, np.radians(38)          # v4's arrival = P1a's first frame
-        ctr = A_ctr * (1 - b1) + B_ctr * b1
-        sz = A_sz * (1 - b1) + B_sz * b1
-        ang = A_ang * (1 - b1) + B_ang * b1
-        v = rot_axis(np.array([0, 1.0, 0]), (1, 0, 0), ang)
-        corners = card_corners(ctr, (1, 0, 0), v, sz * pw / ph, sz)
+        tilt = -np.radians(85) * (1 - smooth(a1 / 0.85)) + np.radians(10) * smooth(a1)  # top edge leans back a little
+        yaw = np.radians(-16.0) + np.radians(4.0) * np.sin(2 * np.pi * (t - 14.97) / 1.6)
+        uA = rot_axis(np.array([1.0, 0, 0]), (0, 1, 0), yaw)
+        vA = rot_axis(rot_axis(np.array([0, 1.0, 0]), (1, 0, 0), tilt), (0, 1, 0), yaw)
+        bendA = 0.22 * smooth(a1 / 0.6) + 0.05 * np.sin(2 * np.pi * (t - 14.97) / 1.1)
+        # the arrival: P1a's first frame, its page pose carried into this camera (same lens, same screen geometry)
+        Cp, focus = self.p1a_cam(15.875)
+        Rm = np.stack([cam.rt, cam.up, cam.fw], 1) @ np.stack([Cp.rt, Cp.up, Cp.fw], 0)
+
+        def T(X):
+            return cam.p + Rm @ (np.asarray(X, np.float64) - Cp.p)
+        cB, uB, vB = T((0, 0, 0)), Rm @ np.array([1.0, 0, 0]), Rm @ np.array([0, 0, 1.0])
+        c = A_ctr * (1 - b1) + cB * b1
+        u = uA * (1 - b1) + uB * b1
+        u /= np.linalg.norm(u)
+        v = vA * (1 - b1) + vB * b1
+        v -= (v @ u) * u
+        v /= np.linalg.norm(v)
+        w_ = A_sz * pw / ph * (1 - b1) + pw / self.PU * b1
+        h_ = A_sz * (1 - b1) + ph / self.PU * b1
         k = 0.6 * a1 + 0.4 * b1
-        lit = self.lit_page(15.9)
+        lit = self.lit_page(15.875)
         tex = np.dstack([lit * (0.6 + 0.4 * k) + np.array([0.25, 0.42, 0.55], np.float32) * (1 - k) ** 2, np.ones((ph, pw), np.float32)])
-        img, _ = put_card(img, cam, corners, tex)
-        return glow(img, cam.project(ctr)[0][0], 0.35 + 0.25 * k, 1.1 * (1 - 0.7 * k))
+        if b1 < 0.5:
+            img = put_bent(img, cam, c, u, v, w_, h_, tex, bendA * (1 - b1))
+        else:                                                                            # P1a's depth of field comes in
+            img, _ = put_card(img, cam, card_corners(c, u, v, w_, h_), tex, focus=focus, aperture=0.45 * smooth((b1 - 0.5) / 0.5),
+                              dof_map=True)
+        # the light: on the sheet, then exactly where P1a's reader light is on its first frame
+        lp = cam.project(c)[0][0] * (1 - b1) + cam.project(T(self.reader_light(15.875)))[0][0] * b1
+        img = glow(img, lp, (0.35 + 0.25 * k) * (1 - b1) + 0.16 * b1, 1.1 * (1 - 0.7 * k) * (1 - b1) + 0.9 * b1)
+        if b1 > 0:
+            OI.dot(img, lp, 2.0, b1)
+        return img
 
     # -- the letter, P1a/P1b. Page plane y = 0, x right, z away from camera; texture top = far edge.
     def tex2world(self, q):
@@ -1360,18 +1411,21 @@ class Verse:
         v = rot_axis(np.array([0, 0, 1.0]), fr['axis'], ang)
         return c, u, v, k
 
-    def p1a(self, t):
-        """the letter, close: the light reads the words ("in the words that you left"), settles in the full stop, and
-        the page cracks open from it and lifts in fragments ("we met you in fragments")."""
-        img = night_backdrop(2, top=(22, 14, 10), bottom=(34, 22, 16))
-        L = self.reader_light(t)
+    def p1a_cam(self, t):
         g = ease(15.875, 17.35, t)
         tx = -0.62 + 1.20 * g + 0.10 * ease(17.35, 18.6, t)
         tz = 0.02 - 0.06 * ease(17.0, 17.6, t)
         h = 0.56 + 0.16 * ease(15.875, 16.6, t) + 0.38 * ease(17.6, 18.6, t)
         back = 0.50 + 0.12 * ease(15.875, 16.6, t) + 0.30 * ease(17.6, 18.6, t)
         cam = Cam((tx - 0.10, h, tz - back), (tx, 0.0, tz), roll=0.05 - 0.07 * g)
-        focus = float(np.linalg.norm(np.array([tx, 0, tz]) - cam.p))
+        return cam, float(np.linalg.norm(np.array([tx, 0, tz]) - cam.p))
+
+    def p1a(self, t):
+        """the letter, close: the light reads the words ("in the words that you left"), settles in the full stop, and
+        the page cracks open from it and lifts in fragments ("we met you in fragments")."""
+        img = night_backdrop(2, top=(22, 14, 10), bottom=(34, 22, 16))
+        L = self.reader_light(t)
+        cam, focus = self.p1a_cam(t)
         pw, ph = self.page_wh
         lit = self.lit_page(t)
         if t < 17.71:
@@ -1804,8 +1858,8 @@ class Verse:
         ember = ease(40.08, 40.25, t) * (1 - ease(40.5, 40.7, t))
         fk = ease(40.50, 40.95, t)
         canvas = self.over(bg[..., :3].copy(), lay)
-        lights = [(self.TINDER[0], self.TINDER[1] - 20, 120 + 330 * fk, 1.15 * fk + 0.25 * ember)]
-        canvas = self.grade(canvas, lights, night=(0.44, 0.42, 0.52))
+        lights = [(self.TINDER[0], self.TINDER[1] - 20, 120 + 280 * fk, 0.95 * fk + 0.25 * ember)]
+        canvas = self.grade(canvas, lights, night=(0.52, 0.42, 0.38))                  # v6: the same night blue as the hill wide
         x0, y0, w = self.D5_VIEW
         img = self.to_screen(canvas, x0, y0, w)
         sc = W / w
@@ -1922,19 +1976,56 @@ class Verse:
             if cc:
                 words.append((cc, np.array([x + w / 2, y + h / 2], np.float32), w))
         cf = Cam(*self.C1_CAM)
-        field = []
-        for j in range(230):
-            cc, c0, w = words[j % len(words)]
-            d = float(np.exp(rng.uniform(np.log(24), np.log(260))))
-            sx, sy = rng.uniform(-80, 1360), rng.uniform(-60, 600)
-            ang = rng.uniform(-0.5, 0.5)
-            sc = rng.uniform(70, 150) / w * 11.0 / d * 1.6
-            R = np.array([[np.cos(ang), -np.sin(ang)], [np.sin(ang), np.cos(ang)]], np.float32)
-            wch = []
-            for c in cc:
-                q = ((c - c0) @ R.T) * sc + np.array([sx, sy], np.float32)
-                wch.append(cf.p + d * (cf.fw + (q[:, 0:1] - 640.0) / F * cf.rt - (q[:, 1:2] - 360.0) / F * cf.up))
-            field.append(dict(ch=wch, t0=25.85 + 1.6 * rng.uniform() ** 1.5, d=d))
+
+        def word_pts(cc, c0, w, size):                                                    # a word's chains, centred, in units of `size` per width
+            return [(c - c0) * (size / w) for c in cc]
+        # middle: each memory sheds a few words of the letter, which drift from it (toward the field behind)
+        mids = []
+        for name in ('hands', 'war', 'lull', 'mark'):
+            ctr = figs[name]['w_ch'][0].mean(0)
+            for j in range(9):
+                cc, c0, w = words[int(rng.integers(len(words)))]
+                off = cf.rt * rng.uniform(-1.4, 1.4) + cf.up * rng.uniform(-0.8, 0.8) + cf.fw * rng.uniform(-0.5, 1.8)
+                ang = rng.uniform(-0.6, 0.6)
+                R = np.array([[np.cos(ang), -np.sin(ang)], [np.sin(ang), np.cos(ang)]], np.float32)
+                pts = [(q @ R.T) for q in word_pts(cc, c0, w, rng.uniform(0.25, 0.45))]
+                mids.append(dict(base=ctr + off, pts=pts, drift=cf.fw * rng.uniform(0.6, 1.4) + off * 0.15,
+                                 t0=figs[name]['t1'] - 0.1 + rng.uniform(0, 0.5)))
+        # far: the letter's handwriting along the arms of one vast spiral (the letter's own mark, enlarged), on a disk
+        # leaning back behind the hub, ~150 units deep and ~300 across: it opens from its centre outward
+        hub_dir = cf.fw + (640.0 - 640.0) / F * cf.rt - (150.0 - 360.0) / F * cf.up
+        C = cf.p + 150.0 * hub_dir / np.linalg.norm(hub_dir)
+        nrm = rot_axis(-cf.fw, cf.rt, -np.radians(64))
+        e1 = cf.rt.copy()
+        e2 = np.cross(nrm, e1)
+        e2 /= np.linalg.norm(e2)
+        far = []
+        bsp = 0.21
+        for arm in range(3):
+            th = 0.9
+            while True:
+                r = 7.0 * np.exp(bsp * th)
+                if r > 150:
+                    break
+                cc, c0, w = words[int(rng.integers(len(words)))]
+                size = 0.10 * r + 1.5                                                    # word width, world units
+                a0 = th + arm * 2 * np.pi / 3
+                tng = np.array([-np.sin(a0) + bsp * np.cos(a0), np.cos(a0) + bsp * np.sin(a0)])
+                tng /= np.linalg.norm(tng)
+                rad = np.array([np.cos(a0), np.sin(a0)])
+                P = r * rad + rng.normal(0, 0.04 * r, 2)
+                loc = [P[None, :] + q[:, 0:1] * (size / w) * tng[None, :] - q[:, 1:2] * (size / w) * rad[None, :]
+                       for q in [c - c0 for c in cc]]
+                far.append(dict(loc=loc, r=r, t0=26.15 + 1.75 * (r / 150.0) ** 0.8))
+                th += (size * 1.25) / (r * np.sqrt(1 + bsp * bsp))
+        # near: torn shards of the letter, dark against the light, between the memories and the camera's end position
+        near = []
+        cand = [f_ for f_ in self.frags if not f_['hero'] and 140 < f_['box'][2] - f_['box'][0] < 420]
+        for j, (sx, sy, d) in enumerate(((250.0, 420.0, 3.0), (1060.0, 190.0, 4.2), (1180.0, 520.0, 5.0), (90.0, 180.0, 6.0))):
+            fr = cand[(j * 7) % len(cand)]
+            pos = cf.p + d * (cf.fw + (sx - 640.0) / F * cf.rt - (sy - 360.0) / F * cf.up)
+            near.append(dict(fr=fr, pos=pos, axis=rng.normal(0, 1, 3), a0=rng.uniform(-0.6, 0.6), w=rng.uniform(0.15, 0.3)))
+        field = dict(mids=mids, far=far, near=near, C=C, e1=e1, e2=e2)
         self.c1 = dict(figs=figs, field=field)
 
     def c1_observers(self, img, gu):
@@ -1962,6 +2053,18 @@ class Verse:
         ledge = np.clip(yy - y_top + 1, 0, 1) * np.ones((1, W), np.float32)
         stone = np.array([30, 26, 26], np.float32) + np.exp(-((yy - y_top - 2) / 2.0) ** 2)[..., None] * np.array([40, 34, 30], np.float32)
         img = img * (1 - ledge[..., None]) + stone * ledge[..., None]
+        for pre, a, xc, hand_y in self._obs:                                           # contact shadows on the stone first
+            sc = 0.16 * k
+            tx = 640 + (xc - 640) * k - 512 * sc
+            ty = seat + dy - hand_y * sc + 6 * k
+            M = np.float32([[sc, 0, tx], [0, sc, ty]])
+            ga = cv2.warpAffine(a, M, (W, H), flags=cv2.INTER_AREA)
+            band = ga[int(min(H - 1, max(0, y_top - 26))):int(min(H, max(1, y_top)))].max(0)   # what touches the stone
+            sh = np.zeros((H, W), np.float32)
+            y0s = int(min(H - 1, max(0, y_top)))
+            sh[y0s:min(H, y0s + 10)] = band[None, :]
+            sh = cv2.GaussianBlur(sh, (0, 0), 5.0)
+            img = img * (1 - 0.55 * sh[..., None])
         for pre, a, xc, hand_y in self._obs:
             sc = 0.16 * k
             tx = 640 + (xc - 640) * k - 512 * sc
@@ -2008,12 +2111,33 @@ class Verse:
             if len(xy) < 2:
                 return
             cv2.polylines(lines, [np.int32(xy * 4)], False, float(k), 1, cv2.LINE_AA, shift=2)
-        # the field first (deep, faint): word fragments of the letter
-        for f in self.c1['field']:
-            u = ease(f['t0'], f['t0'] + 0.5, t)
-            k = u * 0.45 * np.clip(1.25 - np.log(f['d'] / 16.0) / 3.2, 0.18, 1)
-            for c in f['ch']:
-                poly(c, k)
+        fld = self.c1['field']
+        # far: the spiral of handwriting, revealed from its centre outward, turning slowly
+        far_l = np.zeros((H, W), np.float32)
+        rot = 0.045 * (t - 25.0)
+        cr, sr = np.cos(rot), np.sin(rot)
+        for f in fld['far']:
+            u = ease(f['t0'], f['t0'] + 0.45, t)
+            if u <= 0:
+                continue
+            k = u * 0.40 * (0.45 + 0.55 * np.exp(-f['r'] / 70.0))
+            for q in f['loc']:
+                x, y = q[:, 0] * cr - q[:, 1] * sr, q[:, 0] * sr + q[:, 1] * cr
+                P3 = fld['C'][None, :] + x[:, None] * fld['e1'][None, :] + y[:, None] * fld['e2'][None, :]
+                xy, z = cam.project(P3)
+                if (z < 0.2).any() or len(xy) < 2:
+                    continue
+                cv2.polylines(far_l, [np.int32(xy * 4)], False, float(k), 1, cv2.LINE_AA, shift=2)
+        img = img + (far_l + 0.6 * cv2.GaussianBlur(far_l, (0, 0), 2.5))[..., None] * np.array([110, 165, 220], np.float32)
+        # middle: words drifting off each memory
+        for m in fld['mids']:
+            u = ease(m['t0'], m['t0'] + 0.5, t)
+            if u <= 0:
+                continue
+            base = m['base'] + m['drift'] * max(0.0, t - m['t0'])
+            for q in m['pts']:
+                P3 = base[None, :] + q[:, 0:1] * cam.rt[None, :] - q[:, 1:2] * cam.up[None, :]
+                poly(P3, 0.42 * u)
         # the figures, each drawn along its lines as it comes in
         for name, fgr in fg.items():
             u = ease(fgr['t0'], fgr['t1'], t)
@@ -2021,10 +2145,11 @@ class Verse:
                 continue
             Ltot = sum(fgr['L'])
             acc = 0.0
+            kb = dict(hands=1.0 - 0.30 * ease(26.3, 27.3, t), war=0.80, lull=0.72, mark=0.95)[name]   # not all equally bright
             for c, Lc in zip(fgr['w_ch'], fgr['L']):
                 f = float(np.clip((u * Ltot - acc) / max(Lc, 1e-3), 0, 1))
                 acc += Lc
-                poly(c, 0.85, f)
+                poly(c, 0.85 * kb, f)
         # threads: from the full stop to the flame, the lamp and the gap of the hands
         hub = fg['mark']['w_ex'][0]
         thr = ease(26.75, 27.35, t)
@@ -2058,6 +2183,25 @@ class Verse:
         q = cam.project(P_)[0][0]
         img = glow(img, q, 0.07 + 0.03 * sp, 1.0)
         OI.dot(img, q, 1.7 + 0.8 * sp, 1.0)
+        # near: torn shards of the letter pass the lens as the camera pulls back past them; dark paper against the light,
+        # out of focus (the memories are in focus), they cover what is behind them
+        focus = float(np.linalg.norm(fg['hands']['w_ch'][0].mean(0) - cam.p))
+        for nr in self.c1['field']['near']:
+            fr = nr['fr']
+            bx0, by0, bx1, by1 = fr['box']
+            ang = nr['a0'] + nr['w'] * (t - 25.0)
+            u_ = rot_axis(cam.rt, nr['axis'], ang)
+            v_ = rot_axis(cam.up, nr['axis'], ang)
+            pos = nr['pos'] + cam.up * 0.05 * (t - 25.0)
+            w_, h_ = (bx1 - bx0) / self.PU * 1.8, (by1 - by0) / self.PU * 1.8
+            corners = card_corners(pos, u_, v_, w_, h_)
+            if (cam.project(corners)[1] < 0.3).any():
+                continue
+            pa = self.page[by0:by1, bx0:bx1]
+            rim = cv2.morphologyEx((fr['alpha'] > 0.5).astype(np.uint8), cv2.MORPH_GRADIENT, np.ones((5, 5), np.uint8)).astype(np.float32)
+            tex = np.dstack([pa * np.array([0.030, 0.036, 0.045], np.float32) + rim[..., None] * np.array([0.16, 0.30, 0.48], np.float32),
+                             fr['alpha']])
+            img, _ = put_card(img, cam, corners, tex, focus=focus, aperture=0.9)
         # the two of them, small, from behind, on the parapet (Message 23 rear candidates; they replace KV1's old cut-outs,
         # whose mattes carried KV1's sky around the horns): they enter the bottom of the frame as the view pulls back
         gu = ease(26.85, 27.95, t)
@@ -2162,6 +2306,28 @@ class Verse:
                     btex = np.ones((8, 8, 4), np.float32)
                     btex[..., :3] = tint * np.array([0.62, 0.70, 0.76], np.float32)
                     img, _ = put_card(img, cam, br, btex, focus=focus, aperture=0.35)
+            if grp in ('town', 'street') and 0.12 < ang < np.pi - 0.12:
+                # a pop-up box, not a flat card: a glued tab on the page in front of the fold, and the side wall at the end
+                # that faces the camera, folding with the card (its depth goes with sin(ang))
+                tab = np.ones((6, 6, 4), np.float32)
+                tab[..., :3] = tint * np.array([0.70, 0.78, 0.84], np.float32)
+                img, _ = put_card(img, cam, card_corners(it['base'] + nrm * 0.025 + np.array([0, 0.001, 0]), u, nrm, it['w'], 0.05), tab,
+                                  focus=focus, aperture=0.35)
+                end = 1.0 if (cam.p - it['base']) @ u > 0 else -1.0
+                ta = it['tex'][..., 3]
+                cols = np.nonzero(ta.max(0) > 0.5)[0]
+                if len(cols):
+                    ci = cols[-1] if end > 0 else cols[0]
+                    hs = it['h'] * (1 - np.argmax(ta[:, ci] > 0.5) / ta.shape[0])
+                    xe = (ci / (ta.shape[1] - 1) - 0.5) * it['w']
+                    dd = 0.11 * np.sin(ang)
+                    e0 = it['base'] + u * xe
+                    side = np.ones((24, 8, 4), np.float32)
+                    side[..., :3] = tint * np.array([0.52, 0.58, 0.64], np.float32) * (1 - 0.25 * (age or {}).get(key_g, 0.0))
+                    side[:, :1, :3] = INK
+                    side[:, -1:, :3] = INK
+                    img, _ = put_card(img, cam, card_corners(e0 - nrm * dd / 2 + v * hs / 2, -nrm, v, dd, hs), side,
+                                      focus=focus, aperture=0.35)
             fr = (lights or {}).get(grp, (lights or {}).get(key_g, 0.0))
             if fr > 0 and it['wins']:
                 rng = np.random.default_rng(len(it['wins']) + 7 * it['order'])
@@ -2195,41 +2361,77 @@ class Verse:
         z = 1.0 + 0.02 * u
         M = np.float32([[z, 0, 1280 * (1 - z) * 0.85], [0, z, 0]])
         fa = cv2.warpAffine(self.kv4a, M, (W, H))
+        fg = cv2.warpAffine(self.kv4_pre, M, (W, H))
+        # v6: she follows the street as it unfolds: her eyes lead (29.25-29.55), her chin lowers 1.2 deg about the neck
+        # (29.35-29.85), toward the street below-left. A local warp of the head only; nothing else moves.
+        if not hasattr(self, '_d1w'):
+            yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
+            head = np.exp(-((xx - 745) ** 2 + (yy - 270) ** 2) / (2 * 190.0 ** 2)) * (1 - smooth((yy - 470) / 80.0))
+            eye = np.exp(-((xx - 735) ** 2 + (yy - 265) ** 2) / (2 * 7.0 ** 2))
+            town = np.exp(-((xx - 430) ** 2 + (yy - 640) ** 2) / (2 * 380.0 ** 2))        # the near side, toward the town
+            self._d1w = (xx, yy, head, eye, town)
+        xx, yy, head, eye, town = self._d1w
+        th = np.radians(1.2) * ease(29.35, 29.85, t)
+        ge = ease(29.25, 29.55, t)
+        px, py = 830.0, 470.0
+        rx, ry = xx - px, yy - py
+        dx = head * (rx * np.cos(th) + ry * np.sin(th) - rx) - eye * 1.2 * ge
+        dy = head * (-rx * np.sin(th) + ry * np.cos(th) - ry) + eye * 1.4 * ge
+        mx, my = (xx - dx).astype(np.float32), (yy - dy).astype(np.float32)
+        fa = cv2.remap(fa, mx, my, cv2.INTER_LINEAR, borderMode=cv2.BORDER_REPLICATE)
+        fg = cv2.remap(fg, mx, my, cv2.INTER_LINEAR, borderMode=cv2.BORDER_REPLICATE)
+        # the town's windows light her near side a little as they come on
+        wl = 0.5 * lights['town'] + 0.3 * lights['street'] + 0.2 * lights['village']
+        fg = fg * (1 + (town * 0.22 * wl)[..., None] * np.array([0.55, 0.85, 1.15], np.float32))
         # her shadow on what lies behind her: soft, offset away from the warm light at lower left
         sh = cv2.GaussianBlur(cv2.warpAffine(fa, np.float32([[1, 0, 38], [0, 1, -22]]), (W, H)), (0, 0), 22)
         img = img * (1 - 0.32 * sh[..., None])
-        fg = cv2.warpAffine(self.kv4_pre, M, (W, H))
         return img * (1 - fa[..., None]) + fg
 
     def d3b(self, t):
-        """"that were learning to beat": B (B3, eyes closed, voice-over) in the place she is sitting: beside A on the
-        parapet, the night Earth behind her (KV5a's own background, out of focus). After the breath and the warmth of the
-        memories she takes one slow breath; the warmth of A's light, low at her left, grows a little on her face. Only the
-        breath moves her (the chest rises, the head follows less); nothing turns."""
+        """"that were learning to beat": B (B3, eyes closed, voice-over) where she sits: the stone parapet runs past at
+        her left toward A, the night Earth beyond (both KV5a's own, out of focus). The light comes from A's palm, off frame
+        below-left: warm on her near cheek, jaw and front hair, the far side cool and darker. She takes one slow breath;
+        the hair hanging in front follows a little later. Nothing turns; no lip motion."""
         if not hasattr(self, '_d3b'):
             k = cv2.imread(os.path.join(PLATES, 'KV5a.png')).astype(np.float32)
-            bg = cv2.resize(k[0:884, 1500:3072], (W, H), interpolation=cv2.INTER_AREA)
-            bg = cv2.GaussianBlur(bg, (0, 0), 5.0) * 0.82
+            bg = cv2.resize(k[1000:1731, 1600:2900], (W, H), interpolation=cv2.INTER_AREA)   # the parapet and the Earth to B's right
+            bg = cv2.GaussianBlur(bg, (0, 0), 4.5) * 0.80
             src, a = self.B3
-            yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
-            self._d3b = dict(bg=bg, src=src, a=a, xx=xx, yy=yy)
+            hh, ww = a.shape
+            yy, xx = np.mgrid[0:hh, 0:ww].astype(np.float32)
+            Lsrc = (-120.0, 1150.0)                                                      # A's palm, off frame below-left (B3 px)
+            d2 = (xx - Lsrc[0]) ** 2 + (yy - Lsrc[1]) ** 2
+            warm = np.clip(np.exp(-d2 / 640.0 ** 2) * 1.35, 0, 1)                        # near cheek, jaw, front hair
+            warm *= np.clip((760.0 - xx) / 420.0, 0.15, 1.0)                              # the back of her head turns away
+            cool = np.array([0.58, 0.46, 0.42], np.float32)                             # far side: night, bluish (BGR)
+            hot = np.array([0.74, 1.00, 1.22], np.float32)
+            edge = (a > 0.05) & (cv2.erode((a > 0.5).astype(np.uint8), np.ones((9, 9), np.uint8)) == 0)
+            rim = cv2.GaussianBlur(edge.astype(np.float32), (0, 0), 2.0) * np.clip((560 - xx) / 300.0, 0, 1) * warm
+            bgY, bgX = np.mgrid[0:H, 0:W].astype(np.float32)
+            self._d3b = dict(bg=bg, src=src, a=a, warm=warm, cool=cool, hot=hot, rim=rim, xx=bgX, yy=bgY)
         L = self._d3b
         xx, yy = L['xx'], L['yy']
-        img = glow(L['bg'].copy(), (-60.0, 780.0), 1.6, 0.30 + 0.12 * ease(34.2, 35.3, t))   # A's light, off frame at her left
+        lift = ease(34.25, 35.30, t)                                                     # the warmth grows a little, once
+        img = glow(L['bg'].copy(), (-80.0, 820.0), 1.7, 0.26 + 0.10 * lift)              # A's light on the stone, off frame
         br = 2.6 * ease(34.35, 35.15, t) - 1.6 * ease(35.30, 35.92, t)                    # one slow breath (px)
-        warm = 0.55 + 0.30 * ease(34.25, 35.30, t) + 0.05 * br / 2.6
+        br_h = 2.6 * ease(34.55, 35.40, t) - 1.6 * ease(35.50, 35.92, t)                  # the hanging hair, later
+        kw = (0.75 + 0.25 * lift + 0.04 * br / 2.6) * L['warm']
+        lit = L['src'] * (L['cool'] * (1 - kw[..., None]) + L['hot'] * kw[..., None])
+        lit = lit + L['rim'][..., None] * np.array([40, 95, 150], np.float32) * (0.6 + 0.4 * lift)
         src, a = L['src'], L['a']
-        lit = relight(src, a, (60, 1020), 560, warm)
         h_px = 1250 + 30 * (t - 34.1)
         cx = 700 - 10 * (t - 34.1)
         s_ = h_px / src.shape[0]
         M = np.float32([[s_, 0, cx - src.shape[1] * s_ / 2], [0, s_, 400 - src.shape[0] * s_ / 2]])
-        pre = cv2.warpAffine(lit * a[..., None], M, (W, H), flags=cv2.INTER_AREA)
+        pre = cv2.warpAffine(np.clip(lit, 0, 255) * a[..., None], M, (W, H), flags=cv2.INTER_AREA)
         al = cv2.warpAffine(a, M, (W, H), flags=cv2.INTER_AREA)
-        neck = 0.814 * 860 - 225                                                         # her neck (B3 px 860), on screen
-        wt = smooth((yy - neck + 60) / 160.0)                                            # the chest and shoulders rise
-        wt = 0.45 + 0.55 * wt                                                            # the head rides on them, less
-        mx, my = xx, (yy + br * wt).astype(np.float32)
+        neck = s_ * 860 + M[1, 2]                                                        # her neck (B3 px 860), on screen
+        face_x = s_ * 300 + M[0, 2]                                                      # her profile line, on screen
+        chest = smooth((yy - neck + 60) / 160.0)                                         # the chest and shoulders rise
+        hang = smooth((yy - neck + 40) / 120.0) * (1 - smooth((xx - face_x - 60) / 60.0))   # the hair hanging in front
+        dy = br * (0.45 + 0.55 * chest) * (1 - hang) + br_h * (0.45 + 0.55 * chest) * hang
+        mx, my = xx, (yy + dy).astype(np.float32)
         pre = cv2.remap(pre, mx, my, cv2.INTER_LINEAR, borderMode=cv2.BORDER_REPLICATE)
         al = cv2.remap(al, mx, my, cv2.INTER_LINEAR, borderMode=cv2.BORDER_REPLICATE)
         return img * (1 - al[..., None]) + pre
@@ -2242,7 +2444,7 @@ class Verse:
         fills the frame exactly as the plate does in D6's last window."""
         k = ease(38.0, 38.95, t)
         p0, g0 = np.array([0.0, 1.05, -1.25]), np.array([0.05, 0.22, 1.25])
-        x0, y0, w = self.hill_view(42.75)
+        x0, y0, w = self.hill_view(self.D6_END)
         s_ = W / w
         D = F * (self.HILL_UNITS / 1672.0) / s_
         cy = ((941.0 - y0) * s_ - 360.0) * D / F
@@ -2262,7 +2464,7 @@ class Verse:
             row[last + 1:] = row[last]                                                   # below the lowest sky: its colour, held
             fill = np.repeat(row[:, None, :], ww, 1).astype(np.float32)
             self._skyplate = np.where(sky[..., None], pl, fill)
-        x0, y0, w = self.hill_view(42.75)
+        x0, y0, w = self.hill_view(self.D6_END)
         img = self.to_screen(self._skyplate, x0, y0, w)
         pitch = np.arcsin(-cam.fw[1])                                                    # looking down: the sky slides up
         yaw = np.arctan2(cam.fw[0], cam.fw[2])
@@ -2295,9 +2497,10 @@ class Verse:
         fin = ease(38.95, 39.15, t)
         if fin > 0:                                                                       # exactly D6's last window, before the fire
             pl = self.plate5('first_fire_hill_wide_v1') * np.array([0.92, 0.94, 0.96], np.float32)
-            img = img * (1 - fin) + self.to_screen(pl, *self.hill_view(42.75), cubic=True) * fin
+            img = img * (1 - fin) + self.to_screen(pl, *self.hill_view(self.D6_END), cubic=True) * fin
         return img
 
+    D6_END = 1014 / 24                             # v6: E1 starts here (42.25), 1.0 s of return before 43.25
     HILL_TINDER = np.array([724.0, 596.0])        # first_fire_hill_wide_v1 (1672x941): the tinder bundle on the crest, measured;
     HILL_STONE = (646.0, 583.0, 708.0, 609.0)      # the flat stone beside it (the hearth stone of D5)
     PALM = np.array([1361 * OI.S, (1205 - 160) * OI.S])                                # the light in A's palm (V1a, E1): (567, 435)
@@ -2305,7 +2508,7 @@ class Verse:
     def hill_view(self, t):
         """D6's window on the hill plate: from close on the tinder and the stone (the struck flame on D5's screen point)
         back to the whole hill, ending with the fire on the palm light's screen point."""
-        u = ease(41.22, 42.40, t)                                                        # the match registers, then the view opens
+        u = ease(41.00, 42.02, t)                                                        # the match registers, then the view opens
         w = 760.0 * (1540.0 / 760.0) ** u
         q = np.array([567.0, 443.0]) * (1 - u) + self.PALM * u
         return self.HILL_TINDER[0] - q[0] * w / W, self.HILL_TINDER[1] - q[1] * w / W, w
@@ -2320,21 +2523,30 @@ class Verse:
         tx, ty = self.HILL_TINDER
         d2 = (xx - tx) ** 2 + ((yy - ty) * 1.6) ** 2                                      # light spreads along the ground
         fl = 1.0 + 0.06 * np.sin(t * 2 * np.pi * 5.3) + 0.04 * np.sin(t * 2 * np.pi * 9.1)
-        warm = (0.9 * np.exp(-d2 / 70.0 ** 2) + 0.35 * np.exp(-d2 / 190.0 ** 2)) * fl
+        warm = (1.05 * np.exp(-d2 / 75.0 ** 2) + 0.42 * np.exp(-d2 / 230.0 ** 2)) * fl
         k = np.array([0.92, 0.94, 0.96], np.float32) + warm[..., None] * np.array([0.35, 0.80, 1.25], np.float32)
         x0, y0, w = self.hill_view(t)
         img = self.to_screen(pl * k, x0, y0, w, cubic=True)
         f = self.c2s(self.HILL_TINDER + np.array([0.0, -3.0]), x0, y0, w)
         self.fire_xy = f
-        return flame(img, f, 15.5 * W / w, t, k=1.0)
+        img = flame(img, f, 15.5 * W / w, t, k=1.0)
+        hb = ease(self.D6_END - 0.21, self.D6_END, t)                                    # the fire's warmth gathers to the palm light's size
+        if hb > 0:
+            img = glow(img, f, 0.62 * hb, 0.85 * hb, tint=(0.70, 0.90, 1.15))
+            img = glow(img, f, 0.40 * hb, 1.35 * hb)
+        return img
 
     def e1(self, t):
         """"hill": the same light, still in A's palm (V1a's frame and light, not a new catch), now warm as the fire; it
         settles into the next section."""
-        img = self.kv5a.copy()
-        u = ease(42.75, 43.25, t)
-        img = glow(img, self.PALM, 0.62, 0.55 + 0.05 * np.sin(t * 2 * np.pi * 1.1), tint=(0.80, 0.95, 1.15))
-        return glow(img, self.PALM, 0.40, 1.15 + 0.10 * u)
+        u = ease(self.D6_END, 43.25, t)
+        z = 1.0 + 0.018 * u                                                              # a slight push in, toward her palm
+        c = self.PALM
+        M = np.float32([[z, 0, c[0] * (1 - z)], [0, z, c[1] * (1 - z)]])
+        img = cv2.warpAffine(self.kv5a, M, (W, H), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
+        mem = 1 - ease(self.D6_END, self.D6_END + 0.40, t)                               # the fire's warmth resolves into the held light
+        img = glow(img, c, 0.62 + 0.10 * mem, 0.55 + 0.25 * mem + 0.05 * np.sin(t * 2 * np.pi * 1.1), tint=(0.78, 0.94, 1.16))
+        return glow(img, c, 0.40, 1.15 + 0.10 * u)
 
 # constellation shapes (card units, x 0..1.5, y 0..1): war = the candle and its flame, the helmet, the letter on the
 # table; lullaby = the lamp, the cradle and its rockers; goodbye = two arms reaching toward each other, not touching
@@ -2500,9 +2712,9 @@ SHOTS = [
     ('D3', 775, 818, '"hearts" (full frame, supplied art): parent and baby breathe together, one connected layer; no light from the chest'),
     ('D3b', 819, 861, 'B3 (voice-over, new matte) on the parapet over the Earth (KV5a behind, out of focus): one slow breath; A\'s warmth grows on her face'),
     ('D4', 862, 941, '"silent, still": windows go dark, paper yellows, town and street fold back (36.85), the village (37.54); the gaze lifts to the hill print, which becomes the painted hill of the first fire under its own sky'),
-    ('D5', 942, 987, '"the first fire": prepare (fist up, wrist cocked), strike into contact (frames 950-951, 961-962), rebound; the forearm swings about the elbow; sparks, ember, flame at 40.50'),
-    ('D6', 988, 1025, '"on the first cold hill" (first_fire_hill_wide_v1): the flame on the measured tinder by the flat stone, held on the struck flame\'s screen point while the view opens to the bare hill; it ends on the palm light\'s point'),
-    ('E1', 1026, 1037, 'KV5a: the same light, still in A\'s palm (no new catch), warm now; it settles into the next section'),
+    ('D5', 942, 982, '"the first fire": prepare (fist up, wrist cocked), strike into contact (frames 950-951, 961-962), rebound; the forearm swings about the elbow; sparks, ember, flame at 40.50'),
+    ('D6', 983, 1013, '"on the first cold hill" (first_fire_hill_wide_v1): the flame on the measured tinder by the flat stone, held on the struck flame\'s screen point while the view opens to the bare hill; it ends on the palm light\'s point'),
+    ('E1', 1014, 1037, 'KV5a: the same light, still in A\'s palm (no new catch); the fire\'s warmth resolves into it; 1.0 s, a slight push in'),
 ]
 WIPES = []          # v4: no decorative wipes; the cuts are matches on the light, the hands, the spark and the fire
 
@@ -2533,6 +2745,9 @@ def main():
         import multiprocessing as mp
         ids = sys.argv[sys.argv.index('--shots') + 1].split(',')
         frames = [f for sh in SHOTS if ids == ['all'] or sh[0] in ids for f in range(sh[1], sh[2] + 1)]
+        if '--frames' in sys.argv:                                                       # a frame range a-b (inclusive)
+            a_, b_ = map(int, sys.argv[sys.argv.index('--frames') + 1].split('-'))
+            frames = [f for f in range(a_, b_ + 1)] if ids == ['none'] else [f for f in frames if a_ <= f <= b_]
         jobs = int(sys.argv[sys.argv.index('--jobs') + 1]) if '--jobs' in sys.argv else 4
         os.makedirs(CACHE, exist_ok=True)
         frames = frames[::2] + frames[1::2]                                              # spread heavy shots over the workers
