@@ -1,0 +1,10 @@
+{
+ "master": "/tmp/claude-0/-home-user-OC/c9b74a57-085e-5ad1-8a57-5167fd743993/scratchpad/v8/DEMO_0-43_v8_master_lossless.mkv",
+ "master_bytes": 262558193,
+ "master_sha256": "b20d840f117f65d396e2c7c256a01e49bd9de0bd8e4e89c2041959bf1b04d4df",
+ "frames_sha256": "6ebabdc3e2f101a885fbc2f3f412992879781f25e1dafbc703c5b715219a9558",
+ "preview": "/home/user/OC/loading2/rev3/tests/DEMO_0-43_v8_720p.mp4",
+ "preview_bytes": 35865375,
+ "preview_sha256": "e66bc80a057084aed51ea526c8d3ef38b6d7302a5932c8389015a2c43f511216",
+ "overrides": 282
+}

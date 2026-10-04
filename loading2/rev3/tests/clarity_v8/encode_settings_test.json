@@ -1,0 +1,352 @@
+{
+ "A v7 recipe: crf18 medium, default conversion": {
+  "kbps": 1441,
+  "86": {
+   "A_horns_hair": {
+    "psnr": 42.3,
+    "fine": 0.982,
+    "chroma": 0.521
+   },
+   "B_hair_edge": {
+    "psnr": 40.63,
+    "fine": 0.988,
+    "chroma": 0.634
+   },
+   "railing": {
+    "psnr": 43.73,
+    "fine": 0.975,
+    "chroma": 0.598
+   },
+   "bias": -0.88
+  },
+  "120": {
+   "A_horns_hair": {
+    "psnr": 46.57,
+    "fine": 0.996,
+    "chroma": 0.898
+   },
+   "B_hair_edge": {
+    "psnr": 45.7,
+    "fine": 0.998,
+    "chroma": 0.877
+   },
+   "cloth_hands": {
+    "psnr": 44.31,
+    "fine": 1.002,
+    "chroma": 1.016
+   },
+   "bias": -0.95
+  },
+  "216": {
+   "eye": {
+    "psnr": 38.33,
+    "fine": 0.968,
+    "chroma": 0.655
+   },
+   "horn_hair": {
+    "psnr": 40.48,
+    "fine": 0.974,
+    "chroma": 0.678
+   },
+   "profile": {
+    "psnr": 41.02,
+    "fine": 0.978,
+    "chroma": 0.645
+   },
+   "cloth": {
+    "psnr": 39.7,
+    "fine": 0.983,
+    "chroma": 0.697
+   },
+   "bias": -0.83
+  },
+  "300": {
+   "whole": {
+    "psnr": 48.04,
+    "fine": 0.997,
+    "chroma": 0.821
+   },
+   "bias": -0.88
+  }
+ },
+ "B crf18 medium, accurate conversion": {
+  "kbps": 1374,
+  "86": {
+   "A_horns_hair": {
+    "psnr": 42.29,
+    "fine": 0.985,
+    "chroma": 0.552
+   },
+   "B_hair_edge": {
+    "psnr": 40.64,
+    "fine": 0.99,
+    "chroma": 0.637
+   },
+   "railing": {
+    "psnr": 44.1,
+    "fine": 0.978,
+    "chroma": 0.615
+   },
+   "bias": 0.15
+  },
+  "120": {
+   "A_horns_hair": {
+    "psnr": 47.94,
+    "fine": 0.994,
+    "chroma": 0.907
+   },
+   "B_hair_edge": {
+    "psnr": 46.67,
+    "fine": 1.0,
+    "chroma": 0.885
+   },
+   "cloth_hands": {
+    "psnr": 44.8,
+    "fine": 1.001,
+    "chroma": 1.054
+   },
+   "bias": 0.04
+  },
+  "216": {
+   "eye": {
+    "psnr": 38.36,
+    "fine": 0.978,
+    "chroma": 0.659
+   },
+   "horn_hair": {
+    "psnr": 41.34,
+    "fine": 0.985,
+    "chroma": 0.664
+   },
+   "profile": {
+    "psnr": 40.95,
+    "fine": 0.977,
+    "chroma": 0.621
+   },
+   "cloth": {
+    "psnr": 40.04,
+    "fine": 0.981,
+    "chroma": 0.668
+   },
+   "bias": -0.01
+  },
+  "300": {
+   "whole": {
+    "psnr": 49.25,
+    "fine": 0.996,
+    "chroma": 0.85
+   },
+   "bias": 0.12
+  }
+ },
+ "C crf14 slow, accurate": {
+  "kbps": 2308,
+  "86": {
+   "A_horns_hair": {
+    "psnr": 45.19,
+    "fine": 0.994,
+    "chroma": 0.568
+   },
+   "B_hair_edge": {
+    "psnr": 43.81,
+    "fine": 0.996,
+    "chroma": 0.67
+   },
+   "railing": {
+    "psnr": 46.54,
+    "fine": 0.992,
+    "chroma": 0.663
+   },
+   "bias": 0.13
+  },
+  "120": {
+   "A_horns_hair": {
+    "psnr": 50.13,
+    "fine": 0.996,
+    "chroma": 0.952
+   },
+   "B_hair_edge": {
+    "psnr": 49.46,
+    "fine": 1.0,
+    "chroma": 0.939
+   },
+   "cloth_hands": {
+    "psnr": 46.92,
+    "fine": 1.003,
+    "chroma": 1.036
+   },
+   "bias": 0.03
+  },
+  "216": {
+   "eye": {
+    "psnr": 41.04,
+    "fine": 0.985,
+    "chroma": 0.695
+   },
+   "horn_hair": {
+    "psnr": 44.64,
+    "fine": 0.991,
+    "chroma": 0.794
+   },
+   "profile": {
+    "psnr": 44.13,
+    "fine": 0.992,
+    "chroma": 0.726
+   },
+   "cloth": {
+    "psnr": 42.44,
+    "fine": 0.991,
+    "chroma": 0.761
+   },
+   "bias": -0.03
+  },
+  "300": {
+   "whole": {
+    "psnr": 51.56,
+    "fine": 0.997,
+    "chroma": 0.87
+   },
+   "bias": 0.11
+  }
+ },
+ "D crf12 slow aq3, accurate": {
+  "kbps": 3440,
+  "86": {
+   "A_horns_hair": {
+    "psnr": 47.12,
+    "fine": 1.003,
+    "chroma": 0.619
+   },
+   "B_hair_edge": {
+    "psnr": 45.84,
+    "fine": 0.996,
+    "chroma": 0.711
+   },
+   "railing": {
+    "psnr": 48.18,
+    "fine": 0.997,
+    "chroma": 0.684
+   },
+   "bias": 0.1
+  },
+  "120": {
+   "A_horns_hair": {
+    "psnr": 51.78,
+    "fine": 0.999,
+    "chroma": 0.984
+   },
+   "B_hair_edge": {
+    "psnr": 51.49,
+    "fine": 1.001,
+    "chroma": 0.957
+   },
+   "cloth_hands": {
+    "psnr": 48.64,
+    "fine": 1.002,
+    "chroma": 1.02
+   },
+   "bias": 0.02
+  },
+  "216": {
+   "eye": {
+    "psnr": 43.25,
+    "fine": 0.988,
+    "chroma": 0.863
+   },
+   "horn_hair": {
+    "psnr": 46.41,
+    "fine": 0.995,
+    "chroma": 0.837
+   },
+   "profile": {
+    "psnr": 46.13,
+    "fine": 0.994,
+    "chroma": 0.819
+   },
+   "cloth": {
+    "psnr": 44.63,
+    "fine": 0.994,
+    "chroma": 0.829
+   },
+   "bias": -0.04
+  },
+  "300": {
+   "whole": {
+    "psnr": 52.68,
+    "fine": 0.997,
+    "chroma": 0.881
+   },
+   "bias": 0.1
+  }
+ },
+ "E crf10 slow aq3, accurate": {
+  "kbps": 4534,
+  "86": {
+   "A_horns_hair": {
+    "psnr": 48.6,
+    "fine": 1.001,
+    "chroma": 0.667
+   },
+   "B_hair_edge": {
+    "psnr": 47.53,
+    "fine": 1.0,
+    "chroma": 0.735
+   },
+   "railing": {
+    "psnr": 49.4,
+    "fine": 0.999,
+    "chroma": 0.714
+   },
+   "bias": 0.09
+  },
+  "120": {
+   "A_horns_hair": {
+    "psnr": 52.94,
+    "fine": 0.999,
+    "chroma": 0.989
+   },
+   "B_hair_edge": {
+    "psnr": 52.95,
+    "fine": 1.001,
+    "chroma": 0.966
+   },
+   "cloth_hands": {
+    "psnr": 49.37,
+    "fine": 1.0,
+    "chroma": 1.013
+   },
+   "bias": 0.02
+  },
+  "216": {
+   "eye": {
+    "psnr": 44.82,
+    "fine": 0.997,
+    "chroma": 0.849
+   },
+   "horn_hair": {
+    "psnr": 47.92,
+    "fine": 0.996,
+    "chroma": 0.866
+   },
+   "profile": {
+    "psnr": 47.67,
+    "fine": 0.998,
+    "chroma": 0.849
+   },
+   "cloth": {
+    "psnr": 45.83,
+    "fine": 0.994,
+    "chroma": 0.862
+   },
+   "bias": -0.05
+  },
+  "300": {
+   "whole": {
+    "psnr": 53.4,
+    "fine": 0.998,
+    "chroma": 0.886
+   },
+   "bias": 0.09
+  }
+ }
+}

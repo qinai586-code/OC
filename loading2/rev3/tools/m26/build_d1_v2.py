@@ -2,14 +2,20 @@
 windows light left to right (k 700-714); B starts in cool night light and her face, hair and near side warm only as the
 lit-window count grows (light caused by the windows, lagging them slightly). A per-channel multiply only: no blur, no
 added motion. Window light persists frame to frame along optical flow."""
-import numpy as np, cv2
-from yuv import load
+import os, numpy as np, cv2
+from yuv import load, hq_bgr
 from build_d1_b3 import windows, smooth, xx, yy
 P = '/tmp/claude-0/-home-user-OC/c9b74a57-085e-5ad1-8a57-5167fd743993/scratchpad'
 V6 = P + '/v6/cache/f%04d.png'
 Y, U, V = load('dec/D1_papercity_rep.yuv')
-def get(i):
+HQ = os.environ.get('D1_HQ', '1') == '1'           # clarity round: cubic chroma at the measured siting, no 8-bit rounding
+OUTD = os.environ.get('D1_OUT', P + ('/v8/op' if HQ else '/m27/d1'))
+def get_v7(i):
     return cv2.cvtColor(np.concatenate([Y[i].reshape(-1), U[i].reshape(-1), V[i].reshape(-1)]).reshape(1080, 1280), cv2.COLOR_YUV2BGR_I420)
+def get(i):
+    return hq_bgr(Y, U, V, i) if HQ else get_v7(i)
+def u8(x):
+    return np.clip(np.round(x), 0, 255).astype(np.uint8)
 OFF = 666
 bmask = smooth((xx - 600.0) / 60.0)                                                     # B: her face, hair and shoulder (right of the city)
 near = np.exp(-((xx - 640) ** 2 + (yy - 470) ** 2) / (2 * 230.0 ** 2)) * smooth((xx - 600) / 60.0)
@@ -17,11 +23,12 @@ COOL = np.array([0.97, 0.80, 0.72], np.float32)                                 
 lit_prev, g_prev, counts = None, None, {}
 for k in range(686, 731):
     img = get(k - OFF).astype(np.float32)
-    g_now = cv2.cvtColor(img.astype(np.uint8), cv2.COLOR_BGR2GRAY)
+    det = get_v7(k - OFF)                       # window detection and flow on round 2's decode: the same lit windows
+    g_now = cv2.cvtColor(det, cv2.COLOR_BGR2GRAY)
     wl = smooth((k - 700) / 14.0)
     lit = np.zeros((720, 1280), np.float32)
     if wl > 0:
-        m = windows(img.astype(np.uint8)).astype(np.float32)
+        m = windows(det).astype(np.float32)
         frac = np.clip((xx / 640.0) * 0.6 + 0.4 - (1 - wl) * 1.2, 0, 1)
         m = m * smooth(frac / 0.4)
         if lit_prev is not None:
@@ -41,5 +48,5 @@ for k in range(686, 731):
         core = cv2.GaussianBlur(lit, (0, 0), 0.8)
         img = img * (1 - core[..., None]) + core[..., None] * np.array([110, 215, 255], np.float32)
         img = img + cv2.GaussianBlur(lit, (0, 0), 6.0)[..., None] * np.array([30, 90, 160], np.float32)
-    cv2.imwrite(P + '/m27/d1/f%04d.png' % k, np.clip(img, 0, 255).astype(np.uint8))
+    cv2.imwrite(OUTD + '/f%04d.png' % k, u8(img) if HQ else np.clip(img, 0, 255).astype(np.uint8))
 print({k: int(v) for k, v in counts.items() if k % 3 == 0})

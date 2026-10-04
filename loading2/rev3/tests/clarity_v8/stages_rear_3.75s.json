@@ -1,0 +1,182 @@
+[
+ [
+  "0 KV1 render (v6 f86, the sharper drawing of this composition)",
+  {
+   "A_horns_hair": {
+    "fine": 3.299,
+    "acut": 20.07,
+    "chroma": 1.663
+   },
+   "B_hair_edge": {
+    "fine": 5.022,
+    "acut": 29.04,
+    "chroma": 2.879
+   },
+   "B_star_ribbon": {
+    "fine": 6.476,
+    "acut": 34.36,
+    "chroma": 3.339
+   },
+   "cloth_hands": {
+    "fine": 6.089,
+    "acut": 33.71,
+    "chroma": 1.721
+   },
+   "railing": {
+    "fine": 3.486,
+    "acut": 21.98,
+    "chroma": 1.221
+   }
+  }
+ ],
+ [
+  "1 Seedance source, OpenCV decode (as v7)",
+  {
+   "A_horns_hair": {
+    "fine": 2.571,
+    "acut": 16.54,
+    "chroma": 0.658
+   },
+   "B_hair_edge": {
+    "fine": 3.626,
+    "acut": 21.44,
+    "chroma": 1.412
+   },
+   "B_star_ribbon": {
+    "fine": 5.312,
+    "acut": 29.55,
+    "chroma": 1.662
+   },
+   "cloth_hands": {
+    "fine": 4.629,
+    "acut": 27.12,
+    "chroma": 0.931
+   },
+   "railing": {
+    "fine": 2.895,
+    "acut": 19.6,
+    "chroma": 0.618
+   }
+  }
+ ],
+ [
+  "1b Seedance source, new decode",
+  {
+   "A_horns_hair": {
+    "fine": 2.569,
+    "acut": 16.55,
+    "chroma": 0.617
+   },
+   "B_hair_edge": {
+    "fine": 3.625,
+    "acut": 21.45,
+    "chroma": 1.388
+   },
+   "B_star_ribbon": {
+    "fine": 5.313,
+    "acut": 29.55,
+    "chroma": 1.57
+   },
+   "cloth_hands": {
+    "fine": 4.63,
+    "acut": 27.13,
+    "chroma": 0.872
+   },
+   "railing": {
+    "fine": 2.895,
+    "acut": 19.6,
+    "chroma": 0.569
+   }
+  }
+ ],
+ [
+  "2 v7 render (bicubic warp of 1)",
+  {
+   "A_horns_hair": {
+    "fine": 2.56,
+    "acut": 16.43,
+    "chroma": 0.644
+   },
+   "B_hair_edge": {
+    "fine": 3.609,
+    "acut": 21.44,
+    "chroma": 1.366
+   },
+   "B_star_ribbon": {
+    "fine": 5.253,
+    "acut": 29.15,
+    "chroma": 1.611
+   },
+   "cloth_hands": {
+    "fine": 4.552,
+    "acut": 26.75,
+    "chroma": 0.896
+   },
+   "railing": {
+    "fine": 2.809,
+    "acut": 18.96,
+    "chroma": 0.603
+   }
+  }
+ ],
+ [
+  "2b v8 render (Lanczos warp of 1b)",
+  {
+   "A_horns_hair": {
+    "fine": 2.521,
+    "acut": 16.28,
+    "chroma": 0.609
+   },
+   "B_hair_edge": {
+    "fine": 3.57,
+    "acut": 21.28,
+    "chroma": 1.354
+   },
+   "B_star_ribbon": {
+    "fine": 5.233,
+    "acut": 29.15,
+    "chroma": 1.532
+   },
+   "cloth_hands": {
+    "fine": 4.548,
+    "acut": 26.86,
+    "chroma": 0.844
+   },
+   "railing": {
+    "fine": 2.817,
+    "acut": 19.04,
+    "chroma": 0.559
+   }
+  }
+ ],
+ [
+  "3 v7 delivered mp4 decoded",
+  {
+   "A_horns_hair": {
+    "fine": 2.572,
+    "acut": 16.42,
+    "chroma": 0.57
+   },
+   "B_hair_edge": {
+    "fine": 3.597,
+    "acut": 21.28,
+    "chroma": 1.207
+   },
+   "B_star_ribbon": {
+    "fine": 5.253,
+    "acut": 29.12,
+    "chroma": 1.397
+   },
+   "cloth_hands": {
+    "fine": 4.59,
+    "acut": 26.96,
+    "chroma": 0.916
+   },
+   "railing": {
+    "fine": 2.821,
+    "acut": 19.04,
+    "chroma": 0.589
+   }
+  }
+ ]
+]

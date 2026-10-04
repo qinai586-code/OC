@@ -1,0 +1,398 @@
+{
+ "f72": {
+  "A: horns, hair silhouette": {
+   "v7 pre-encode": {
+    "fine": 2.724,
+    "acut": 16.59,
+    "chroma": 1.184
+   },
+   "v7 final mp4": {
+    "fine": 2.674,
+    "acut": 16.37,
+    "chroma": 0.683
+   },
+   "v8 pre-encode": {
+    "fine": 2.741,
+    "acut": 16.69,
+    "chroma": 1.21
+   },
+   "v8 final mp4": {
+    "fine": 2.737,
+    "acut": 16.65,
+    "chroma": 0.981
+   }
+  },
+  "B: star clip, ribbon, hair": {
+   "v7 pre-encode": {
+    "fine": 3.657,
+    "acut": 20.94,
+    "chroma": 1.986
+   },
+   "v7 final mp4": {
+    "fine": 3.57,
+    "acut": 20.52,
+    "chroma": 1.346
+   },
+   "v8 pre-encode": {
+    "fine": 3.608,
+    "acut": 20.53,
+    "chroma": 1.995
+   },
+   "v8 final mp4": {
+    "fine": 3.605,
+    "acut": 20.49,
+    "chroma": 1.652
+   }
+  }
+ },
+ "f84": {
+  "A: horns, hair silhouette": {
+   "v7 pre-encode": {
+    "fine": 3.474,
+    "acut": 20.96,
+    "chroma": 1.594
+   },
+   "v7 final mp4": {
+    "fine": 3.419,
+    "acut": 20.68,
+    "chroma": 0.761
+   },
+   "v8 pre-encode": {
+    "fine": 3.429,
+    "acut": 20.76,
+    "chroma": 1.605
+   },
+   "v8 final mp4": {
+    "fine": 3.419,
+    "acut": 20.71,
+    "chroma": 1.108
+   }
+  },
+  "B: star clip, ribbon, hair": {
+   "v7 pre-encode": {
+    "fine": 5.54,
+    "acut": 32.08,
+    "chroma": 3.058
+   },
+   "v7 final mp4": {
+    "fine": 5.43,
+    "acut": 31.51,
+    "chroma": 1.804
+   },
+   "v8 pre-encode": {
+    "fine": 5.377,
+    "acut": 31.52,
+    "chroma": 3.045
+   },
+   "v8 final mp4": {
+    "fine": 5.332,
+    "acut": 31.28,
+    "chroma": 2.244
+   }
+  },
+  "railing, hands, cloth": {
+   "v7 pre-encode": {
+    "fine": 4.353,
+    "acut": 27.32,
+    "chroma": 1.305
+   },
+   "v7 final mp4": {
+    "fine": 4.195,
+    "acut": 26.44,
+    "chroma": 0.752
+   },
+   "v8 pre-encode": {
+    "fine": 4.31,
+    "acut": 27.2,
+    "chroma": 1.307
+   },
+   "v8 final mp4": {
+    "fine": 4.222,
+    "acut": 26.67,
+    "chroma": 0.995
+   }
+  }
+ },
+ "f87": {
+  "A: horns, hair silhouette": {
+   "v7 pre-encode": {
+    "fine": 2.841,
+    "acut": 17.88,
+    "chroma": 0.666
+   },
+   "v7 final mp4": {
+    "fine": 2.828,
+    "acut": 17.76,
+    "chroma": 0.601
+   },
+   "v8 pre-encode": {
+    "fine": 2.807,
+    "acut": 17.71,
+    "chroma": 0.627
+   },
+   "v8 final mp4": {
+    "fine": 2.8,
+    "acut": 17.67,
+    "chroma": 0.612
+   }
+  },
+  "B: star clip, ribbon, hair": {
+   "v7 pre-encode": {
+    "fine": 4.192,
+    "acut": 25.36,
+    "chroma": 1.503
+   },
+   "v7 final mp4": {
+    "fine": 4.162,
+    "acut": 25.22,
+    "chroma": 1.288
+   },
+   "v8 pre-encode": {
+    "fine": 4.164,
+    "acut": 25.27,
+    "chroma": 1.462
+   },
+   "v8 final mp4": {
+    "fine": 4.152,
+    "acut": 25.23,
+    "chroma": 1.383
+   }
+  }
+ },
+ "f120": {
+  "A: horns, hair silhouette": {
+   "v7 pre-encode": {
+    "fine": 2.87,
+    "acut": 18.18,
+    "chroma": 0.635
+   },
+   "v7 final mp4": {
+    "fine": 2.853,
+    "acut": 18.02,
+    "chroma": 0.548
+   },
+   "v8 pre-encode": {
+    "fine": 2.833,
+    "acut": 17.99,
+    "chroma": 0.601
+   },
+   "v8 final mp4": {
+    "fine": 2.827,
+    "acut": 17.96,
+    "chroma": 0.596
+   }
+  },
+  "B: star clip, ribbon, hair": {
+   "v7 pre-encode": {
+    "fine": 4.189,
+    "acut": 25.69,
+    "chroma": 1.405
+   },
+   "v7 final mp4": {
+    "fine": 4.157,
+    "acut": 25.46,
+    "chroma": 1.135
+   },
+   "v8 pre-encode": {
+    "fine": 4.159,
+    "acut": 25.6,
+    "chroma": 1.378
+   },
+   "v8 final mp4": {
+    "fine": 4.155,
+    "acut": 25.57,
+    "chroma": 1.329
+   }
+  },
+  "railing": {
+   "v7 pre-encode": {
+    "fine": 2.696,
+    "acut": 18.32,
+    "chroma": 0.589
+   },
+   "v7 final mp4": {
+    "fine": 2.704,
+    "acut": 18.36,
+    "chroma": 0.539
+   },
+   "v8 pre-encode": {
+    "fine": 2.703,
+    "acut": 18.38,
+    "chroma": 0.546
+   },
+   "v8 final mp4": {
+    "fine": 2.71,
+    "acut": 18.4,
+    "chroma": 0.553
+   }
+  }
+ },
+ "f170": {
+  "A: hand on the ledge, cuff": {
+   "v7 pre-encode": {
+    "fine": 2.524,
+    "acut": 17.14,
+    "chroma": 0.637
+   },
+   "v7 final mp4": {
+    "fine": 2.502,
+    "acut": 16.9,
+    "chroma": 0.462
+   },
+   "v8 pre-encode": {
+    "fine": 2.524,
+    "acut": 17.21,
+    "chroma": 0.575
+   },
+   "v8 final mp4": {
+    "fine": 2.521,
+    "acut": 17.13,
+    "chroma": 0.507
+   }
+  },
+  "B: star clip, ribbon, hair": {
+   "v7 pre-encode": {
+    "fine": 3.863,
+    "acut": 23.97,
+    "chroma": 1.299
+   },
+   "v7 final mp4": {
+    "fine": 3.809,
+    "acut": 23.63,
+    "chroma": 0.839
+   },
+   "v8 pre-encode": {
+    "fine": 3.833,
+    "acut": 23.88,
+    "chroma": 1.242
+   },
+   "v8 final mp4": {
+    "fine": 3.818,
+    "acut": 23.78,
+    "chroma": 1.054
+   }
+  }
+ },
+ "f216": {
+  "A: eye, lashes": {
+   "v7 pre-encode": {
+    "fine": 5.928,
+    "acut": 34.64,
+    "chroma": 0.759
+   },
+   "v7 final mp4": {
+    "fine": 5.898,
+    "acut": 34.25,
+    "chroma": 0.738
+   },
+   "v8 pre-encode": {
+    "fine": 6.01,
+    "acut": 35.21,
+    "chroma": 0.999
+   },
+   "v8 final mp4": {
+    "fine": 5.974,
+    "acut": 34.92,
+    "chroma": 0.846
+   }
+  },
+  "A: horns, hair silhouette": {
+   "v7 pre-encode": {
+    "fine": 6.57,
+    "acut": 45.67,
+    "chroma": 0.679
+   },
+   "v7 final mp4": {
+    "fine": 6.54,
+    "acut": 45.36,
+    "chroma": 0.636
+   },
+   "v8 pre-encode": {
+    "fine": 6.668,
+    "acut": 46.28,
+    "chroma": 0.905
+   },
+   "v8 final mp4": {
+    "fine": 6.644,
+    "acut": 46.12,
+    "chroma": 0.784
+   }
+  },
+  "A: profile (nose, lips)": {
+   "v7 pre-encode": {
+    "fine": 5.914,
+    "acut": 40.13,
+    "chroma": 0.904
+   },
+   "v7 final mp4": {
+    "fine": 5.855,
+    "acut": 39.66,
+    "chroma": 0.839
+   },
+   "v8 pre-encode": {
+    "fine": 6.024,
+    "acut": 40.87,
+    "chroma": 1.255
+   },
+   "v8 final mp4": {
+    "fine": 6.028,
+    "acut": 40.89,
+    "chroma": 1.045
+   }
+  },
+  "A: collar, ribbon, suspender": {
+   "v7 pre-encode": {
+    "fine": 7.074,
+    "acut": 42.5,
+    "chroma": 0.903
+   },
+   "v7 final mp4": {
+    "fine": 7.051,
+    "acut": 42.38,
+    "chroma": 0.806
+   },
+   "v8 pre-encode": {
+    "fine": 7.173,
+    "acut": 43.16,
+    "chroma": 1.174
+   },
+   "v8 final mp4": {
+    "fine": 7.134,
+    "acut": 42.89,
+    "chroma": 0.997
+   }
+  }
+ },
+ "generation": {
+  "take frame 0 vs its input still: eye": {
+   "still": {
+    "fine": 7.403,
+    "acut": 43.32
+   },
+   "take0": {
+    "fine": 5.49,
+    "acut": 32.94
+   }
+  },
+  "take frame 0 vs its input still: horn, hair": {
+   "still": {
+    "fine": 7.473,
+    "acut": 50.81
+   },
+   "take0": {
+    "fine": 6.374,
+    "acut": 44.04
+   }
+  },
+  "take frame 0 vs its input still: collar, ribbon": {
+   "still": {
+    "fine": 8.902,
+    "acut": 52.74
+   },
+   "take0": {
+    "fine": 7.13,
+    "acut": 43.2
+   }
+  }
+ }
+}

@@ -611,6 +611,48 @@ def glow(img, c, scale, inten):
     return img
 
 
+# ---------------------------------------------------------------- antialiased resampling (clarity round)
+# OpenCV's warpAffine/remap accept INTER_AREA but silently use bilinear interpolation, so v6's 2.3:1 reductions of the
+# 3072-px KV1 plates sampled every other pixel without a prefilter: hair strands and outlines broke up (aliasing).
+# AA = True resamples with PIL's Lanczos-3, whose support widens with the reduction (a proper antialiasing filter), then
+# clamps each output pixel to the range of the source pixels under it (anti-ringing, so no overshoot halos). v6's
+# pixel-index geometry is kept exactly. AA = False reproduces v6.
+AA = os.environ.get('OI_AA', '1') == '1'
+
+
+def aa_resize(img, f, out_w, out_h, ox=0.0, oy=0.0, border=cv2.BORDER_CONSTANT):
+    """antialiased resample: output index (i, j) <- input index (ox + i / f, oy + j / f); img HxW or HxWxC float32."""
+    from PIL import Image
+    h, w = img.shape[:2]
+    bx0, by0 = ox + 0.5 - 0.5 / f, oy + 0.5 - 0.5 / f
+    bx1, by1 = bx0 + out_w / f, by0 + out_h / f
+    pl, pt = max(0, int(np.ceil(-bx0)) + 4), max(0, int(np.ceil(-by0)) + 4)
+    pr, pb = max(0, int(np.ceil(bx1 - w)) + 4), max(0, int(np.ceil(by1 - h)) + 4)
+    if pl or pt or pr or pb:
+        img = cv2.copyMakeBorder(img, pt, pb, pl, pr, border, value=0)
+    box = (bx0 + pl, by0 + pt, bx1 + pl, by1 + pt)
+
+    def rs(x, flt):
+        ch = [x] if x.ndim == 2 else [x[..., c] for c in range(x.shape[2])]
+        out = [np.asarray(Image.fromarray(np.ascontiguousarray(c, np.float32), 'F').resize((out_w, out_h), flt, box=box))
+               for c in ch]
+        return out[0] if x.ndim == 2 else np.dstack(out)
+    k = np.ones((int(np.ceil(1.0 / f)) + 1,) * 2, np.uint8)
+    return np.clip(rs(img, Image.LANCZOS), rs(cv2.erode(img, k), Image.BOX), rs(cv2.dilate(img, k), Image.BOX))
+
+
+LEVELS = (1.0, 0.85, 0.7, 0.6, 0.5, W / 3072.0)
+
+
+def plate_density(x, y, mask):
+    """median plate pixels per screen pixel of a remap (sqrt of the Jacobian determinant) over mask"""
+    xu, xv = np.gradient(x, axis=1), np.gradient(x, axis=0)
+    yu, yv = np.gradient(y, axis=1), np.gradient(y, axis=0)
+    d = np.sqrt(np.abs(xu * yv - xv * yu))
+    ok = mask & np.isfinite(d)
+    return float(np.median(d[ok])) if ok.any() else 1.0
+
+
 def light_path(t, birth):
     birth = np.asarray(birth, np.float64)
     apex, turn_end = np.array([660.0, 118.0]), np.array([612.0, 150.0])
@@ -742,6 +784,28 @@ class Opening:
         self.ocean = self.earth[1100 - Y0 - 30:1100 - Y0 + 30, 1450:1650].reshape(-1, 3).mean(0) / 255.0
         self.build_lights()
         self._page_t = None
+        self._levels = {}
+
+    def plate_sample(self, name, x, y, mask):
+        """remap a 3072-px plate (earth or sky) at plate index coords (x, y). With AA, from the coarsest prefiltered level
+        that is still at least as dense as the screen, with a bicubic remap (near 1:1); at the landed camera the level at
+        the frame's own scale is sampled on whole pixels, i.e. without interpolation."""
+        plate = getattr(self, name)
+        if not AA:
+            return cv2.remap(plate, x.astype(np.float32), y.astype(np.float32), cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
+        dens = plate_density(x, y, mask)
+        f = 1.0
+        for lv in LEVELS:
+            if lv * dens >= 0.98:
+                f = lv
+        key = (name, f)
+        if key not in self._levels:
+            h, w = plate.shape[:2]
+            self._levels[key] = plate if f == 1.0 else aa_resize(plate, f, int(np.ceil(w * f)), int(np.ceil(h * f)),
+                                                                  border=cv2.BORDER_REFLECT)
+        out = cv2.remap(self._levels[key], (x * f).astype(np.float32), (y * f).astype(np.float32), cv2.INTER_CUBIC,
+                        borderMode=cv2.BORDER_REFLECT)
+        return np.maximum(out, 0.0)
 
     # the flourish's points (for the pen) and the lights along every line
     def build_lights(self):
@@ -803,14 +867,14 @@ class Opening:
             x1 = (CX1 + F * (v @ RX) / z) / S
             y1 = (360.0 - F * (v @ UP1) / z) / S
             hidden = (X @ C1) < 1.0 + 1e-4
-            earth = cv2.remap(self.earth, x1.astype(np.float32), y1.astype(np.float32), cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
+            earth = self.plate_sample('earth', x1, y1, hitm)
             mu = np.clip(-(D * X).sum(-1), 0, 1)
             hz = np.where(hidden, 1.0, np.exp(-mu / 0.07) * (1.0 - ease(0.93, 0.995, cam['zm'])))
             earth = earth * (1 - hz[..., None]) + self.haze * hz[..., None]
             dz = D @ FW1
             sx = (CX1 + F * (D @ RX) / dz) / S
             sy = (360.0 - F * (D @ UP1) / dz) / S
-            sky = cv2.remap(self.sky, sx.astype(np.float32), sy.astype(np.float32), cv2.INTER_LINEAR, borderMode=cv2.BORDER_REFLECT)
+            sky = self.plate_sample('sky', sx, sy, ~hitm)
             img = np.where(hitm[..., None], earth, sky)
             k_atm = 1.0 - ease(0.80, 0.99, cam['zm'])
             if k_atm > 0:
@@ -886,8 +950,14 @@ class Opening:
             tx = (640 - 640 * s) * zf + PUSH_C[0] * (1 - zf)
             ty = (720 - 720 * s + dy) * zf + PUSH_C[1] * (1 - zf)
             M = np.float32([[sc, 0, tx], [0, sc, ty]])
-            acc_c += cv2.warpAffine(pre, M, (W, H), flags=cv2.INTER_AREA if sc < 1 else cv2.INTER_LINEAR)
-            acc_a += cv2.warpAffine(a, M, (W, H), flags=cv2.INTER_LINEAR)
+            if AA and sc < 1:                                            # warpAffine's own index mapping, antialiased
+                r = aa_resize(np.dstack([pre, a]).astype(np.float32), sc, W, H, -tx / sc, -ty / sc)
+                al = np.clip(r[..., 3], 0, 1)
+                acc_c += np.clip(r[..., :3], 0, 255 * al[..., None])
+                acc_a += al
+            else:
+                acc_c += cv2.warpAffine(pre, M, (W, H), flags=cv2.INTER_AREA if sc < 1 else cv2.INTER_LINEAR)
+                acc_a += cv2.warpAffine(a, M, (W, H), flags=cv2.INTER_LINEAR)
         n = float(len(subs))
         return img * (1 - acc_a[..., None] / n) + acc_c / n
 

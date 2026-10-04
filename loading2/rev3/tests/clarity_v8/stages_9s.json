@@ -1,0 +1,172 @@
+{
+ "stages": [
+  [
+   "1 source take (decoded, native 1280x720)",
+   {
+    "eye": {
+     "fine": 6.727,
+     "acut": 36.38,
+     "chroma": 1.152,
+     "psnr_vs_lossless": 168.13
+    },
+    "horn_hair": {
+     "fine": 6.668,
+     "acut": 46.28,
+     "chroma": 0.905,
+     "psnr_vs_lossless": 168.13
+    },
+    "profile": {
+     "fine": 6.024,
+     "acut": 40.87,
+     "chroma": 1.255,
+     "psnr_vs_lossless": 168.13
+    },
+    "cloth": {
+     "fine": 7.173,
+     "acut": 43.16,
+     "chroma": 1.174,
+     "psnr_vs_lossless": 168.13
+    }
+   }
+  ],
+  [
+   "2 processed S1, lossless (light mask + light)",
+   {
+    "eye": {
+     "fine": 6.727,
+     "acut": 36.38,
+     "chroma": 1.152,
+     "psnr_vs_lossless": 168.13
+    },
+    "horn_hair": {
+     "fine": 6.668,
+     "acut": 46.28,
+     "chroma": 0.905,
+     "psnr_vs_lossless": 168.13
+    },
+    "profile": {
+     "fine": 6.024,
+     "acut": 40.87,
+     "chroma": 1.255,
+     "psnr_vs_lossless": 168.13
+    },
+    "cloth": {
+     "fine": 7.173,
+     "acut": 43.16,
+     "chroma": 1.174,
+     "psnr_vs_lossless": 168.13
+    }
+   }
+  ],
+  [
+   "3 P1_light_catch_720p.mp4 (crf 16) decoded",
+   {
+    "eye": {
+     "fine": 6.59,
+     "acut": 35.61,
+     "chroma": 0.872,
+     "psnr_vs_lossless": 38.58
+    },
+    "horn_hair": {
+     "fine": 6.57,
+     "acut": 45.67,
+     "chroma": 0.679,
+     "psnr_vs_lossless": 39.15
+    },
+    "profile": {
+     "fine": 5.914,
+     "acut": 40.13,
+     "chroma": 0.904,
+     "psnr_vs_lossless": 39.66
+    },
+    "cloth": {
+     "fine": 7.074,
+     "acut": 42.5,
+     "chroma": 0.903,
+     "psnr_vs_lossless": 39.5
+    }
+   }
+  ],
+  [
+   "4 v7 cache PNG (= stage 3, read back)",
+   {
+    "eye": {
+     "fine": 6.59,
+     "acut": 35.61,
+     "chroma": 0.872,
+     "psnr_vs_lossless": 38.58
+    },
+    "horn_hair": {
+     "fine": 6.57,
+     "acut": 45.67,
+     "chroma": 0.679,
+     "psnr_vs_lossless": 39.15
+    },
+    "profile": {
+     "fine": 5.914,
+     "acut": 40.13,
+     "chroma": 0.904,
+     "psnr_vs_lossless": 39.66
+    },
+    "cloth": {
+     "fine": 7.074,
+     "acut": 42.5,
+     "chroma": 0.903,
+     "psnr_vs_lossless": 39.5
+    }
+   }
+  ],
+  [
+   "5 v7 delivered mp4 (crf 18) decoded",
+   {
+    "eye": {
+     "fine": 6.557,
+     "acut": 35.14,
+     "chroma": 0.96,
+     "psnr_vs_lossless": 34.57
+    },
+    "horn_hair": {
+     "fine": 6.54,
+     "acut": 45.35,
+     "chroma": 0.662,
+     "psnr_vs_lossless": 34.63
+    },
+    "profile": {
+     "fine": 5.861,
+     "acut": 39.67,
+     "chroma": 0.891,
+     "psnr_vs_lossless": 35.22
+    },
+    "cloth": {
+     "fine": 7.053,
+     "acut": 42.37,
+     "chroma": 0.848,
+     "psnr_vs_lossless": 35.18
+    }
+   }
+  ]
+ ],
+ "generation": {
+  "eye0": {
+   "still": 5.76,
+   "take0": 4.876,
+   "ratio": 0.846,
+   "acut_still": 41.57,
+   "acut_take0": 36.44
+  },
+  "horn_hair0": {
+   "still": 2.798,
+   "take0": 2.506,
+   "ratio": 0.895,
+   "acut_still": 12.72,
+   "acut_take0": 11.78
+  },
+  "cloth0": {
+   "still": 8.596,
+   "take0": 7.13,
+   "ratio": 0.829,
+   "acut_still": 50.62,
+   "acut_take0": 43.2
+  }
+ }
+}
