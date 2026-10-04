@@ -6,8 +6,8 @@ Changes against rev1, applied here so rev1's own code stays reproducible:
   - camera zoom on the plates is capped at ZMAX = 1.3 (= the 1536-px approved original at about 1.08x on a 1280 frame;
     rev1 went to 2.75 in S17); where the cap applies, the frame centre is kept inside the plate. S12 keeps its push into
     the painting (that shot is about where the picture ends).
-  - colour washes arrive with a softer edge (soak 0.07 -> 0.22 s, wet-edge pooling 0.28 -> 0.12), so they read as paint
-    coming in, not as torn paper.
+  - colour washes: the arrival maps are smoothed (sigma 24 plate px) and soak a little longer (0.07 -> 0.22-0.6 s, wet-edge
+    pooling 0.28 -> 0.12 or less), so the front is a defined organic paint edge, not torn paper.
   - one resample: rev1 renders 1920x1080 float; this downscales once to 1280x720 (Lanczos-3 + anti-ringing, as the
     opening) and writes PNG.
   python3 rev1_bridge.py OUTDIR S07 S09 ... [--frames a-b] [--step n] [--jobs 4]"""
@@ -24,7 +24,8 @@ NOCLAMP = {'S12'}
 # wash soak per shot, in seconds of the shot's own arrival map: where the wash front crosses the frame slowly
 # (S42 3.4 s, S46/S47 12 s per unit of distance) a 0.22 s soak left a hard, ragged dark blob on white paper
 S07_SHIFT = (185.0, 126.0)
-SOAK = {'S42': 0.40, 'S46': 0.9, 'S47': 0.9}
+SOAK = {'S42': 0.25, 'S46': 0.6, 'S47': 0.6}
+WASH_SIGMA = 24.0                                                     # plate px: smooths the wash arrival maps' fine noise
 _CUR = {'shot': None}
 
 
@@ -63,6 +64,14 @@ def _patch():
         col = col * (1 - 0.12 * min(1.0, 0.3 / soak) * wet[:, :, None])
         return shots_a.over(base, col, a)
     shots_a.wash_over = wash_over
+    # wash arrival maps: rev1's front followed noise down to ~30 plate px (a ragged, torn edge). A wide soak hid that
+    # but read as smoke; instead smooth the map itself (the domain-warped shape stays) and keep a short soak, so the
+    # front is a defined, organic paint edge
+    wa0 = shots_a.wash_arrival
+
+    def wash_arrival(shape, origin, t_start, dur, seed=0, warp=240.0):
+        return cv2.GaussianBlur(wa0(shape, origin, t_start, dur, seed=seed, warp=warp), (0, 0), WASH_SIGMA)
+    shots_a.wash_arrival = wash_arrival
     # S12: rev1 pushed 14x into the painting, then showed its pixels (nearest-neighbour blocks) and random-noise fog.
     # v9: a gentler push (to 3.2x) while the paint thins, defocused, into the paper it is painted on: long fibres and
     # tooth, procedural and sharp at this scale (the edge of what's known is the sheet itself). No pixel blocks, no noise.
@@ -137,6 +146,8 @@ def _patch():
         mod = __import__(m)
         if hasattr(mod, 'wash_over'):
             mod.wash_over = wash_over
+        if hasattr(mod, 'wash_arrival'):
+            mod.wash_arrival = wash_arrival
         if hasattr(mod, 'Cam'):
             pass                                                              # same class object: patched in place
 

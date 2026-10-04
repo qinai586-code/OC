@@ -1,0 +1,286 @@
+{
+ "1_landing": {
+  "f72 A: horns, hair": {
+   "v8 final": {
+    "fine": 2.745,
+    "acut": 16.42
+   },
+   "v9 pre-encode": {
+    "fine": 3.192,
+    "acut": 17.52
+   },
+   "v9 final": {
+    "fine": 3.151,
+    "acut": 17.21
+   }
+  },
+  "f72 B: star clip, hair": {
+   "v8 final": {
+    "fine": 3.24,
+    "acut": 19.54
+   },
+   "v9 pre-encode": {
+    "fine": 2.271,
+    "acut": 12.43
+   },
+   "v9 final": {
+    "fine": 2.251,
+    "acut": 12.14
+   }
+  },
+  "f76 A: horns, hair": {
+   "v8 final": {
+    "fine": 3.34,
+    "acut": 20.43
+   },
+   "v9 pre-encode": {
+    "fine": 2.849,
+    "acut": 14.82
+   },
+   "v9 final": {
+    "fine": 2.831,
+    "acut": 14.63
+   }
+  },
+  "f76 B: star clip, hair": {
+   "v8 final": {
+    "fine": 4.78,
+    "acut": 27.79
+   },
+   "v9 pre-encode": {
+    "fine": 1.524,
+    "acut": 9.04
+   },
+   "v9 final": {
+    "fine": 1.472,
+    "acut": 8.61
+   }
+  },
+  "f80 A: horns, hair": {
+   "v8 final": {
+    "fine": 3.533,
+    "acut": 21.26
+   },
+   "v9 pre-encode": {
+    "fine": 2.642,
+    "acut": 13.69
+   },
+   "v9 final": {
+    "fine": 2.632,
+    "acut": 13.48
+   }
+  },
+  "f80 B: star clip, hair": {
+   "v8 final": {
+    "fine": 5.305,
+    "acut": 30.72
+   },
+   "v9 pre-encode": {
+    "fine": 1.661,
+    "acut": 9.45
+   },
+   "v9 final": {
+    "fine": 1.594,
+    "acut": 8.9
+   }
+  },
+  "f81 A: horns, hair": {
+   "v8 final": {
+    "fine": 3.507,
+    "acut": 21.17
+   },
+   "v9 pre-encode": {
+    "fine": 3.55,
+    "acut": 21.42
+   },
+   "v9 final": {
+    "fine": 3.55,
+    "acut": 21.38
+   }
+  },
+  "f81 B: star clip, hair": {
+   "v8 final": {
+    "fine": 5.278,
+    "acut": 30.65
+   },
+   "v9 pre-encode": {
+    "fine": 5.331,
+    "acut": 30.89
+   },
+   "v9 final": {
+    "fine": 5.332,
+    "acut": 30.85
+   }
+  },
+  "f84 A: horns, hair": {
+   "v8 final": {
+    "fine": 3.532,
+    "acut": 21.31
+   },
+   "v9 pre-encode": {
+    "fine": 3.549,
+    "acut": 21.42
+   },
+   "v9 final": {
+    "fine": 3.489,
+    "acut": 21.03
+   }
+  },
+  "f84 B: star clip, hair": {
+   "v8 final": {
+    "fine": 5.261,
+    "acut": 30.55
+   },
+   "v9 pre-encode": {
+    "fine": 5.306,
+    "acut": 30.81
+   },
+   "v9 final": {
+    "fine": 5.203,
+    "acut": 30.29
+   }
+  }
+ },
+ "2_rear": {
+  "f90 A: horns, hair": {
+   "v8 final": {
+    "fine": 2.807,
+    "acut": 17.75
+   },
+   "v9 pre-encode": {
+    "fine": 3.424,
+    "acut": 20.78
+   },
+   "v9 final": {
+    "fine": 3.338,
+    "acut": 20.23
+   }
+  },
+  "f90 B: star clip, ribbon": {
+   "v8 final": {
+    "fine": 4.15,
+    "acut": 25.27
+   },
+   "v9 pre-encode": {
+    "fine": 5.34,
+    "acut": 31.37
+   },
+   "v9 final": {
+    "fine": 5.252,
+    "acut": 30.93
+   }
+  },
+  "f120 A: horns, hair": {
+   "v8 final": {
+    "fine": 2.827,
+    "acut": 17.96
+   },
+   "v9 pre-encode": {
+    "fine": 3.367,
+    "acut": 20.24
+   },
+   "v9 final": {
+    "fine": 3.36,
+    "acut": 20.16
+   }
+  },
+  "f120 B: star clip, ribbon": {
+   "v8 final": {
+    "fine": 4.155,
+    "acut": 25.57
+   },
+   "v9 pre-encode": {
+    "fine": 5.194,
+    "acut": 30.59
+   },
+   "v9 final": {
+    "fine": 5.181,
+    "acut": 30.49
+   }
+  },
+  "f150 A: horns, hair": {
+   "v8 final": {
+    "fine": 2.764,
+    "acut": 17.5
+   },
+   "v9 pre-encode": {
+    "fine": 3.218,
+    "acut": 18.97
+   },
+   "v9 final": {
+    "fine": 3.156,
+    "acut": 18.62
+   }
+  },
+  "f150 B: star clip, ribbon": {
+   "v8 final": {
+    "fine": 3.977,
+    "acut": 24.72
+   },
+   "v9 pre-encode": {
+    "fine": 4.911,
+    "acut": 29.18
+   },
+   "v9 final": {
+    "fine": 4.879,
+    "acut": 29.03
+   }
+  }
+ },
+ "7_9s": {
+  "A: eye, lashes": {
+   "SOURCE": {
+    "fine": 6.01,
+    "acut": 35.21
+   },
+   "v8 final": {
+    "fine": 5.974,
+    "acut": 34.92
+   },
+   "v9 pre-encode": {
+    "fine": 6.01,
+    "acut": 35.21
+   },
+   "v9 final": {
+    "fine": 5.89,
+    "acut": 34.31
+   }
+  },
+  "A: horns, hair": {
+   "SOURCE": {
+    "fine": 6.668,
+    "acut": 46.28
+   },
+   "v8 final": {
+    "fine": 6.644,
+    "acut": 46.12
+   },
+   "v9 pre-encode": {
+    "fine": 6.668,
+    "acut": 46.28
+   },
+   "v9 final": {
+    "fine": 6.592,
+    "acut": 45.74
+   }
+  },
+  "A: collar, ribbon": {
+   "SOURCE": {
+    "fine": 7.173,
+    "acut": 43.16
+   },
+   "v8 final": {
+    "fine": 7.134,
+    "acut": 42.89
+   },
+   "v9 pre-encode": {
+    "fine": 7.173,
+    "acut": 43.16
+   },
+   "v9 final": {
+    "fine": 7.08,
+    "acut": 42.53
+   }
+  }
+ }
+}

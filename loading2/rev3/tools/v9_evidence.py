@@ -28,8 +28,9 @@ _cache = {}
 
 
 def mp4_frame(path, f):
-    raw = subprocess.check_output(['ffmpeg', '-v', 'error', '-i', path, '-vf', DEC + ',select=eq(n\\,%d)' % f, '-vsync', '0',
-                                   '-frames:v', '1', '-pix_fmt', 'bgr24', '-f', 'rawvideo', '-'])
+    # accurate seek: decoding starts at the keyframe before and frames before f/24 are dropped (checked against select=n)
+    raw = subprocess.check_output(['ffmpeg', '-v', 'error', '-ss', '%.6f' % ((f - 0.25) / 24), '-i', path, '-vf', DEC, '-frames:v', '1',
+                                   '-pix_fmt', 'bgr24', '-f', 'rawvideo', '-'])
     return np.frombuffer(raw, np.uint8).reshape(720, 1280, 3)
 
 
@@ -98,8 +99,9 @@ for f in (72, 76, 80, 81, 84):
             cells.append(('%s %s' % (t, rn[:2]), c(im, box)))
             metrics.setdefault('1_landing', {}).setdefault('f%d %s' % (f, rn), {})[t] = m(im, box)
     rows.append(('%.3f s (frame %d)' % (f / 24, f), cells))
-sheet('1_landing_3s', rows, 'Landing, 2.9-3.5 s. Pixels 1:1. v8 frames 72-80 carry the 520-px slide and its motion blur; v9 holds the '
-      'wide frame still until the first chime (3.344 s) and cuts to the rear two-shot between frames 80 and 81.')
+sheet('1_landing_3s', rows, 'Landing, 2.9-3.5 s. Pixels 1:1. v8 frames 72-80 carry the girls\' 520-px slide and its motion blur. v9 '
+      'removes the slide: before the cut only the Earth and sky are in frame (the camera\'s push continues, at a 0.075-frame '
+      'shutter), and the girls appear in place on the cut to the rear two-shot between frames 80 and 81 (first chime, 3.344 s).')
 
 # ---------------------------------------------------------------------------------------------------------------------
 # 2. 3.375-6.6 s rear two-shot: v8 = the Seedance rear take (soft in the file itself); v9 = the approved KV1 art.
@@ -178,10 +180,10 @@ sheet('4_D1_event_gaze', rows, 'D1. v9 source frames 0-44: the strip brightens (
 # 5. V1b 14.96-15.83 s: v8's note appeared at full exposure in the air; v9's rests in the palm under the glow and is
 #    revealed as the glow dims, then lifts and unfolds.
 rows = []
-box = (800, 150, 1180, 720)
+box = (520, 120, 1180, 620)
 for t, path in (('v8 final', V8), ('v9 final', V9)):
-    rows.append((t, [('%d %.2fs' % (f, f / 24), c(dec(path, f), box)) for f in (359, 362, 365, 369, 373, 378)]))
-sheet('5_V1b_paper_entrance', rows, 'The note\'s entrance. Pixels 1:1 (x 800-1180). v9: the note is in the palm cup from the start, '
+    rows.append((t, [('%d %.2fs' % (f, f / 24), c(dec(path, f), box)) for f in (359, 362, 366, 369, 373)]))
+sheet('5_V1b_paper_entrance', rows, 'The note\'s entrance. Pixels 1:1 (x 520-1180, y 120-620: palm and note). v9: the note is in the palm cup from the start, '
       'covered by the glow; as the glow shrinks (14.97-15.12 s) it shows, lifts (15.10-15.58 s) and unfolds toward the viewer in two folds.')
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -215,9 +217,9 @@ sheet('7_9s_S1_unchanged', rows, '9.000 s (frame 216 = take frame 88). Pixels 1:
 rows = []
 for f, box, note in ((1500, (320, 180, 960, 540), 'S12 62.5 s: rev1 pixel blocks + noise fog -> paint thinning into paper'),
                      (1650, (0, 0, 640, 360), 'S14 68.75 s: torn edge -> brushed edge'),
-                     (2040, (320, 180, 960, 540), 'S17 85.0 s: zoom 2.75 -> capped 1.3 (sharper, wider)'),
-                     (4224, (440, 300, 1080, 660), 'S42 176.0 s: hard wash front -> soft wash'),
-                     (4910, (640, 100, 1280, 460), 'S47 204.6 s: hard wash front -> soft wash')):
+                     (1980, (320, 180, 960, 540), 'S17 82.5 s: zoom 2.5 -> capped 1.3 (wider; the approved art no longer magnified 2x)'),
+                     (4224, (440, 300, 1080, 660), 'S42 176.0 s: ragged wash front -> smoothed front'),
+                     (4910, (640, 100, 1280, 460), 'S47 204.6 s: ragged wash front -> smoothed front')):
     rows.append(('frame %d  %s' % (f, note), [('rev1 final (720p preview)', c(dec(REV1, f), box)), ('v9 pre-encode', c(master_frame(f), box)),
                                               ('v9 final', c(dec(V9, f), box))]))
 sheet('8_rev1_vs_v9_43-213s', rows, 'Original project shots, before (rev1\'s own 720p preview) and after (v9). Pixels 1:1. v9 also removes '
