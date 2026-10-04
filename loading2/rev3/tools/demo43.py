@@ -40,6 +40,7 @@ AUDIO = OI.AUDIO
 OUT = os.path.join(R, 'tests', 'DEMO_0-43_v7_720p.mp4')                      # v6, v5, v4, v3 stay in tests/ for comparison
 STRIP = os.path.join(R, 'tests', 'DEMO_0-43_v7_strip.jpg')
 LOG = os.path.join(R, 'tests', 'DEMO_0-43_v7_shots.json')
+STAGE = os.environ.get('DEMO_STAGE', 'v9')                                       # v9 fixes; DEMO_STAGE=v8 reproduces v8
 CACHE = os.environ.get('DEMO_CACHE') or '/tmp/claude-0/-home-user-OC/c9b74a57-085e-5ad1-8a57-5167fd743993/scratchpad/v7/cache'
 S3_V5 = os.path.join(R, 'work', 'p1', 'S3_v5_frames.npy')   # the approved S3 with the v5 settle (tools/p1_local.build_s3)
 W, H, FPS, N = 1280, 720, 24, 1038
@@ -320,6 +321,41 @@ def put_bent(img, cam, c, u, v, w, h, tex, bend, focus=None, aperture=0.0, extra
     for cc, uu, tt in parts:
         img, _ = put_card(img, cam, card_corners(cc, uu, v, w / 2, h), np.ascontiguousarray(tt), focus=focus,
                           aperture=aperture, extra_blur=extra_blur)
+    return img
+
+
+def put_folded(img, cam, c, u, v, w, h, front, back, a_top, a_right, focus=None, aperture=0.0):
+    """v9: a letter folded in quarters (right half over the left, then the top over the bottom, toward the viewer, writing
+    inside), drawn as four quarter panels. a_top / a_right: fold angles of the top half and the right half (pi = closed,
+    0 = open). Each panel shows the letter's face or its back depending on which side faces the camera."""
+    c, u, v = (np.asarray(a_, np.float64) for a_ in (c, u, v))
+    u, v = u / np.linalg.norm(u), v / np.linalg.norm(v)
+    n = np.cross(u, v)
+    if (cam.p - c) @ n < 0:
+        n = -n
+    a_top, a_right = min(a_top, np.pi - 0.05), min(a_right, np.pi - 0.07)              # paper has thickness
+    v1 = v * np.cos(a_top) + n * np.sin(a_top)
+    n1 = n * np.cos(a_top) - v * np.sin(a_top)
+    u2 = u * np.cos(a_right) + n * np.sin(a_right)
+    u2t = u * np.cos(a_right) + n1 * np.sin(a_right)
+    hh, ww = front.shape[:2]
+    panels = []
+    for qx, qy in ((0, 0), (0, 1), (1, 0), (1, 1)):                                    # (right?, top?)
+        ex = u2t if (qx and qy) else (u2 if qx else u)
+        ey = v1 if qy else v
+        xs = (0.0, w / 2) if qx else (-w / 2, 0.0)
+        ys = (h / 2, 0.0) if qy else (0.0, -h / 2)
+        corners = np.array([c + ex * xs[0] + ey * ys[0], c + ex * xs[1] + ey * ys[0], c + ex * xs[1] + ey * ys[1],
+                            c + ex * xs[0] + ey * ys[1]])
+        ty0, ty1 = (0, hh // 2) if qy else (hh // 2, hh)
+        tx0, tx1 = (ww // 2, ww) if qx else (0, ww // 2)
+        xy, z = cam.project(corners)
+        area = (xy[1, 0] - xy[0, 0]) * (xy[3, 1] - xy[0, 1]) - (xy[1, 1] - xy[0, 1]) * (xy[3, 0] - xy[0, 0])
+        tex = front if area > 0 else back                                                # flipped panel: its back faces us
+        panels.append((float(z.mean()), corners, np.ascontiguousarray(tex[ty0:ty1, tx0:tx1])))
+    panels.sort(key=lambda q: -q[0])
+    for _, corners, tex in panels:
+        img, _ = put_card(img, cam, corners, tex, focus=focus, aperture=aperture)
     return img
 
 
@@ -1184,12 +1220,17 @@ class Verse:
         piece(40, 420, 'near', [-1.15, 0.0, 0.18], [1.0, 0.0, 0.0], 0.95, 1)
         g = paper(2640, 1148, 9, tone=(0.74, 0.84, 0.90))                                 # the page: 6.6 x 2.87, z -0.47..2.4 (wider than the hill)
         for k in self.TOWN:                                                              # pop-up creases along the folds
+            if STAGE == 'v9' and k == 'hill':                                            # v9: the hill and the page are one print
+                continue
             y = int((2.4 - self.TOWN[k][0]) / 2.87 * 1148)
             cv2.line(g, (0, y), (2639, y), (0.55, 0.62, 0.68), 2, cv2.LINE_AA)
             cv2.line(g, (0, y + 2), (2639, y + 2), (0.86, 0.94, 0.98), 1, cv2.LINE_AA)
 
         def gp(q):                                                                       # page point -> ground texture px
             return np.array([(q[0] + 3.3) / 6.6 * 2640, (2.4 - q[2]) / 2.87 * 1148])
+        if STAGE == 'v9':
+            g = g * self.ground_print()[..., None]                                       # the hill's own ground, continued
+            self.ground_noroad = np.dstack([g.copy(), np.ones((1148, 2640), np.float32)])
         a_, b_, nn = self.road
         hw = 0.075
         poly = np.array([gp(a_ + nn * hw), gp(b_ + nn * hw * 0.8), gp(b_ - nn * hw * 0.8), gp(a_ - nn * hw)])
@@ -1210,6 +1251,58 @@ class Verse:
                      tuple(float(v) for v in INK), 2, cv2.LINE_AA, shift=2)
         self.ground = np.dstack([g, np.ones((1148, 2640), np.float32)])
         self.crest = self.hill_world(self.HILL_TINDER)                                  # the fire's place on the hill card
+
+    def ground_map(self):
+        """v9: page texture px -> hill-plate px (two tilings and their blend). The page in front of the hill card is
+        printed with the plate's own near ground (rows 760-941, far to near in the same orientation as on the card, never
+        mirrored, so nothing reads as a reflection). Each further band shifts sideways; neighbouring bands cross-fade."""
+        if not hasattr(self, '_gmap'):
+            gy, gx = np.mgrid[0:1148, 0:2640].astype(np.float32)
+            x = gx / 400.0 - 3.3
+            z = 2.4 - gy / 400.0
+            card_px = 2472.0 / self.TOWN['hill'][1]                                      # card texture px per unit
+            d = np.clip(self.TOWN['hill'][0] - z, 0, None) * card_px * 0.55              # distance in front of the card, in rows
+            band = 181.0
+            maps = []
+            for off in (0.0, band / 2):
+                dd = d + off
+                tile = np.floor(dd / band)
+                row = 760.0 + np.mod(dd, band)
+                cx = x * card_px + 1236.0 + tile * 397.0 + off * 2.3
+                cx = np.mod(cx, 2 * 2471.0)
+                cx = np.where(cx > 2471, 2 * 2471 - cx, cx)
+                col = np.clip(cx - self.HILL_PAD, 0, 1671)
+                maps.append((col.astype(np.float32), row.astype(np.float32)))
+            w0 = np.abs(np.mod(d, 181.0) / 181.0 - 0.5) * 2                               # 1 mid-band, 0 at its seams
+            wA = np.clip((1 - w0) * 1.6 - 0.3, 0, 1)
+            self._gmap = (maps, wA.astype(np.float32), z)
+        return self._gmap
+
+    def _ground_sample(self, img):
+        maps, wA, z = self.ground_map()
+        a = cv2.remap(img, maps[0][0], maps[0][1], cv2.INTER_LINEAR)
+        b = cv2.remap(img, maps[1][0], maps[1][1], cv2.INTER_LINEAR)
+        w = wA if img.ndim == 2 else wA[..., None]
+        return a * (1 - w) + b * w, z
+
+    def ground_print(self):
+        """the page's terrain print: the plate's ground luminance in the hill print's paper tones (factor on the paper)."""
+        pl = self.plate5('first_fire_hill_wide_v1')
+        l0 = np.ascontiguousarray(pl.mean(2))
+        lo = cv2.GaussianBlur(l0, (0, 0), 7.0)                                           # its tones, and only a third of its
+        lum, z = self._ground_sample(lo + 0.33 * (l0 - lo))                               # edges (ledges flatten into stripes on the page)
+        ln = np.clip((lum - 0.02) / 0.27, 0, 1)
+        k = 0.40 + 0.70 * ln
+        k = np.where(z < self.TOWN['hill'][0] + 0.02, k, 1.0)                            # behind the card: plain page
+        return cv2.GaussianBlur(k.astype(np.float32), (0, 0), 0.8)
+
+    def ground_real(self):
+        """the same ground in the plate's painted colours (for the end of D4, when the print becomes the place)."""
+        if not hasattr(self, '_greal'):
+            pl = self.plate5('first_fire_hill_wide_v1')
+            lo = cv2.GaussianBlur(pl, (0, 0), 7.0)
+            self._greal = self._ground_sample(np.ascontiguousarray(lo + 0.33 * (pl - lo)))[0]
+        return self._greal
 
     HILL_ROW0, HILL_PAD, HILL_UNITS = 515, 400, 3.5      # the card: plate rows 515..941, mirrored 400 px past each side
 
@@ -1319,16 +1412,30 @@ class Verse:
         def world(q, z):                                                                 # screen point at depth z
             return np.array([(q[0] - 640) / F * (3.0 + z), -(q[1] - 360) / F * (3.0 + z), z])
         pw, ph = self.page_wh
-        a1 = ease(14.97, 15.58, t)                                                       # opening beside her
+        if STAGE == 'v9':
+            # v9: no sheet grows out of a point. The light in her palm dims to show what it is: a small note, folded in
+            # quarters and lit from inside. It lifts off the palm, its top half opens, then its right half, as it rises
+            # toward us beside her; its size never changes, only its distance (z 0 at her palm, -1.6 beside her).
+            a1 = ease(15.10, 15.58, t)                                                   # rests in the cup, then lift and travel
+            h_full = 0.233
+            s_, (tx_, ty_) = self.V1B_S, self.V1B_T
+            palm_c = world(np.array([s_ * 1005.0 + tx_, s_ * 594.0 + ty_]), 0.0)          # on the palm's cup (candidate px 1005, 600)
+            A_ctr = palm_c * (1 - a1) + world((935.0, 285.0), -1.6) * a1 + np.array([0, 0.05, 0]) * np.sin(np.pi * a1)
+            A_sz = h_full
+            tilt = -np.radians(62) * (1 - smooth(a1 / 0.7)) + np.radians(10) * smooth(a1)  # lying in the palm, then upright
+            open_top = np.pi * (1 - ease(15.14, 15.34, t))
+            open_right = np.pi * (1 - ease(15.30, 15.50, t))
+        else:
+            a1 = ease(14.97, 15.58, t)                                                   # opening beside her
+            A_ctr = world(p, 0.0) * (1 - a1) + world((935.0, 285.0), 0.0) * a1 + np.array([0, 0.04, 0]) * np.sin(np.pi * a1)
+            A_sz = 0.10 + 0.40 * a1 ** 1.2
+            tilt = -np.radians(85) * (1 - smooth(a1 / 0.85)) + np.radians(10) * smooth(a1)  # top edge leans back a little
+            open_top = open_right = 0.0
         b1 = ease(15.60, 15.833, t)                                                      # then onto P1a's page (exact on frame 380)
-        # the float: a sheet of paper beside her, turned a little and gently flexed (not a flat panel)
-        A_ctr = world(p, 0.0) * (1 - a1) + world((935.0, 285.0), 0.0) * a1 + np.array([0, 0.04, 0]) * np.sin(np.pi * a1)
-        A_sz = 0.10 + 0.40 * a1 ** 1.2
-        tilt = -np.radians(85) * (1 - smooth(a1 / 0.85)) + np.radians(10) * smooth(a1)  # top edge leans back a little
         yaw = np.radians(-16.0) + np.radians(4.0) * np.sin(2 * np.pi * (t - 14.97) / 1.6)
         uA = rot_axis(np.array([1.0, 0, 0]), (0, 1, 0), yaw)
         vA = rot_axis(rot_axis(np.array([0, 1.0, 0]), (1, 0, 0), tilt), (0, 1, 0), yaw)
-        bendA = 0.22 * smooth(a1 / 0.6) + 0.05 * np.sin(2 * np.pi * (t - 14.97) / 1.1)
+        bendA = (0.22 * smooth(a1 / 0.6) + 0.05 * np.sin(2 * np.pi * (t - 14.97) / 1.1)) * (1.0 if STAGE != 'v9' else smooth((t - 15.48) / 0.12))
         # the arrival: P1a's first frame, its page pose carried into this camera (same lens, same screen geometry)
         Cp, focus = self.p1a_cam(15.875)
         Rm = np.stack([cam.rt, cam.up, cam.fw], 1) @ np.stack([Cp.rt, Cp.up, Cp.fw], 0)
@@ -1344,17 +1451,39 @@ class Verse:
         v /= np.linalg.norm(v)
         w_ = A_sz * pw / ph * (1 - b1) + pw / self.PU * b1
         h_ = A_sz * (1 - b1) + ph / self.PU * b1
+        c_mid = c.copy()                                                                 # where the folded block's middle is
+        if STAGE == 'v9':                                                                # the closed quarters sit in the lower left
+            c = c + u * w_ / 4 * (open_right / np.pi) + v * h_ / 4 * (open_top / np.pi)
         k = 0.6 * a1 + 0.4 * b1
         lit = self.lit_page(15.875)
         tex = np.dstack([lit * (0.6 + 0.4 * k) + np.array([0.25, 0.42, 0.55], np.float32) * (1 - k) ** 2, np.ones((ph, pw), np.float32)])
-        if b1 < 0.5:
+        if STAGE == 'v9' and (open_top > 0.01 or open_right > 0.01):
+            if not hasattr(self, '_note_back'):
+                bk = paper(pw, ph, 77, tone=(0.70, 0.78, 0.84))
+                ink = np.clip(1 - self.page.mean(2, keepdims=True) / max(float(self.page.mean()), 1e-3), 0, 1)
+                self._note_back = np.dstack([bk * (1 - 0.18 * ink), np.ones((ph, pw), np.float32)]).astype(np.float32)
+            glow_in = 1 - 0.6 * smooth((t - 15.10) / 0.40)                              # lit from inside while folded
+            back = self._note_back.copy()
+            back[..., :3] = back[..., :3] * np.array([0.42, 0.40, 0.46], np.float32) + np.array([0.25, 0.45, 0.62], np.float32) * glow_in
+            hot = 1 - ease(14.97, 15.12, t)                                              # first only a light; the paper shows as it dims
+            hotc = np.array([0.80, 0.93, 1.0], np.float32)
+            ftex, btex = tex.copy(), back
+            ftex[..., :3] = ftex[..., :3] * (1 - hot) + hotc * hot
+            btex[..., :3] = btex[..., :3] * (1 - hot) + hotc * hot
+            img = put_folded(img, cam, c, u, v, w_, h_, ftex, btex, open_top, open_right)
+        elif b1 < 0.5:
             img = put_bent(img, cam, c, u, v, w_, h_, tex, bendA * (1 - b1))
         else:                                                                            # P1a's depth of field comes in
             img, _ = put_card(img, cam, card_corners(c, u, v, w_, h_), tex, focus=focus, aperture=0.45 * smooth((b1 - 0.5) / 0.5),
                               dof_map=True)
         # the light: on the sheet, then exactly where P1a's reader light is on its first frame
-        lp = cam.project(c)[0][0] * (1 - b1) + cam.project(T(self.reader_light(15.875)))[0][0] * b1
-        img = glow(img, lp, (0.35 + 0.25 * k) * (1 - b1) + 0.16 * b1, 1.1 * (1 - 0.7 * k) * (1 - b1) + 0.9 * b1)
+        lp = cam.project(c_mid)[0][0] * (1 - b1) + cam.project(T(self.reader_light(15.875)))[0][0] * b1
+        if STAGE == 'v9':
+            shrink = ease(14.97, 15.12, t)                                               # the glow draws in to the note
+            img = glow(img, lp, (0.45 - 0.22 * shrink + 0.15 * k) * (1 - b1) + 0.16 * b1,
+                       (1.4 - 0.75 * shrink) * (1 - 0.5 * k) * (1 - b1) + 0.9 * b1)
+        else:
+            img = glow(img, lp, (0.35 + 0.25 * k) * (1 - b1) + 0.16 * b1, 1.1 * (1 - 0.7 * k) * (1 - b1) + 0.9 * b1)
         if b1 > 0:
             OI.dot(img, lp, 2.0, b1)
         return img
@@ -2229,7 +2358,8 @@ class Verse:
         return img
 
     # -- B's half: the paper town
-    def town_scene(self, t, cam, up, key, lights=None, focus=1.5, haze=None, stars=0.0, sun_x=None, cold=0.0, age=None, real=0.0, sky=None):
+    def town_scene(self, t, cam, up, key, lights=None, focus=1.5, haze=None, stars=0.0, sun_x=None, cold=0.0, age=None, real=0.0, sky=None,
+                   road=1.0):
         """the pop-up page. up[group]: 0 lying flat toward the viewer .. 1 standing .. 2 laid back flat behind its fold
         (going back in time folds a group backward, like closing a spread, not toward the viewer as it rose).
         key: warm light on the paper (0 night .. 1 dusk); lights[group]: fraction of windows lit; age[group]: the paper
@@ -2246,7 +2376,11 @@ class Verse:
         tint = night * (1 - key) + warm * key
         tint = tint * (1 - cold) + np.array([0.46, 0.34, 0.28], np.float32) * cold      # moonlight, cold
         g = self.ground.copy()
+        if STAGE == 'v9' and road < 1:                                                   # the road goes with the town
+            g = g * road + self.ground_noroad * (1 - road)
         g[..., :3] *= tint * 0.92
+        if STAGE == 'v9' and real > 0:                                                   # the page becomes the painted ground too
+            g[..., :3] = g[..., :3] * (1 - real) + self.ground_real() * np.float32(0.93) * real
         if sun_x is not None:                                                          # the light crossing the page
             xx = np.linspace(-3.3, 3.3, g.shape[1], dtype=np.float32)[None, :]
             g[..., :3] *= (1 + 0.45 * np.exp(-((xx - sun_x) / 0.9) ** 2))[..., None]
@@ -2292,6 +2426,8 @@ class Verse:
                 tex[..., :3] = tex[..., :3] * (1 - real) + self.hill_real[..., :3] * np.float32(0.93) * real
             hh = tex.shape[0]
             ao = 0.72 + 0.28 * smooth(np.arange(hh, 0, -1, dtype=np.float32) / 45.0)       # darker where it meets the page
+            if STAGE == 'v9' and grp == 'hill':                                           # v9: the hill print continues into the page
+                ao = 0.94 + 0.06 * ao
             tex[..., :3] *= ao[:, None, None]
             if sun_x is not None:
                 xx = np.linspace(-it['w'] / 2, it['w'] / 2, tex.shape[1], dtype=np.float32)[None, :]
@@ -2511,7 +2647,7 @@ class Verse:
         real = ease(38.55, 39.05, t)
         img = self.town_scene(t, cam, up, 0.12 * (1 - cold), lights, focus=focus, haze={'hill': 0.25 * (1 - cold), 'village': 0.12},
                               stars=0.0, cold=cold * (1 - real), age=age, real=real,
-                              sky=(self.hill_sky(cam), sk) if sk > 0 else None)
+                              sky=(self.hill_sky(cam), sk) if sk > 0 else None, road=1.0 - ease(36.85, 37.45, t))
         img = img * (1 - 0.18 * cold * (1 - real)) + np.array([14, 6, 0], np.float32) * cold * (1 - real)
         fin = ease(38.95, 39.15, t)
         if fin > 0:                                                                       # exactly D6's last window, before the fire

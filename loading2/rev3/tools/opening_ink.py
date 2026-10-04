@@ -67,6 +67,16 @@ T_FG = 2.62
 SHUTTER = 0.15 / 24                           # half the shutter (0.3 of a frame)
 T_PULL = 2.25                                 # the pull-back starts (gentle cubic ease to the landing)
 
+# v9 staging (OI_STAGE=v8 reproduces the v6-v8 landing). v6-v8 slid the observers up from below the frame (520 px in
+# 0.72 s, up to 50 px per frame) under a 0.3-frame shutter, which smeared them ("drag blur" at 2.7-3.3 s). v9: the
+# pull-back plays over the Earth alone and stops short of landing (PRE9 of the way); on the first chime the picture cuts
+# to the observers' two-shot (from what they see to who is seeing it). No layer slides; the background's shutter is
+# halved. A and B then look up at the climbing light; the hand stays on the stone (the shot ends at 6.625 on "two").
+STAGE = os.environ.get('OI_STAGE', 'v9')
+CUT9 = 3.36                                   # between frames 80 (3.333) and 81 (3.375), on the first chime (3.344)
+PRE9 = 0.86
+SHUTTER9 = 0.075 / 24
+
 
 def smooth(x):
     x = np.clip(x, 0.0, 1.0)
@@ -115,12 +125,15 @@ ALPHA_PAGE = np.radians(50.0)                              # the page tilts this
 
 def schedule(t):
     """zoom (0..1 of log distance), tilt angle, page-centre offset (radii, along RX)."""
-    zm = 0.99 * float(smooth((t - T_PULL) / (T_LAND - T_PULL)))
+    pg = float(smooth((t - T_PULL) / (T_LAND - T_PULL)))
+    if STAGE == 'v9':
+        pg = pg * PRE9 if t < CUT9 else 1.0
+    zm = 0.99 * pg
     if t > T_LAND:
         zm = 0.99 + 0.01 * (1 - (1 - min((t - T_LAND) / (7.5 - T_LAND), 1.0)) ** 2)
     push = 1.04 - 0.04 * ease(0.23, 1.95, t)                # a slow settle while the pen writes
     a1 = ALPHA_PAGE * float(smoother((t - 1.90) / 0.55))
-    a2 = (0.99 * ALPHA1 - ALPHA_PAGE) * float(smooth((t - T_PULL) / (T_LAND - T_PULL)))
+    a2 = (0.99 * ALPHA1 - ALPHA_PAGE) * pg
     al = a1 + a2
     if t > T_LAND:
         al = 0.99 * ALPHA1 + 0.01 * ALPHA1 * (1 - (1 - min((t - T_LAND) / (7.5 - T_LAND), 1.0)) ** 2)
@@ -678,6 +691,8 @@ B_HEAD = dict(box=(1740, 1040 - Y0, 2030, 1330 - Y0), top=1060 - Y0, neck=1320 -
 
 
 def girl_motion(t):
+    if STAGE == 'v9':                                # the hand stays on the stone; B looks up a little at the light
+        return ease(5.55, 6.35, t), 0.0, ease(5.90, 6.50, t)
     head_a = ease(5.55, 6.35, t)                     # A looks up on "three"
     hand_a = ease(6.60, 7.45, t)                     # her right hand leaves the stone on "two"
     head_b = ease(6.70, 7.35, t)                     # B turns toward her
@@ -718,7 +733,8 @@ class Girls:
         if ha > 0:
             col, a = self.head(col, a, A_HEAD, ha, dy=18.0, horn=18.0, dx=0.0)
         if hb > 0:
-            col, a = self.head(col, a, B_HEAD, hb, dy=8.0, horn=0.0, dx=13.0)
+            col, a = self.head(col, a, B_HEAD, hb, dy=8.0, horn=0.0, dx=13.0) if STAGE != 'v9' else \
+                self.head(col, a, B_HEAD, hb, dy=6.0, horn=0.0, dx=4.0)
         return col, a
 
     def head(self, col, a, spec, k, dy, horn, dx):
@@ -929,7 +945,7 @@ class Opening:
         return img + layer, xy[-1]
 
     def foreground(self, img, t, subs=(0.0,)):
-        if t < T_FG:
+        if t < T_FG or (STAGE == 'v9' and t < CUT9):
             return img
         acc_c = np.zeros((H, W, 3), np.float32)
         acc_a = np.zeros((H, W), np.float32)
@@ -939,7 +955,10 @@ class Opening:
             ts = t + dt
             u = float(np.clip((ts - T_FG) / (T_LAND - T_FG), 0, 1))
             u = 1 - (1 - u) ** 3
-            if ts <= T_LAND:
+            if STAGE == 'v9':                                           # in place from the cut; the same slow settle
+                s = 1.05 - 0.05 * (1 - (1 - np.clip((ts - CUT9) / (7.5 - CUT9), 0, 1)) ** 2)
+                dy = 0.0
+            elif ts <= T_LAND:
                 s = 1.35 + (1.05 - 1.35) * u
                 dy = 520.0 * (1 - u)
             else:
@@ -962,7 +981,10 @@ class Opening:
         return img * (1 - acc_a[..., None] / n) + acc_c / n
 
     def frame(self, t, subs=1):
-        dts = [0.0] if subs == 1 else list(np.linspace(-SHUTTER, SHUTTER, subs))
+        sh_ = SHUTTER9 if STAGE == 'v9' else SHUTTER
+        dts = [0.0] if subs == 1 else list(np.linspace(-sh_, sh_, subs))
+        if STAGE == 'v9' and subs > 1:                                  # never average across the cut
+            dts = [d for d in dts if (t + d < CUT9) == (t < CUT9)] or [0.0]
         acc = None
         for dt in dts:
             ts = t + dt
@@ -980,7 +1002,7 @@ class Opening:
                 img = glow(img, PUSH_C + (p - PUSH_C) * zb, sc * zb, it)
             acc = img if acc is None else acc + img
         img = acc / len(dts)
-        fg_subs = tuple(np.linspace(-SHUTTER, SHUTTER, 9)) if T_FG <= t <= T_LAND + 0.05 else (0.0,)
+        fg_subs = (0.0,) if STAGE == 'v9' else (tuple(np.linspace(-SHUTTER, SHUTTER, 9)) if T_FG <= t <= T_LAND + 0.05 else (0.0,))
         return self.foreground(img, t, fg_subs)
 
 
